@@ -26,4 +26,4 @@ clean-light:
 	find . -wholename '*.gch/c++' -exec rm '{}' \;
 
 archive:
-	tar -cf ../semester09_`date +%F_%H-%M-%S`.tar ./
+	tar -cf ../semester10_`date +%F_%H-%M-%S`.tar ./

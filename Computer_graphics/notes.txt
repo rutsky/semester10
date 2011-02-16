@@ -1,0 +1,7 @@
+Наталья Дмитриевна Смирнова <natalia.d.smirnova@gmail.com>
+https://sites.google.com/site/primatcgadvanced/
+
+Дифференцированный зачет + Экзамен
+
+Группа командой пишет семплы на темы: Mappings, Shading и Post Effects.
+Используем: VS 2008 Express, DXUT, DirectX 9 June 2010 SDK.

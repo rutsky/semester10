@@ -23,16 +23,38 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <vector>
 #include <stdexcept>
 #include <iomanip>
 
 #include <boost/assert.hpp>
 #include <boost/foreach.hpp>
 #include <boost/format.hpp>
+#include <boost/bind.hpp>
 
+// TODO: Rename to freq_table_t.
 class FreqTable : public std::map<char, double>
 {
 };
+
+// TODO: Rename to freq_table_t.
+class VectorFreqTable : public std::vector<std::pair<char, double> >
+{
+};
+
+VectorFreqTable toVector( FreqTable const &table )
+{
+  VectorFreqTable vec;
+  std::copy(table.begin(), table.end(), std::back_inserter(vec));
+  return vec;
+}
+
+void sort( VectorFreqTable &table )
+{
+  std::sort(table.begin(), table.end(), 
+      boost::bind(&VectorFreqTable::value_type::second, _1) <
+      boost::bind(&VectorFreqTable::value_type::second, _2));
+}
 
 // TODO: Maybe work on character iterator?
 template< class CharT, class Traits >

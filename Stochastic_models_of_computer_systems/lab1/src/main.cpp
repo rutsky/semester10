@@ -20,9 +20,39 @@
 #include "chi_square.h"
 #include "freq_table.hpp"
 
+bool decode( FreqTable const &trueTable, FreqTable const &table )
+{
+  VectorFreqTable trueTableVec = toVector(trueTable);
+  VectorFreqTable tableVec = toVector(table);
+
+  sort(trueTableVec);
+  sort(tableVec);
+}
+
 int main( int argc, char *argv[] )
 {
-  //freq_table table = 
+  if (argc != 2)
+  {
+    std::cout << 
+        "Usage:\n" <<
+        "  " << argv[0] << " true_freq_table < encoded_text\n";
+    return 0;
+  }
+
+  FreqTable trueTable;
+  {
+    std::fstream trueTableFS(argv[1]);
+    if (!trueTableFS)
+    {
+      perror(argv[1]);
+      return 1;
+    }
+    trueTableFS >> trueTable;
+  }
+
+  FreqTable table = calcFreqTable(std::cin);
+
+  decode(trueTable, table);
 }
 
 // vim: set ts=2 sw=2 et:

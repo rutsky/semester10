@@ -40,7 +40,9 @@ decode_result_t decode( FreqTable const &trueTable, FreqTable const &table,
   sort(tableVec);
 
   double const chi2 = chiSquareCharact(trueTableVec, tableVec);
+  std::cout << chi2 << "\n";
   double const chi2Cr = chiSquareCritical(alpha, trueTableVec.size());
+  std::cout << chi2Cr << "\n";
   if (chi2 < chi2Cr)
   {
     biection_t const biection = buildBiection(trueTableVec, tableVec);

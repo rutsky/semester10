@@ -16,17 +16,38 @@
  */
 
 #include <iostream>
+#include <vector>
+
+#include <boost/optional.hpp>
 
 #include "chi_square.h"
 #include "freq_table.hpp"
 
-bool decode( FreqTable const &trueTable, FreqTable const &table )
+typedef boost::optional<biection_t const> decode_result_t;
+
+decode_result_t decode( FreqTable const &trueTable, FreqTable const &table, 
+                        double alpha )
 {
-  VectorFreqTable trueTableVec = toVector(trueTable);
-  VectorFreqTable tableVec = toVector(table);
+  FreqTable trueTableCopy(trueTable);
+  FreqTable tableCopy(table);
+
+  updateWithKeys(trueTableCopy, tableCopy);
+
+  VectorFreqTable trueTableVec = toVector(trueTableCopy);
+  VectorFreqTable tableVec = toVector(tableCopy);
 
   sort(trueTableVec);
   sort(tableVec);
+
+  double const chi2 = chiSquareCharact(trueTableVec, tableVec);
+  double const chi2Cr = chiSquareCritical(alpha, trueTableVec.size());
+  if (chi2 < chi2Cr)
+  {
+    biection_t const biection = buildBiection(trueTableVec, tableVec);
+    return decode_result_t(biection);
+  }
+  else
+    return decode_result_t();
 }
 
 int main( int argc, char *argv[] )
@@ -50,9 +71,23 @@ int main( int argc, char *argv[] )
     trueTableFS >> trueTable;
   }
 
-  FreqTable table = calcFreqTable(std::cin);
+  std::string input(
+      std::istream_iterator<char>(std::cin),
+      std::istream_iterator<char>());
+  FreqTable table = calcFreqTable(input.begin(), input.end());
 
-  decode(trueTable, table);
+  double const alpha = 0.9;
+  decode_result_t res = decode(trueTable, table, alpha);
+  if (res)
+  {
+
+  }
+  else
+  {
+    std::cout << 
+      "Input message is not encoded English text "
+      "with statistical significance " << alpha << "\n";
+  }
 }
 
 // vim: set ts=2 sw=2 et:

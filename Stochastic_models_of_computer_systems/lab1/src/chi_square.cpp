@@ -22,7 +22,7 @@
 
 #include "common.hpp"
 
-// TODO: Rename to somethinf about quantiles.
+// TODO: Rename to something about quantiles.
 double chiSquareCritical( double alpha, size_t n )
 {
   // Golberg H., Levine H. Approximate formulas for the percentage points and 

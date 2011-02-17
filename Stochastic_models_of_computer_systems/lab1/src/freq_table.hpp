@@ -32,6 +32,8 @@
 #include <boost/format.hpp>
 #include <boost/bind.hpp>
 
+#include "common.hpp"
+
 // TODO: Rename to freq_table_t.
 class FreqTable : public std::map<char, double>
 {
@@ -41,6 +43,21 @@ class FreqTable : public std::map<char, double>
 class VectorFreqTable : public std::vector<std::pair<char, double> >
 {
 };
+
+void updateWithKeys( FreqTable &table1, FreqTable &table2 )
+{
+  // TODO: Not optimal.
+  BOOST_FOREACH(FreqTable::value_type const &pair, table1)
+  {
+    if (table2.find(pair.first) == table2.end())
+      table2[pair.first] = 0;
+  }
+  BOOST_FOREACH(FreqTable::value_type const &pair, table2)
+  {
+    if (table1.find(pair.first) == table1.end())
+      table1[pair.first] = 0;
+  }
+}
 
 VectorFreqTable toVector( FreqTable const &table )
 {
@@ -56,20 +73,47 @@ void sort( VectorFreqTable &table )
       boost::bind(&VectorFreqTable::value_type::second, _2));
 }
 
-// TODO: Maybe work on character iterator?
-template< class CharT, class Traits >
+double chiSquareCharact( VectorFreqTable const &trueVec, 
+                         VectorFreqTable const &vec )
+{
+  BOOST_ASSERT(trueVec.size() == vec.size());
+  
+  size_t const n(trueVec.size());
+  double ch(0);
+  for (size_t i = 0; i < n; ++i)
+  {
+    ch += sqr(vec[i].second - trueVec[i].second) / trueVec[i].second;
+  }
+
+  return ch * n;
+}
+
+typedef std::map<char, char> biection_t;
+biection_t buildBiection( VectorFreqTable const &trueVec, 
+                          VectorFreqTable const &vec )
+{
+  BOOST_ASSERT(trueVec.size() == vec.size());
+
+  biection_t biection;
+  for (size_t i = 0; i < vec.size(); ++i)
+  {
+    BOOST_ASSERT(biection.find(vec[i].first) == biection.end());
+    biection[vec[i].first] = trueVec[i].first;
+  }
+
+  return biection;
+}
+
+template< class CharInputIt >
 inline
-FreqTable calcFreqTable( std::basic_istream<CharT, Traits> &is )
+FreqTable calcFreqTable( CharInputIt first, CharInputIt beyond )
 {
   FreqTable table;
   double totalCount(0);
 
-  while (true)
+  for (; first != beyond; ++first)
   {
-    char ch;
-    is >> ch;
-    if (!is)
-      break;
+    char ch = *first;
 
     if (table.find(ch) == table.end())
       table[ch] = 0;
@@ -84,6 +128,18 @@ FreqTable calcFreqTable( std::basic_istream<CharT, Traits> &is )
   }
 
   return table;
+}
+
+// TODO: Maybe work on character iterator?
+// TODO: Move to separate file `freq_table_io.hpp' and other source from here
+// move to freq_table.cpp.
+template< class CharT, class Traits >
+inline
+FreqTable calcFreqTable( std::basic_istream<CharT, Traits> &is )
+{
+  return calcFreqTable(
+      std::istream_iterator<char>(is),
+      std::istream_iterator<char>());
 }
 
 template< class CharT, class Traits >

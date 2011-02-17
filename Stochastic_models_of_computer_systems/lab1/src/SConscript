@@ -14,16 +14,39 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import os.path
+import itertools
 
-global_env = Environment()
-Export('global_env')
+import SCons.Util
 
-global_env.AppendUnique(LIBS=['m'])
+Import('global_env')
+env = global_env.Clone()
 
-SConscript(os.path.join("report", "SConscript"), 
-    variant_dir=os.path.join("build", "report"))
-SConscript(os.path.join("src", "SConscript"), 
-    variant_dir=os.path.join("build", "src"))
+sources = ['chi_square.cpp']
+
+main = env.Program(target="main",
+    source=['main.cpp'] + sources)
+
+Default(main)
+
+test_env = env.Clone()
+test_env.AppendUnique(
+    #LIBPATH=['#boost-lib'],
+    LIBS=['boost_unit_test_framework'])
+test_sources = (
+    [test_env.Object('test_' + cpp.replace('.cpp', ''), cpp) 
+        for cpp in sources] +
+    ['chi_square_test.cpp']
+    )
+test = test_env.Program(target="test",
+    source=['unit_testing.cpp'] + test_sources)
+
+run_tests = Command(
+    ".passed",
+    test,
+    "{tests} && date -R > $TARGET".\
+        format(tests=str(test[0].abspath))) 
+
+Default(run_tests)
 
 # vim: set filetype=python ts=4 sw=4 et:

@@ -66,8 +66,8 @@ FreqTable calcFreqTable( std::basic_istream<CharT, Traits> &is )
 
 template< class CharT, class Traits >
 inline
-std::basic_istream<CharT, Traits> 
-    operator << ( std::basic_istream<CharT, Traits> &is, FreqTable &table )
+std::basic_istream<CharT, Traits> &
+    operator >> ( std::basic_istream<CharT, Traits> &is, FreqTable &table )
 {
   table.clear();
 
@@ -87,7 +87,7 @@ std::basic_istream<CharT, Traits>
     if (freq <= 0)
     {
       throw std::runtime_error(
-          boost::format("Invalid frequency string: %1%") % str);
+          (boost::format("Invalid frequency string: %1%") % str).str());
     }
 
     table[ch] = freq;
@@ -97,7 +97,8 @@ std::basic_istream<CharT, Traits>
   if (!table.empty() && freqSum < 0.999)
   {
     throw std::runtime_error(
-        boost::format("Sum of frequencies not even close to 1.0: %1%") % freqSum);
+        (boost::format(
+            "Sum of frequencies not even close to 1.0: %1%") % freqSum).str());
   }
 
   return is;
@@ -105,8 +106,8 @@ std::basic_istream<CharT, Traits>
 
 template< class CharT, class Traits >
 inline
-std::basic_ostream<CharT, Traits> 
-    operator >> ( std::basic_ostream<CharT, Traits> &os, 
+std::basic_ostream<CharT, Traits> &
+    operator << ( std::basic_ostream<CharT, Traits> &os, 
                   FreqTable const &table )
 {
   BOOST_FOREACH(FreqTable::value_type const &pair, table)

@@ -43,6 +43,20 @@ BOOST_AUTO_TEST_CASE(test_main)
   BOOST_CHECK_CLOSE(table['b'], 1.0 / 7, 1e-3);
   BOOST_CHECK_CLOSE(table['c'], 2.0 / 7, 1e-3);
   BOOST_CHECK_CLOSE(table['d'], 1.0 / 7, 1e-3);
+
+  {
+    std::ostringstream ostr;
+    ostr << table;
+    std::istringstream istr(ostr.str());
+    FreqTable table2;
+    istr >> table2;
+
+    BOOST_CHECK_EQUAL(table2.size(), 4);
+    BOOST_CHECK_CLOSE(table2['a'], table['a'], 1e-3);
+    BOOST_CHECK_CLOSE(table2['b'], table['b'], 1e-3);
+    BOOST_CHECK_CLOSE(table2['c'], table['c'], 1e-3);
+    BOOST_CHECK_CLOSE(table2['d'], table['d'], 1e-3);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

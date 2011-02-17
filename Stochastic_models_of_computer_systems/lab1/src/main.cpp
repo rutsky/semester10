@@ -80,11 +80,17 @@ int main( int argc, char *argv[] )
   decode_result_t res = decode(trueTable, table, alpha);
   if (res)
   {
-
+    biection_t const &biection = *res;
+    BOOST_FOREACH(char ch, input)
+    {
+      biection_t::const_iterator it = biection.find(ch);
+      BOOST_ASSERT(it != biection.end());
+      std::cout << it->second;
+    }
   }
   else
   {
-    std::cout << 
+    std::cerr << 
       "Input message is not encoded English text "
       "with statistical significance " << alpha << "\n";
   }

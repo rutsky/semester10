@@ -15,14 +15,36 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
+#define BOOST_TEST_DYN_LINK
+#define BOOST_TEST_NO_MAIN
 
-#include "chi_square.h"
+#include <boost/test/unit_test.hpp>
+
 #include "freq_table.hpp"
 
-int main( int argc, char *argv[] )
+#include <sstream>
+
+BOOST_AUTO_TEST_SUITE(freq_table)
+
+BOOST_AUTO_TEST_CASE(test_main)
 {
-  //freq_table table = 
+  std::string testText("aabcacd");
+  std::istringstream istr(testText);
+
+  FreqTable table = calcFreqTable(istr);
+
+  BOOST_CHECK_EQUAL(table.size(), 4);
+  BOOST_CHECK(table.find('a') != table.end());
+  BOOST_CHECK(table.find('b') != table.end());
+  BOOST_CHECK(table.find('c') != table.end());
+  BOOST_CHECK(table.find('d') != table.end());
+
+  BOOST_CHECK_CLOSE(table['a'], 3.0 / 7, 1e-3);
+  BOOST_CHECK_CLOSE(table['b'], 1.0 / 7, 1e-3);
+  BOOST_CHECK_CLOSE(table['c'], 2.0 / 7, 1e-3);
+  BOOST_CHECK_CLOSE(table['d'], 1.0 / 7, 1e-3);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 // vim: set ts=2 sw=2 et:

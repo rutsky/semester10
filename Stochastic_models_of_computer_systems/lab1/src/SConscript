@@ -34,12 +34,14 @@ test_env.AppendUnique(
     #LIBPATH=['#boost-lib'],
     LIBS=['boost_unit_test_framework'])
 test_sources = (
-    [test_env.Object('test_' + cpp.replace('.cpp', ''), cpp) 
-        for cpp in sources] +
-    ['chi_square_test.cpp']
+    ['unit_testing.cpp'] + 
+    sources +
+    Glob('*_test.cpp', strings=True)
     )
-test = test_env.Program(target="test",
-    source=['unit_testing.cpp'] + test_sources)
+test_sources = [
+    test_env.Object('test_' + cpp.replace('.cpp', ''), cpp) 
+        for cpp in test_sources]
+test = test_env.Program(target="test", source=test_sources)
 
 run_tests = Command(
     ".passed",

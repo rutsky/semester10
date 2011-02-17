@@ -26,8 +26,8 @@ BOOST_AUTO_TEST_SUITE(chi_square)
 
 BOOST_AUTO_TEST_CASE(test_main)
 {
-  BOOST_CHECK_CLOSE(chiSquareCritical(0.2, 10),  6.1791, 0.02);
-  BOOST_CHECK_CLOSE(chiSquareCritical(0.8, 50), 58.1638, 0.02);
+  BOOST_CHECK_CLOSE(chiSquareCritical(0.2, 10),  6.1791, 0.2);
+  BOOST_CHECK_CLOSE(chiSquareCritical(0.8, 50), 58.1638, 0.2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -35,12 +35,12 @@
 #include "common.hpp"
 
 // TODO: Rename to freq_table_t.
-class FreqTable : public std::map<char, double>
+class FreqTable : public std::map<std::string, double>
 {
 };
 
 // TODO: Rename to freq_table_t.
-class VectorFreqTable : public std::vector<std::pair<char, double> >
+class VectorFreqTable : public std::vector<std::pair<std::string, double> >
 {
 };
 
@@ -97,8 +97,8 @@ biection_t buildBiection( VectorFreqTable const &trueVec,
   biection_t biection;
   for (size_t i = 0; i < vec.size(); ++i)
   {
-    BOOST_ASSERT(biection.find(vec[i].first) == biection.end());
-    biection[vec[i].first] = trueVec[i].first;
+    BOOST_ASSERT(biection.find(vec[i].first[0]) == biection.end());
+    biection[vec[i].first[0]] = trueVec[i].first[0];
   }
 
   return biection;
@@ -113,7 +113,7 @@ FreqTable calcFreqTable( CharInputIt first, CharInputIt beyond )
 
   for (; first != beyond; ++first)
   {
-    char ch = *first;
+    std::string ch = *first;
 
     if (table.find(ch) == table.end())
       table[ch] = 0;
@@ -133,14 +133,14 @@ FreqTable calcFreqTable( CharInputIt first, CharInputIt beyond )
 // TODO: Maybe work on character iterator?
 // TODO: Move to separate file `freq_table_io.hpp' and other source from here
 // move to freq_table.cpp.
-template< class CharT, class Traits >
-inline
-FreqTable calcFreqTable( std::basic_istream<CharT, Traits> &is )
-{
-  return calcFreqTable(
-      std::istream_iterator<char>(is),
-      std::istream_iterator<char>());
-}
+//template< class CharT, class Traits >
+//inline
+//FreqTable calcFreqTable( std::basic_istream<CharT, Traits> &is )
+//{
+//  return calcFreqTable(
+//      std::istream_iterator<char>(is),
+//      std::istream_iterator<char>());
+//}
 
 template< class CharT, class Traits >
 inline
@@ -151,24 +151,22 @@ std::basic_istream<CharT, Traits> &
 
   double freqSum(0);
 
-  std::string str;
-  while (std::getline(is, str))
+  std::string chStr, freqStr;
+  while (std::getline(is, chStr) && std::getline(is, freqStr))
   {
-    if (str.length() == 0 || str[0] == '#')
+    if (chStr.length() == 0 || freqStr.length() == 0)
       continue;
 
-    std::istringstream istr(str);
-
-    char ch;
+    std::istringstream istr(freqStr);
     double freq(-1);
-    istr >> ch >> freq;
+    istr >> freq;
     if (freq <= 0)
     {
       throw std::runtime_error(
-          (boost::format("Invalid frequency string: %1%") % str).str());
+          (boost::format("Invalid frequency string: %1%") % freqStr).str());
     }
 
-    table[ch] = freq;
+    table[chStr] = freq;
     freqSum += freq;
   }
 
@@ -190,7 +188,7 @@ std::basic_ostream<CharT, Traits> &
 {
   BOOST_FOREACH(FreqTable::value_type const &pair, table)
   {
-    os << pair.first << " " << std::setprecision(16) << pair.second << "\n";
+    os << pair.first << "\n" << std::setprecision(16) << pair.second << "\n";
   }
 
   return os;

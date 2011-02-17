@@ -33,6 +33,9 @@ decode_result_t decode( FreqTable const &trueTable, FreqTable const &table,
 
   updateWithKeys(trueTableCopy, tableCopy);
 
+  std::cerr << trueTable << "\n"; // DEBUG
+  std::cerr << table << "\n"; // DEBUG
+
   VectorFreqTable trueTableVec = toVector(trueTableCopy);
   VectorFreqTable tableVec = toVector(tableCopy);
 
@@ -40,9 +43,9 @@ decode_result_t decode( FreqTable const &trueTable, FreqTable const &table,
   sort(tableVec);
 
   double const chi2 = chiSquareCharact(trueTableVec, tableVec);
-  std::cout << chi2 << "\n";
+  std::cout << chi2 << "\n"; // DEBUG
   double const chi2Cr = chiSquareCritical(alpha, trueTableVec.size());
-  std::cout << chi2Cr << "\n";
+  std::cout << chi2Cr << "\n"; // DEBUG
   if (chi2 < chi2Cr)
   {
     biection_t const biection = buildBiection(trueTableVec, tableVec);
@@ -76,7 +79,14 @@ int main( int argc, char *argv[] )
   std::string input(
       std::istream_iterator<char>(std::cin),
       std::istream_iterator<char>());
-  FreqTable table = calcFreqTable(input.begin(), input.end());
+  std::vector<std::string> chs;
+  for (size_t i = 0; i < input.size(); ++i)
+  {
+    std::ostringstream ostr;
+    ostr << input[i];
+    chs.push_back(ostr.str());
+  }
+  FreqTable table = calcFreqTable(chs.begin(), chs.end());
 
   double const alpha = 0.9;
   decode_result_t res = decode(trueTable, table, alpha);

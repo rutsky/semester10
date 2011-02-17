@@ -15,7 +15,7 @@ def main(args):
     ch_entries = sorted(counters.items(), cmp=(lambda a, b: -cmp(a[1], b[1])))
     total_count = len(contents)
     for ch, count in ch_entries:
-        print("{0} {1:.16}".format(ch, float(count) / total_count))
+        print("{0}\n{1:.16}".format(ch, float(count) / total_count))
 
 if __name__ == "__main__":
     main(sys.argv)

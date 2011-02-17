@@ -28,19 +28,18 @@ BOOST_AUTO_TEST_SUITE(freq_table)
 
 BOOST_AUTO_TEST_CASE(test_main)
 {
-  std::string testText("aabcac");
-  std::istringstream istr(testText);
+  std::string testText[] = {"a", "a", "b", "c", "a", "c", ""};
 
-  FreqTable table = calcFreqTable(istr);
+  FreqTable table = calcFreqTable(&testText[0], &testText[6]);
 
   BOOST_CHECK_EQUAL(table.size(), 3);
-  BOOST_CHECK(table.find('a') != table.end());
-  BOOST_CHECK(table.find('b') != table.end());
-  BOOST_CHECK(table.find('c') != table.end());
+  BOOST_CHECK(table.find("a") != table.end());
+  BOOST_CHECK(table.find("b") != table.end());
+  BOOST_CHECK(table.find("c") != table.end());
 
-  BOOST_CHECK_CLOSE(table['a'], 3.0 / 6, 1e-3);
-  BOOST_CHECK_CLOSE(table['b'], 1.0 / 6, 1e-3);
-  BOOST_CHECK_CLOSE(table['c'], 2.0 / 6, 1e-3);
+  BOOST_CHECK_CLOSE(table["a"], 3.0 / 6, 1e-3);
+  BOOST_CHECK_CLOSE(table["b"], 1.0 / 6, 1e-3);
+  BOOST_CHECK_CLOSE(table["c"], 2.0 / 6, 1e-3);
 
   {
     std::ostringstream ostr;
@@ -50,29 +49,29 @@ BOOST_AUTO_TEST_CASE(test_main)
     istr >> table2;
 
     BOOST_CHECK_EQUAL(table2.size(), 3);
-    BOOST_CHECK_CLOSE(table2['a'], table['a'], 1e-3);
-    BOOST_CHECK_CLOSE(table2['b'], table['b'], 1e-3);
-    BOOST_CHECK_CLOSE(table2['c'], table['c'], 1e-3);
+    BOOST_CHECK_CLOSE(table2["a"], table["a"], 1e-3);
+    BOOST_CHECK_CLOSE(table2["b"], table["b"], 1e-3);
+    BOOST_CHECK_CLOSE(table2["c"], table["c"], 1e-3);
   }
 
   VectorFreqTable vec;
   vec = toVector(table);
   BOOST_CHECK_EQUAL(vec.size(), 3);
-  BOOST_CHECK_EQUAL(vec[0].first, 'a');
-  BOOST_CHECK_CLOSE(vec[0].second, table['a'], 1e-3);
-  BOOST_CHECK_EQUAL(vec[1].first, 'b');
-  BOOST_CHECK_CLOSE(vec[1].second, table['b'], 1e-3);
-  BOOST_CHECK_EQUAL(vec[2].first, 'c');
-  BOOST_CHECK_CLOSE(vec[2].second, table['c'], 1e-3);
+  BOOST_CHECK_EQUAL(vec[0].first, "a");
+  BOOST_CHECK_CLOSE(vec[0].second, table["a"], 1e-3);
+  BOOST_CHECK_EQUAL(vec[1].first, "b");
+  BOOST_CHECK_CLOSE(vec[1].second, table["b"], 1e-3);
+  BOOST_CHECK_EQUAL(vec[2].first, "c");
+  BOOST_CHECK_CLOSE(vec[2].second, table["c"], 1e-3);
 
   sort(vec);
 
-  BOOST_CHECK_EQUAL(vec[0].first, 'b');
-  BOOST_CHECK_CLOSE(vec[0].second, table['b'], 1e-3);
-  BOOST_CHECK_EQUAL(vec[1].first, 'c');
-  BOOST_CHECK_CLOSE(vec[1].second, table['c'], 1e-3);
-  BOOST_CHECK_EQUAL(vec[2].first, 'a');
-  BOOST_CHECK_CLOSE(vec[2].second, table['a'], 1e-3);
+  BOOST_CHECK_EQUAL(vec[0].first, "b");
+  BOOST_CHECK_CLOSE(vec[0].second, table["b"], 1e-3);
+  BOOST_CHECK_EQUAL(vec[1].first, "c");
+  BOOST_CHECK_CLOSE(vec[1].second, table["c"], 1e-3);
+  BOOST_CHECK_EQUAL(vec[2].first, "a");
+  BOOST_CHECK_CLOSE(vec[2].second, table["a"], 1e-3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

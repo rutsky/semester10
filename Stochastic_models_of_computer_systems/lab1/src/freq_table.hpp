@@ -186,7 +186,10 @@ std::basic_ostream<CharT, Traits> &
     operator << ( std::basic_ostream<CharT, Traits> &os, 
                   FreqTable const &table )
 {
-  BOOST_FOREACH(FreqTable::value_type const &pair, table)
+  VectorFreqTable vec = toVector(table);
+  sort(vec);
+  
+  BOOST_FOREACH(VectorFreqTable::value_type const &pair, vec)
   {
     os << pair.first << "\n" << std::setprecision(16) << pair.second << "\n";
   }

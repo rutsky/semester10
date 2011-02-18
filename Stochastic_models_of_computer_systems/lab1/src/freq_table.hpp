@@ -95,10 +95,18 @@ biection_t buildBiection( VectorFreqTable const &trueVec,
   BOOST_ASSERT(trueVec.size() == vec.size());
 
   biection_t biection;
-  for (size_t i = 0; i < vec.size(); ++i)
+  for (int i = vec.size() - 1; i >= 0; --i)
   {
-    BOOST_ASSERT(biection.find(vec[i].first[0]) == biection.end());
-    biection[vec[i].first[0]] = trueVec[i].first[0];
+    // TODO
+    //BOOST_ASSERT(biection.find(vec[i].first[0]) == biection.end());
+    BOOST_ASSERT(vec[i].first.length() == trueVec[i].first.length());
+    for (size_t j = 0; j < vec[i].first.length(); ++j)
+    {
+      char const from = vec[i].first[j];
+      char const to = trueVec[i].first[j];
+      if (biection.find(from) == biection.end())
+        biection[from] = to;
+    }
   }
 
   return biection;

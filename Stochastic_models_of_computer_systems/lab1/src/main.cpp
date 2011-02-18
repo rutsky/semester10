@@ -76,15 +76,19 @@ int main( int argc, char *argv[] )
     trueTableFS >> trueTable;
   }
 
+  BOOST_ASSERT(!trueTable.empty());
+  size_t const m = (*trueTable.begin()).first.length();
+
   std::noskipws(std::cin);
   std::string input(
       std::istream_iterator<char>(std::cin),
       std::istream_iterator<char>());
   std::vector<std::string> chs;
-  for (size_t i = 0; i < input.size(); ++i)
+  for (size_t i = 0; i < input.size() - m + 1; ++i)
   {
     std::ostringstream ostr;
-    ostr << input[i];
+    for (size_t j = 0; j < m; ++j)
+      ostr << input[i + j];
     chs.push_back(ostr.str());
   }
   FreqTable table = calcFreqTable(chs.begin(), chs.end());

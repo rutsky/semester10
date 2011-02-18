@@ -43,9 +43,9 @@ decode_result_t decode( FreqTable const &trueTable, FreqTable const &table,
   sort(tableVec);
 
   double const chi2 = chiSquareCharact(trueTableVec, tableVec);
-  std::cout << "Chi2 = " << chi2 << "\n"; // DEBUG
+  std::cerr << "Chi2 = " << chi2 << "\n"; // DEBUG
   double const chi2Cr = chiSquareCritical(alpha, trueTableVec.size());
-  std::cout << "Chi2Critival = " << chi2Cr << "\n"; // DEBUG
+  std::cerr << "Chi2Critival = " << chi2Cr << "\n"; // DEBUG
   if (chi2 < chi2Cr)
   {
     biection_t const biection = buildBiection(trueTableVec, tableVec);
@@ -85,7 +85,6 @@ int main( int argc, char *argv[] )
   {
     std::ostringstream ostr;
     ostr << input[i];
-    std::cout << " >>> '" << ostr.str() << "'\n";
     chs.push_back(ostr.str());
   }
   FreqTable table = calcFreqTable(chs.begin(), chs.end());

@@ -33,8 +33,8 @@ decode_result_t decode( FreqTable const &trueTable, FreqTable const &table,
 
   updateWithKeys(trueTableCopy, tableCopy);
 
-  std::cerr << trueTable << "\n"; // DEBUG
-  std::cerr << table << "\n"; // DEBUG
+  std::cerr << " *** True table:\n" << trueTable << "\n"; // DEBUG
+  std::cerr << " *** Table for input:\n" << table << "\n"; // DEBUG
 
   VectorFreqTable trueTableVec = toVector(trueTableCopy);
   VectorFreqTable tableVec = toVector(tableCopy);
@@ -43,9 +43,9 @@ decode_result_t decode( FreqTable const &trueTable, FreqTable const &table,
   sort(tableVec);
 
   double const chi2 = chiSquareCharact(trueTableVec, tableVec);
-  std::cout << chi2 << "\n"; // DEBUG
+  std::cout << "Chi2 = " << chi2 << "\n"; // DEBUG
   double const chi2Cr = chiSquareCritical(alpha, trueTableVec.size());
-  std::cout << chi2Cr << "\n"; // DEBUG
+  std::cout << "Chi2Critival = " << chi2Cr << "\n"; // DEBUG
   if (chi2 < chi2Cr)
   {
     biection_t const biection = buildBiection(trueTableVec, tableVec);
@@ -76,6 +76,7 @@ int main( int argc, char *argv[] )
     trueTableFS >> trueTable;
   }
 
+  std::noskipws(std::cin);
   std::string input(
       std::istream_iterator<char>(std::cin),
       std::istream_iterator<char>());
@@ -84,6 +85,7 @@ int main( int argc, char *argv[] )
   {
     std::ostringstream ostr;
     ostr << input[i];
+    std::cout << " >>> '" << ostr.str() << "'\n";
     chs.push_back(ostr.str());
   }
   FreqTable table = calcFreqTable(chs.begin(), chs.end());

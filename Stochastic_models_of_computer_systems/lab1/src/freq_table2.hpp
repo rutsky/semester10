@@ -140,7 +140,7 @@ std::basic_istream<CharT, Traits> &
     std::istringstream istr(freqStr);
     scalar_t freq(-1);
     istr >> freq;
-    if (freq <= 0)
+    if (freq < 0)
     {
       throw std::runtime_error(
           (boost::format("Invalid frequency string: %1%") % freqStr).str());

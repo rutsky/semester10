@@ -20,6 +20,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <fstream>
+
 #include "freq_table2.hpp"
 
 BOOST_AUTO_TEST_SUITE(freq_table2)
@@ -31,6 +33,20 @@ BOOST_AUTO_TEST_CASE(test_main)
 
   freq1_map_t fm1;
   freq2_map_t fm2;
+
+  {
+    std::ifstream is("table/table.dat");
+    BOOST_CHECK(is);
+
+    is >> fm1;
+  }
+
+  {
+    std::ifstream is("table/table2.dat");
+    BOOST_CHECK(is);
+
+    is >> fm2;
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

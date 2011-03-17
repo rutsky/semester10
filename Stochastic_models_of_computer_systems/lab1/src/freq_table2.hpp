@@ -25,6 +25,9 @@
 #include <stdexcept>
 #include <cmath>
 
+// TODO: Debug.
+#include <iostream>
+
 #include <boost/array.hpp>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
@@ -67,6 +70,7 @@ typedef freq_map_t<char, double, 2> freq2_map_t;
  *****/
 
 template< class SymbT, class ScalarT, class OutT, size_t Len >
+inline
 size_t alphabet( freq_map_t<SymbT, ScalarT, Len> const &fm, OutT outIt )
 {
   typedef freq_map_t<SymbT, ScalarT, Len> fm_t;
@@ -80,9 +84,12 @@ size_t alphabet( freq_map_t<SymbT, ScalarT, Len> const &fm, OutT outIt )
   }
 
   std::copy(chars.begin(), chars.end(), outIt);
+
+  return chars.size();
 }
 
-template< class SymbT, class ScalarT, class OutT, size_t Len >
+template< class SymbT, class ScalarT, size_t Len >
+inline
 bool is_complete( freq_map_t<SymbT, ScalarT, Len> const &fm )
 {
   typedef freq_map_t<SymbT, ScalarT, Len> fm_t;
@@ -150,7 +157,7 @@ std::basic_istream<CharT, Traits> &
             "Sum of frequencies not even close to 1.0: %1%") % freqSum).str());
   }
 
-  if (is_complete(fm))
+  if (!is_complete(fm))
   {
     throw std::runtime_error(
         (boost::format(

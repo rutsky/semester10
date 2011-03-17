@@ -29,10 +29,11 @@ typedef boost::optional<biection_t const> decode_result_t;
 
 int main( int argc, char *argv[] )
 {
+  std::string freq1FileName, freq2FileName;
+  double gamma, alpha, zeta;
+
   try
   {
-    std::string freq1FileName, freq2FileName;
-    double gamma, alpha, zeta;
 
     po::options_description optDesc("Allowed options");
     optDesc.add_options()

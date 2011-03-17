@@ -20,6 +20,7 @@ global_env = Environment()
 Export('global_env')
 
 global_env.AppendUnique(LIBS=['m'])
+global_env.MergeFlags(global_env.ParseFlags("-g -W -Wall"))
 
 SConscript(os.path.join("report", "SConscript"), 
     variant_dir=os.path.join("build", "report"))

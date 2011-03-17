@@ -160,8 +160,7 @@ std::basic_istream<CharT, Traits> &
   if (!is_complete(fm))
   {
     throw std::runtime_error(
-        (boost::format(
-            "Not all frequencies listed")).str());
+        (boost::format("Not all frequencies listed")).str());
   }
 
   return is;

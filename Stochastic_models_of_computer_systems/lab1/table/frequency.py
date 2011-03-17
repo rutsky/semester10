@@ -19,3 +19,5 @@ def main(args):
 
 if __name__ == "__main__":
     main(sys.argv)
+
+# vim: set ts=4 sw=4 et:

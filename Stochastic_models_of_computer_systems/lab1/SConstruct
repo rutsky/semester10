@@ -21,8 +21,10 @@ Export('global_env')
 
 global_env.AppendUnique(LIBS=['m'])
 
-SConscript(os.path.join("report", "SConscript"), 
-    variant_dir=os.path.join("build", "report"))
+#SConscript(os.path.join("report", "SConscript"), 
+#    variant_dir=os.path.join("build", "report"))
+SConscript(os.path.join("report", "SConscript"))
+
 SConscript(os.path.join("src", "SConscript"), 
     variant_dir=os.path.join("build", "src"))
 

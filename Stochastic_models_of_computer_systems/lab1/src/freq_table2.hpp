@@ -25,16 +25,18 @@
 #include <boost/array.hpp>
 
 /*****
- * Types definition
+ * Types definition.
  *****/
 
 template< class SymbType, class ScalarType, size_t n >
-struct freq_vec_t : std::vector<std::pair<boost::array<SymbType, n>, ScalarType> >
+struct freq_vec_t
+  : std::vector<std::pair<boost::array<SymbType, n>, ScalarType>
 {
 };
 
 template< class SymbType, class ScalarType, size_t n >
-struct freq_map_t : std::map<boost::array<SymbType, n>, ScalarType>
+struct freq_map_t
+  : std::map<boost::array<SymbType, n>, ScalarType>
 {
 };
 
@@ -42,6 +44,18 @@ typedef freq_vec_t<char, double, 1> freq1_vec_t;
 typedef freq_vec_t<char, double, 2> freq2_vec_t;
 typedef freq_map_t<char, double, 1> freq1_map_t;
 typedef freq_map_t<char, double, 2> freq2_map_t;
+
+/*****
+ * Frequency tables I/O.
+ *****/
+
+
+
+/*****
+ * Operations with frequency tables.
+ *****/
+
+
 
 #endif // FREQ_TABLE2_HPP_
 

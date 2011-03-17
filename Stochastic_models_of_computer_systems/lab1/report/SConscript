@@ -24,6 +24,7 @@ env['ENV']['HOME'] = os.environ['HOME']
 
 env['PDFLATEXFLAGS'].append('-shell-escape')
 report_pdf = env.PDF(target="report.pdf", source="report.tex")
-Depends(report_pdf, Split("references.bib"))
+# TODO: Maybe dependencies are found automatically.
+Depends(report_pdf, Split("references.bib title.tex"))
 
 Default(report_pdf)

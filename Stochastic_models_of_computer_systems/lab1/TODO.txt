@@ -1,1 +1,2 @@
  * Publish report.pdf.
+ * Add CC-BY-SA note to report.

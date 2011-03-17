@@ -23,6 +23,7 @@
 #include "common.hpp"
 
 // TODO: Rename to something about quantiles.
+// TODO: Use Boost implementation.
 double chiSquareCritical( double alpha, size_t n )
 {
   // Golberg H., Levine H. Approximate formulas for the percentage points and 

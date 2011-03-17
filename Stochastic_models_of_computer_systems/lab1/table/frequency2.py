@@ -3,12 +3,17 @@
 import sys
 import locale
 import collections
+import itertools
 
 def main(args):
     full_contents = sys.stdin.read()
     #contents = filter(lambda x: len(x.encode("utf-8")) >= 2, full_contents)
     contents = full_contents
-    counters = collections.defaultdict(int) # dict(character: count)
+
+    # dict(character: count)
+    counters = dict([(a + b, 0)
+            for (a, b) in itertools.product(set(contents), repeat=2)])
+
     for ch in map(
 	    lambda x: ''.join(x), 
 	    zip(contents[:-1], contents[1:])):
@@ -21,3 +26,5 @@ def main(args):
 
 if __name__ == "__main__":
     main(sys.argv)
+
+# vim: set ts=4 sw=4 et:

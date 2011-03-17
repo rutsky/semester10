@@ -32,9 +32,9 @@ int main( int argc, char *argv[] )
   std::string freq1FileName, freq2FileName;
   double gamma, alpha, zeta;
 
+  // Parse command line.
   try
   {
-
     po::options_description optDesc("Allowed options");
     optDesc.add_options()
         ("help", "display help message.")

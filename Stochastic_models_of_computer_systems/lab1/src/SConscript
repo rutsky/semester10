@@ -22,6 +22,8 @@ import SCons.Util
 Import('global_env')
 env = global_env.Clone()
 
+env.AppendUnique(
+    LIBS=['boost_program_options'])
 main_sources = ['main.cpp']
 testing_main_sources = ['unit_testing.cpp']
 testing_sources = Glob('*_test.cpp', strings=True)

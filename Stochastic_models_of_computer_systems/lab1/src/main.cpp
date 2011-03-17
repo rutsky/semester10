@@ -19,97 +19,65 @@
 #include <vector>
 
 #include <boost/optional.hpp>
+#include <boost/program_options.hpp>
 
-#include "chi_square.h"
 #include "freq_table.hpp"
+
+namespace po = boost::program_options;
 
 typedef boost::optional<biection_t const> decode_result_t;
 
-decode_result_t decode( FreqTable const &trueTable, FreqTable const &table, 
-                        double alpha )
-{
-  FreqTable trueTableCopy(trueTable);
-  FreqTable tableCopy(table);
-
-  updateWithKeys(trueTableCopy, tableCopy);
-
-  std::cerr << " *** True table:\n" << trueTable << "\n"; // DEBUG
-  std::cerr << " *** Table for input:\n" << table << "\n"; // DEBUG
-
-  VectorFreqTable trueTableVec = toVector(trueTableCopy);
-  VectorFreqTable tableVec = toVector(tableCopy);
-
-  sort(trueTableVec);
-  sort(tableVec);
-
-  double const chi2 = chiSquareCharact(trueTableVec, tableVec);
-  std::cerr << "Chi2 = " << chi2 << "\n"; // DEBUG
-  double const chi2Cr = chiSquareCritical(alpha, trueTableVec.size());
-  std::cerr << "Chi2Critival = " << chi2Cr << "\n"; // DEBUG
-  if (chi2 < chi2Cr)
-  {
-    biection_t const biection = buildBiection(trueTableVec, tableVec);
-    return decode_result_t(biection);
-  }
-  else
-    return decode_result_t();
-}
-
 int main( int argc, char *argv[] )
 {
-  if (argc != 2)
+  try
   {
-    std::cout << 
-        "Usage:\n" <<
-        "  " << argv[0] << " true_freq_table < encoded_text\n";
-    return 0;
-  }
+    std::string freq1FileName, freq2FileName;
+    double gamma, alpha, zeta;
 
-  FreqTable trueTable;
-  {
-    std::fstream trueTableFS(argv[1]);
-    if (!trueTableFS)
+    po::options_description optDesc("Allowed options");
+    optDesc.add_options()
+        ("help", "display help message.")
+        ("1-frequency", po::value<std::string>(&freq1FileName), 
+            "single characters frequencies.")
+        ("2-frequency", po::value<std::string>(&freq2FileName), 
+            "single characters frequencies.")
+        ("gamma", po::value<double>(&gamma),
+            "confidence level of reducing number of bijections confidence "
+            "intervals.")
+        ("alpha", po::value<double>(&alpha),
+            "significance level for Pearson's Chi-square test.")
+        ("zeta", po::value<double>(&zeta),
+            "minimal acceptable probability of observed Markov chain.");
+    po::positional_options_description posOptDesc;
+    posOptDesc
+        .add("1-frequency", 1)
+        .add("2-frequency", 1)
+        .add("gamma", 1)
+        .add("alpha", 1)
+        .add("zeta", 1);
+
+    po::variables_map vm;
+    po::store(po::command_line_parser(argc, argv).
+        options(optDesc).positional(posOptDesc).run(), vm);
+    po::notify(vm);
+
+    bool const haveRequiredOptions = 
+        vm.count("1-frequency") && 
+        vm.count("2-frequency") &&
+        vm.count("gamma") &&
+        vm.count("alpha") &&
+        vm.count("zeta");
+
+    if (vm.count("help") || !haveRequiredOptions)
     {
-      perror(argv[1]);
-      return 1;
-    }
-    trueTableFS >> trueTable;
-  }
-
-  BOOST_ASSERT(!trueTable.empty());
-  size_t const m = (*trueTable.begin()).first.length();
-
-  std::noskipws(std::cin);
-  std::string input(
-      std::istream_iterator<char>(std::cin),
-      std::istream_iterator<char>());
-  std::vector<std::string> chs;
-  for (size_t i = 0; i < input.size() - m + 1; ++i)
-  {
-    std::ostringstream ostr;
-    for (size_t j = 0; j < m; ++j)
-      ostr << input[i + j];
-    chs.push_back(ostr.str());
-  }
-  FreqTable table = calcFreqTable(chs.begin(), chs.end());
-
-  double const alpha = 0.9;
-  decode_result_t res = decode(trueTable, table, alpha);
-  if (res)
-  {
-    biection_t const &biection = *res;
-    BOOST_FOREACH(char ch, input)
-    {
-      biection_t::const_iterator it = biection.find(ch);
-      BOOST_ASSERT(it != biection.end());
-      std::cout << it->second;
+      std::cout << optDesc << "\n";
+      return (haveRequiredOptions ? 0 : 1);
     }
   }
-  else
+  catch ( std::exception &ex )
   {
-    std::cerr << 
-      "Input message is not encoded English text "
-      "with statistical significance " << alpha << "\n";
+    std::cerr << "Error: " << ex.what() << std::endl;
+    return 1;
   }
 }
 

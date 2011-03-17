@@ -22,10 +22,14 @@ import SCons.Util
 Import('global_env')
 env = global_env.Clone()
 
-sources = ['chi_square.cpp']
+main_sources = ['main.cpp']
+testing_main_sources = ['unit_testing.cpp']
+testing_sources = Glob('*_test.cpp', strings=True)
+sources = list(
+    set(Glob('*.cpp', strings=True)) - 
+        set(main_sources + testing_main_sources + testing_sources))
 
-main = env.Program(target="main",
-    source=['main.cpp'] + sources)
+main = env.Program(target="main", source=main_sources + sources)
 
 Default(main)
 
@@ -33,11 +37,7 @@ test_env = env.Clone()
 test_env.AppendUnique(
     #LIBPATH=['#boost-lib'],
     LIBS=['boost_unit_test_framework'])
-test_sources = (
-    ['unit_testing.cpp'] + 
-    sources +
-    Glob('*_test.cpp', strings=True)
-    )
+test_sources = testing_main_sources + testing_sources + sources
 test_sources = [
     test_env.Object('test_' + cpp.replace('.cpp', ''), cpp) 
         for cpp in test_sources]

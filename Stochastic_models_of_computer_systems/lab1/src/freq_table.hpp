@@ -65,15 +65,6 @@ struct freq_map_t
   operator freq_vec_t<SymbT, ScalarT, Len>() const;
 };
 
-typedef freq_map_t<char, double, 1> freq1_map_t;
-typedef freq_map_t<char, double, 2> freq2_map_t;
-typedef freq_vec_t<char, double, 1> freq1_vec_t;
-typedef freq_vec_t<char, double, 2> freq2_vec_t;
-
-/*****
- * Operations with frequency tables.
- *****/
-
 template< class SymbT, class ScalarT, size_t Len >
 inline
 freq_map_t<SymbT, ScalarT, Len>::operator freq_vec_t<SymbT, ScalarT, Len> () const
@@ -88,6 +79,15 @@ freq_map_t<SymbT, ScalarT, Len>::operator freq_vec_t<SymbT, ScalarT, Len> () con
 
   return result;
 }
+
+typedef freq_map_t<char, double, 1> freq1_map_t;
+typedef freq_map_t<char, double, 2> freq2_map_t;
+typedef freq_vec_t<char, double, 1> freq1_vec_t;
+typedef freq_vec_t<char, double, 2> freq2_vec_t;
+
+/*****
+ * Operations with frequency tables.
+ *****/
 
 template< class SymbT, class ScalarT, class OutT, size_t Len >
 inline

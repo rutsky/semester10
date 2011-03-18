@@ -1,2 +1,2 @@
-pg2006.txt downloaded from:
+war_and_peace.txt downloaded from:
 <http://www.gutenberg.org/cache/epub/2600/pg2600.txt>

@@ -118,6 +118,16 @@ int main( int argc, char *argv[] )
     std::cerr << "Error: " << ex.what() << std::endl;
     return 1;
   }
+
+  // Check that both table have same alphabet.
+  std::set<char> alphabet1, alphabet2;
+  alphabet(fm1, std::inserter(alphabet1, alphabet1.begin()));
+  alphabet(fm2, std::inserter(alphabet2, alphabet2.begin()));
+  if (alphabet1 != alphabet2)
+  {
+    std::cerr << "Error: alphabets differs in frequencies tables\n";
+    return 1;
+  }
   
   // Start decoding process.
   std::noskipws(std::cin);

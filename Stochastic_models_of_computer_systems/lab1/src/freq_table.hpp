@@ -15,8 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FREQ_TABLE2_HPP_
-#define FREQ_TABLE2_HPP_
+#ifndef FREQ_TABLE_HPP_
+#define FREQ_TABLE_HPP_
 
 #include <cstddef>
 #include <vector>
@@ -254,6 +254,6 @@ std::basic_ostream<CharT, Traits> &
   return os;
 }*/
 
-#endif // FREQ_TABLE2_HPP_
+#endif // FREQ_TABLE_HPP_
 
 // vim: set ts=2 sw=2 et:

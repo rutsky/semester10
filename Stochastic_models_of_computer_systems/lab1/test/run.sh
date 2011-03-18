@@ -4,7 +4,7 @@
 
 prg=../build/src/main
 
-args="../table/table.dat ../table/table2.dat 0.9 0.1 0.9"
+args="../table/table.dat ../table/table2.dat 0.8 0.1 0.9"
 
 for i in 1500; do
   for test_name in war_and_peace random crime_and_punishment; do

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#set -x
+
 prg=../build/src/main
 
 args="../table/table.dat ../table/table2.dat 0.9 0.1 0.9"

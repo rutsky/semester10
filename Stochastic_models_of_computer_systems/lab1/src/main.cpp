@@ -16,16 +16,14 @@
  */
 
 #include <iostream>
-#include <vector>
+#include <fstream>
 
-#include <boost/optional.hpp>
 #include <boost/program_options.hpp>
 
-#include "freq_table.hpp"
+#include "freq_table2.hpp"
+#include "decode.hpp"
 
 namespace po = boost::program_options;
-
-typedef boost::optional<biection_t const> decode_result_t;
 
 int main( int argc, char *argv[] )
 {
@@ -75,11 +73,57 @@ int main( int argc, char *argv[] )
       return (haveRequiredOptions ? 0 : 1);
     }
   }
-  catch ( std::exception &ex )
+  catch( std::exception &ex )
   {
     std::cerr << "Error: " << ex.what() << std::endl;
     return 1;
   }
+
+  // Load frequency tables.
+  freq1_map_t fm1;
+  freq2_map_t fm2;
+
+  try
+  {
+    {
+      std::ifstream is(freq1FileName.c_str());
+
+      if (!is)
+      {
+        perror(freq1FileName.c_str());
+        return 1;
+      }
+      else
+      {
+        is >> fm1;
+      }
+    }
+
+    {
+      std::ifstream is(freq2FileName.c_str());
+
+      if (!is)
+      {
+        perror(freq2FileName.c_str());
+        return 1;
+      }
+      else
+      {
+        is >> fm2;
+      }
+    }
+  }
+  catch( std::exception &ex )
+  {
+    std::cerr << "Error: " << ex.what() << std::endl;
+    return 1;
+  }
+  
+  // Start decoding process.
+  std::noskipws(std::cin);
+  decode(fm1, fm2, gamma, alpha, zeta, 
+      std::istream_iterator<char>(std::cin),
+      std::istream_iterator<char>());
 }
 
 // vim: set ts=2 sw=2 et:

@@ -6,10 +6,12 @@ prg=../build/src/main
 
 args="../table/table.dat ../table/table2.dat 0.9 0.1 0.9"
 
-i=1500
+for i in 1500; do
+  for test_name in war_and_peace random crime_and_punishment; do
+    cat $test_name"_"$i.txt | $prg $args > result_$test_name"_"$i.txt
+    mv frequency1.dat result_$test_name"_"frequency1_$i.dat
+    mv frequency2.dat result_$test_name"_"frequency2_$i.dat
+  done
+done
 
-cat war_and_peace_$i.txt | $prg $args > result_war_and_peace_$i.txt
-cat random_$i.txt | $prg $args > result_random_$i.txt
-cat crime_and_punishment_$i.txt | $prg $args > result_crime_and_punishment_$i.txt
-
-# vim: set ts=2 sw=2 et
+# vim: set ts=2 sw=2 et:

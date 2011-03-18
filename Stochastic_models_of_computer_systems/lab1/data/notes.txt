@@ -1,2 +1,5 @@
 war_and_peace.txt downloaded from:
 <http://www.gutenberg.org/cache/epub/2600/pg2600.txt>
+
+crime_and_punishment.txt downloaded from:
+<http://www.kiosek.com/dostoevsky/library/crimeandpunishment.txt>

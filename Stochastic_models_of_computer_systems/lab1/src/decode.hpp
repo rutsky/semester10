@@ -18,6 +18,9 @@
 #ifndef DECODE_HPP_
 #define DECODE_HPP_
 
+#include <vector>
+#include <set>
+
 #include "freq_table2.hpp"
 
 template< class CharInIt >
@@ -27,6 +30,11 @@ void decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
              CharInIt first, CharInIt beyond )
 {
   std::vector<char> input(first, beyond);
+
+  std::set<char> chars;
+  alphabet(fm1, std::inserter(chars, chars.begin()));
+
+  
 }
 
 #endif // DECODE_HPP_

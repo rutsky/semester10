@@ -129,11 +129,24 @@ int main( int argc, char *argv[] )
     return 1;
   }
   
-  // Start decoding process.
+  // Read whole input and check it's alphabet.
   std::noskipws(std::cin);
-  decode(fm1, fm2, gamma, alpha, zeta, 
+  std::vector<char> input(
       std::istream_iterator<char>(std::cin),
       std::istream_iterator<char>());
+
+  std::set<char> chars;
+  std::copy(input.begin(), input.end(), std::inserter(chars, chars.begin()));
+  if (!std::includes(alphabet1.begin(), alphabet1.end(), 
+                     chars.begin(), chars.end()))
+  {
+    std::cerr << 
+        "Error: input has characters not described in frequency tables.\n";
+    return 1;
+  }
+
+  // Start decoding process.
+  decode(fm1, fm2, gamma, alpha, zeta, input.begin(), input.end());
 }
 
 // vim: set ts=2 sw=2 et:

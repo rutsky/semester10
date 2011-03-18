@@ -21,6 +21,7 @@
 #include <vector>
 #include <set>
 #include <fstream>
+#include <iostream>
 
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
@@ -104,6 +105,7 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   theor_to_emp_symbs_t theorToEmp;
 
   // TODO: Optimize.
+  size_t totalMatches(0);
   BOOST_FOREACH(freq1_map_t::value_type const &theorPair, fm1)
   {
     possible_symb_t &possible = theorToEmp[theorPair.first[0]];
@@ -116,12 +118,15 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
         // Found empirical symbol whom frequency lies in confidence interval 
         // of current theoretical symbol.
         possible.push_back(empPair.first[0]);
+        ++totalMatches;
       }
     }
   }
 
   // Output all matches.
-
+  std::cout << "Found " << totalMatches << " matches of empirical frequencies "
+      "with theoretical confidence intervals.";
+  //BOOST_FOREACH()
   
   return 0;
 }

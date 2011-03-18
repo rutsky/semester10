@@ -45,6 +45,7 @@ void decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   
   // Write empiric frequencies to files.
   
+  
   // Calculate confidence intervals for theoretic frequencies.
   
   // Find all emperic frequencies that match each confidence interval.

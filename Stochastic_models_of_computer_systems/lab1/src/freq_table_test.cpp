@@ -47,6 +47,9 @@ BOOST_AUTO_TEST_CASE(test_main)
 
     is >> fm2;
   }
+
+  f1 = fm1;
+  f2 = fm2;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

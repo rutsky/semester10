@@ -41,6 +41,7 @@ template< class SymbT, class ScalarT, std::size_t Len >
 struct freq_vec_t
   : std::vector<std::pair<boost::array<SymbT, Len>, ScalarT> >
 {
+  typedef freq_vec_t<SymbT, ScalarT, Len> fv_t;
   typedef SymbT   symb_t;
   typedef ScalarT scalar_t;
 
@@ -53,22 +54,40 @@ template< class SymbT, class ScalarT, std::size_t Len >
 struct freq_map_t
   : std::map<boost::array<SymbT, Len>, ScalarT>
 {
+  typedef freq_map_t<SymbT, ScalarT, Len> fm_t;
   typedef SymbT   symb_t;
   typedef ScalarT scalar_t;
 
   typedef boost::array<symb_t, Len> chain_t;
 
   static size_t const chain_length = Len;
+
+  operator freq_vec_t<SymbT, ScalarT, Len>() const;
 };
 
-typedef freq_vec_t<char, double, 1> freq1_vec_t;
-typedef freq_vec_t<char, double, 2> freq2_vec_t;
 typedef freq_map_t<char, double, 1> freq1_map_t;
 typedef freq_map_t<char, double, 2> freq2_map_t;
+typedef freq_vec_t<char, double, 1> freq1_vec_t;
+typedef freq_vec_t<char, double, 2> freq2_vec_t;
 
 /*****
  * Operations with frequency tables.
  *****/
+
+template< class SymbT, class ScalarT, size_t Len >
+inline
+freq_map_t<SymbT, ScalarT, Len>::operator freq_vec_t<SymbT, ScalarT, Len> () const
+{
+  typedef freq_vec_t<SymbT, ScalarT, Len> fv_t;
+
+  fv_t result;
+  BOOST_FOREACH(typename fm_t::value_type const &pair, *this)
+  {
+    result.push_back(pair);
+  }
+
+  return result;
+}
 
 template< class SymbT, class ScalarT, class OutT, size_t Len >
 inline
@@ -239,7 +258,7 @@ template< class CharT, class Traits,
 inline
 std::basic_ostream<CharT, Traits> &
     operator << ( std::basic_ostream<CharT, Traits> &os, 
-                  freq_map_t<SymbT, ScalarT, Len> &fm )
+                  freq_map_t<SymbT, ScalarT, Len> const &fm )
 {
   typedef freq_map_t<SymbT, ScalarT, Len> fm_t;
 

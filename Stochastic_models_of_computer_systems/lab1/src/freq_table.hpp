@@ -24,6 +24,7 @@
 #include <set>
 #include <stdexcept>
 #include <cmath>
+#include <algorithm>
 
 // TODO: Debug.
 #include <iostream>
@@ -32,6 +33,7 @@
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
+#include <boost/bind.hpp>
 
 /*****
  * Types definition.
@@ -142,6 +144,17 @@ bool is_normalized( freq_map_t<SymbT, ScalarT, Len> const &fm )
   return
       (scalar_t(1.0) - sum) <= scalar_t(+1e-3) && 
       (scalar_t(1.0) - sum) >= scalar_t(-1e-3);
+}
+
+template< class SymbT, class ScalarT, size_t Len >
+inline
+void sort( freq_vec_t<SymbT, ScalarT, Len> &fv )
+{
+  typedef freq_vec_t<SymbT, ScalarT, Len> fv_t;
+
+  std::sort(fv.begin(), fv.end(),
+      boost::bind(&fv_t::value_type::second, _1) <
+      boost::bind(&fv_t::value_type::second, _2));
 }
 
 template< class SymbT, class ScalarT, class CharIt, size_t Len >

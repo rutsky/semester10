@@ -29,10 +29,22 @@ void decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
              double gamma, double alpha, double zeta,
              CharInIt first, CharInIt beyond )
 {
+  // Read input.
   std::vector<char> input(first, beyond);
 
+  // Construct alphabet.
   std::set<char> chars;
   alphabet(fm1, std::inserter(chars, chars.begin()));
+
+  // Calculate empiric frequencies.
+  
+  // Write empiric frequencies to files.
+  
+  // Calculate confidence intervals for theoretic frequencies.
+  
+  // Find all emperic frequencies that match each confidence interval.
+
+  // Output all matches.
 
   
 }

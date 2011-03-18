@@ -37,6 +37,11 @@ void decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   alphabet(fm1, std::inserter(chars, chars.begin()));
 
   // Calculate empiric frequencies.
+  freq1_map_t efm1(fm1);
+  calculate_frequency(input.begin(), input.end(), efm1);
+
+  freq2_map_t efm2(fm2);
+  calculate_frequency(input.begin(), input.end(), efm2);
   
   // Write empiric frequencies to files.
   

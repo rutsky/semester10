@@ -134,7 +134,33 @@ int main( int argc, char *argv[] )
   std::vector<char> input(
       std::istream_iterator<char>(std::cin),
       std::istream_iterator<char>());
+  
+  std::vector<char> filteredInput;
+  bool filtered(false);
+  BOOST_FOREACH(char ch, input)
+  {
+    if (alphabet1.find(ch) != alphabet1.end())
+    {
+      filteredInput.push_back(ch);
+    }
+    else
+    {
+      if (!filtered)
+      {
+        filtered = true;
+        std::cerr << 
+          "Warning: found symbols outside frequency tables alphabet.\n";
+      }
+    }
+  }
 
+  if (filteredInput.size() < 2)
+  {
+    std::cerr << "Error: too small input. Need at least two characters.\n";
+    return 1;
+  }
+
+  /*
   std::set<char> chars;
   std::copy(input.begin(), input.end(), std::inserter(chars, chars.begin()));
   if (!std::includes(alphabet1.begin(), alphabet1.end(), 
@@ -144,9 +170,11 @@ int main( int argc, char *argv[] )
         "Error: input has characters not described in frequency tables.\n";
     return 1;
   }
+  */
 
   // Start decoding process.
-  decode(fm1, fm2, gamma, alpha, zeta, input.begin(), input.end());
+  decode(fm1, fm2, gamma, alpha, zeta, 
+      filteredInput.begin(), filteredInput.end());
 }
 
 // vim: set ts=2 sw=2 et:

@@ -31,6 +31,7 @@
 #include <boost/array.hpp>
 #include <boost/format.hpp>
 #include <boost/foreach.hpp>
+#include <boost/assert.hpp>
 
 /*****
  * Types definition.
@@ -45,7 +46,7 @@ struct freq_vec_t
 
   typedef boost::array<symb_t, Len> chain_t;
 
-  static int const chain_length = Len;
+  static size_t const chain_length = Len;
 };
 
 template< class SymbT, class ScalarT, std::size_t Len >
@@ -57,7 +58,7 @@ struct freq_map_t
 
   typedef boost::array<symb_t, Len> chain_t;
 
-  static int const chain_length = Len;
+  static size_t const chain_length = Len;
 };
 
 typedef freq_vec_t<char, double, 1> freq1_vec_t;
@@ -88,6 +89,7 @@ size_t alphabet( freq_map_t<SymbT, ScalarT, Len> const &fm, OutT outIt )
   return chars.size();
 }
 
+// Checks is frequency table alphabet is complete.
 template< class SymbT, class ScalarT, size_t Len >
 inline
 bool is_complete( freq_map_t<SymbT, ScalarT, Len> const &fm )
@@ -101,6 +103,71 @@ bool is_complete( freq_map_t<SymbT, ScalarT, Len> const &fm )
   size_t const nReqFreq = std::pow(nChars, fm_t::chain_length);
 
   return fm.size() == nReqFreq;
+}
+
+// Checks is sum of frequencies is close to 1.0.
+template< class SymbT, class ScalarT, size_t Len >
+inline
+bool is_normalized( freq_map_t<SymbT, ScalarT, Len> const &fm )
+{
+  typedef freq_map_t<SymbT, ScalarT, Len> fm_t;
+  typedef typename fm_t::scalar_t scalar_t;
+
+  scalar_t sum;
+  // TODO: Use std::accumulate().
+  BOOST_FOREACH(typename fm_t::value_type const &pair, fm)
+  {
+    sum += pair.second;
+  }
+
+  return
+      (scalar_t(1.0) - sum) <= scalar_t(+1e-3) && 
+      (scalar_t(1.0) - sum) >= scalar_t(-1e-3);
+}
+
+template< class SymbT, class ScalarT, class CharIt, size_t Len >
+inline
+void calculate_frequency( CharIt first, CharIt beyond, 
+                          freq_map_t<SymbT, ScalarT, Len> &fm )
+{
+  typedef freq_map_t<SymbT, ScalarT, Len> fm_t;
+  typedef typename fm_t::scalar_t scalar_t;
+
+  // Input frequency container must contain alphabet.
+  BOOST_ASSERT(is_complete(fm));
+
+  // Reset frequency statistics.
+  BOOST_FOREACH(typename fm_t::value_type &pair, fm)
+  {
+    pair.second = scalar_t(0);
+  }
+
+  // Copy input.
+  std::vector<typename fm_t::symb_t> const input(first, beyond);
+
+  BOOST_ASSERT(input.size() >= fm_t::chain_length);
+
+  // Calculate frequency.
+  size_t n(0);
+  typename fm_t::chain_t chain;
+  for (size_t i = 0; i < input.size() - fm_t::chain_length; ++i, ++n)
+  {
+    std::copy(
+        input.begin() + i, 
+        input.begin() + i + fm_t::chain_length, 
+        chain.begin());
+
+    BOOST_ASSERT(fm.find(chain) != fm.end());
+    fm[chain] += scalar_t(1.0);
+  }
+
+  // Normalize.
+  BOOST_FOREACH(typename fm_t::value_type &pair, fm)
+  {
+    pair.second /= n;
+  }
+
+  BOOST_ASSERT(is_normalized(fm));
 }
 
 /*****
@@ -150,7 +217,7 @@ std::basic_istream<CharT, Traits> &
     freqSum += freq;
   }
 
-  if (!fm.empty() && freqSum < 0.999)
+  if (!is_normalized(fm))
   {
     throw std::runtime_error(
         (boost::format(

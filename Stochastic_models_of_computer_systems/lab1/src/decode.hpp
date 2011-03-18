@@ -20,15 +20,20 @@
 
 #include <vector>
 #include <set>
+#include <fstream>
 
 #include "freq_table.hpp"
 
 template< class CharInIt >
 inline
-void decode( freq1_map_t const &fm1, freq2_map_t const &fm2, 
+int decode( freq1_map_t const &fm1, freq2_map_t const &fm2, 
              double gamma, double alpha, double zeta,
              CharInIt first, CharInIt beyond )
 {
+  char const 
+      *freq1FileName = "frequency1.dat",
+      *freq2FileName = "frequency2.dat";
+
   // Read input.
   std::vector<char> input(first, beyond);
 
@@ -44,7 +49,32 @@ void decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   calculate_frequency(input.begin(), input.end(), efm2);
   
   // Write empiric frequencies to files.
-  
+  {
+    std::ofstream os(freq1FileName);
+    
+    if (!os)
+    {
+      perror(freq1FileName);
+      return 1;
+    }
+    else
+    {
+      os << efm1;
+    }
+  }
+  {
+    std::ofstream os(freq2FileName);
+    
+    if (!os)
+    {
+      perror(freq2FileName);
+      return 1;
+    }
+    else
+    {
+      os << efm2;
+    }
+  }
   
   // Calculate confidence intervals for theoretic frequencies.
   
@@ -53,6 +83,7 @@ void decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   // Output all matches.
 
   
+  return 0;
 }
 
 #endif // DECODE_HPP_

@@ -173,7 +173,7 @@ int main( int argc, char *argv[] )
   */
 
   // Start decoding process.
-  decode(fm1, fm2, gamma, alpha, zeta, 
+  return decode(fm1, fm2, gamma, alpha, zeta, 
       filteredInput.begin(), filteredInput.end());
 }
 

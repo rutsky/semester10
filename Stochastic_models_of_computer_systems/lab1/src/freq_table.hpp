@@ -25,6 +25,7 @@
 #include <stdexcept>
 #include <cmath>
 #include <algorithm>
+#include <iomanip>
 
 // TODO: Debug.
 #include <iostream>
@@ -153,7 +154,7 @@ void sort( freq_vec_t<SymbT, ScalarT, Len> &fv )
   typedef freq_vec_t<SymbT, ScalarT, Len> fv_t;
 
   std::sort(fv.begin(), fv.end(),
-      boost::bind(&fv_t::value_type::second, _1) <
+      boost::bind(&fv_t::value_type::second, _1) >
       boost::bind(&fv_t::value_type::second, _2));
 }
 
@@ -265,7 +266,6 @@ std::basic_istream<CharT, Traits> &
   return is;
 }
 
-/*
 template< class CharT, class Traits,
           class SymbT, class ScalarT, size_t Len >
 inline
@@ -274,17 +274,20 @@ std::basic_ostream<CharT, Traits> &
                   freq_map_t<SymbT, ScalarT, Len> const &fm )
 {
   typedef freq_map_t<SymbT, ScalarT, Len> fm_t;
+  typedef freq_vec_t<SymbT, ScalarT, Len> fv_t;
 
-  VectorFreqTable vec = toVector(table);
-  sort(vec);
+  fv_t fv(fm);
+  sort(fv);
   
-  BOOST_FOREACH(VectorFreqTable::value_type const &pair, vec)
+  BOOST_FOREACH(typename fv_t::value_type const &pair, fv)
   {
-    os << pair.first << "\n" << std::setprecision(16) << pair.second << "\n";
+    for (size_t i = 0; i < fv_t::chain_length; ++i)
+      os << pair.first.at(i);
+    os << "\n" << std::setprecision(16) << pair.second << "\n";
   }
 
   return os;
-}*/
+}
 
 #endif // FREQ_TABLE_HPP_
 

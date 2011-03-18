@@ -21,7 +21,7 @@
 #include <vector>
 #include <set>
 
-#include "freq_table2.hpp"
+#include "freq_table.hpp"
 
 template< class CharInIt >
 inline

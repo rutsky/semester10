@@ -22,7 +22,7 @@
 
 #include <fstream>
 
-#include "freq_table2.hpp"
+#include "freq_table.hpp"
 
 BOOST_AUTO_TEST_SUITE(freq_table2)
 

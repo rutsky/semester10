@@ -20,7 +20,7 @@
 
 #include <boost/program_options.hpp>
 
-#include "freq_table2.hpp"
+#include "freq_table.hpp"
 #include "decode.hpp"
 
 namespace po = boost::program_options;

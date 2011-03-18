@@ -124,6 +124,7 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   }
 
   // Output all matches.
+  // TODO: Order by intervals.
   std::cout << "Found " << totalMatches << " matches of empirical frequencies "
       "with theoretical confidence intervals.\n";
   std::cout << "Symbol (confidence interval): matched symbols\n";

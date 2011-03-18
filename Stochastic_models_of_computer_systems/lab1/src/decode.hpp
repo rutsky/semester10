@@ -22,6 +22,10 @@
 #include <set>
 #include <fstream>
 
+#include <boost/foreach.hpp>
+#include <boost/assert.hpp>
+#include <boost/math/distributions/binomial.hpp>
+
 #include "freq_table.hpp"
 
 template< class CharInIt >
@@ -77,8 +81,24 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   }
   
   // Calculate confidence intervals for theoretic frequencies.
+  typedef std::pair<double, double> interval_t;
+  typedef std::map<char, interval_t> confidence_intervals_map_t;
+  confidence_intervals_map_t confInt;
+
+  BOOST_FOREACH(freq1_map_t::value_type const &pair, fm1)
+  {
+    typedef boost::math::binomial_distribution<double> binomial_distr_t;
+    double const lo = 
+        binomial_distr_t::find_lower_bound_on_p(
+            input.size(), input.size() * pair.second, (1.0 - gamma) / 2.0);
+    double const hi = 
+        binomial_distr_t::find_upper_bound_on_p(
+            input.size(), input.size() * pair.second,  (1.0 - gamma) / 2.0);
+
+    confInt[pair.first[0]] = interval_t(lo, hi);
+  }
   
-  // Find all emperic frequencies that match each confidence interval.
+  // Find all empiric frequencies that match each confidence interval.
 
   // Output all matches.
 

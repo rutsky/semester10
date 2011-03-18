@@ -99,6 +99,26 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   }
   
   // Find all empiric frequencies that match each confidence interval.
+  typedef std::vector<char> possible_symb_t;
+  typedef std::map<char, possible_symb_t> theor_to_emp_symbs_t;
+  theor_to_emp_symbs_t theorToEmp;
+
+  // TODO: Optimize.
+  BOOST_FOREACH(freq1_map_t::value_type const &theorPair, fm1)
+  {
+    possible_symb_t &possible = theorToEmp[theorPair.first[0]];
+
+    interval_t const &interval = confInt[theorPair.first[0]];
+    BOOST_FOREACH(freq1_map_t::value_type const &empPair, efm1)
+    {
+      if (empPair.second >= interval.first && empPair.second <= interval.second)
+      {
+        // Found empirical symbol whom frequency lies in confidence interval 
+        // of current theoretical symbol.
+        possible.push_back(empPair.first[0]);
+      }
+    }
+  }
 
   // Output all matches.
 

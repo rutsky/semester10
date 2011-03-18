@@ -129,13 +129,6 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   std::cout << "Symbol (confidence interval): matched symbols\n";
   BOOST_FOREACH(theor_to_emp_symbs_t::value_type const &pair, theorToEmp)
   {
-    /*
-    std::cout << "Symbol '" << pair.first << "'. " << 
-        "Confidence interval: (" << 
-            confInt[pair.first].first << "," <<
-            confInt[pair.first].second << ")\n" <<
-        "Matched symbols: ";
-    */
     std::cout << "'" << pair.first << "': (" << 
             std::setw(16) << std::setprecision(16) << std::fixed << 
                 confInt[pair.first].first << ", " <<

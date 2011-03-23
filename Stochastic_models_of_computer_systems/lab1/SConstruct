@@ -45,6 +45,8 @@ elif global_env.conf == 'gprof':
     # Performance profiling.
     # For intruduction see:
     # http://www.ibm.com/developerworks/library/l-gnuprof.html
+    # Short HOWTO:
+    # gprof ./main gmon.out -p
     global_env.MergeFlags(global_env.ParseFlags("-O2 -pg"))
     #global_env.AppendUnique(LIBS='c_p')
     global_env.AppendUnique(LINKFLAGS='-pg')

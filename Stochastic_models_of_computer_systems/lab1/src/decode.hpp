@@ -149,6 +149,10 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   // Go over all possible bijections and store bijections that pass Pearson's
   // Chi-square test.
 
+
+  // For each bijection that passed Pearson's Chi-square test output bijections
+  // which probability in Markov's chain is not less than zeta.
+
   
   return 0;
 }

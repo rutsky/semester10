@@ -51,6 +51,10 @@ size_t find_bijections( std::map<char, std::vector<char> > const &theorToEmp,
     if ((numFoundBijections + 1) % 1000000 == 0)
       std::cout << "Already found " << numFoundBijections + 1 << 
           " bijections..." << std::endl;
+
+    if (numFoundBijections + 1 == maxNumberOfBijections)
+      std::cout << "Maximum number of bijections to try exceeded (" <<
+          maxNumberOfBijections << ")" << std::endl;
     
     // DEBUG
     //static int cc(0);
@@ -107,7 +111,7 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
       *freq1FileName = "frequency1.dat",
       *freq2FileName = "frequency2.dat",
       *bijectionsFileName = "bijections.dat";
-  size_t const maxNumberOfBijections(1e8);
+  size_t const maxNumberOfBijections(3e6);
 
   std::cout << 
       "Confidence level of reducing number of bijections confidence "

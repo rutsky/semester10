@@ -19,6 +19,36 @@ import os
 global_env = Environment()
 Export('global_env')
 
+def get_argument(name, values, default=None):
+    if default is not None:
+        using_default = default
+        assert default in values
+    else:
+        using_default = values[0]
+
+    v = ARGUMENTS.get(name, using_default)
+    assert v in values
+
+    return v
+
+configurations = ['release', 'debug', 'valgrind', 'gprof']
+global_env.conf = get_argument('conf', configurations)
+
+if global_env.conf == 'debug':
+    global_env.MergeFlags(global_env.ParseFlags("-O0"))
+elif global_env.conf == 'release':
+    global_env.MergeFlags(global_env.ParseFlags("-O3"))
+elif global_env.conf == 'valgrind':
+    # Leak checking.
+    global_env.MergeFlags(global_env.ParseFlags("-O -fno-inline"))
+elif global_env.conf == 'gprof':
+    # Performance profiling.
+    # For intruduction see:
+    # http://www.ibm.com/developerworks/library/l-gnuprof.html
+    global_env.MergeFlags(global_env.ParseFlags("-O2 -pg"))
+    #global_env.AppendUnique(LIBS='c_p')
+    global_env.AppendUnique(LINKFLAGS='-pg')
+
 global_env.AppendUnique(LIBS=['m'])
 global_env.MergeFlags(global_env.ParseFlags("-g -W -Wall"))
 
@@ -27,6 +57,6 @@ SConscript(os.path.join("report", "SConscript"),
 #SConscript(os.path.join("report", "SConscript"))
 
 SConscript(os.path.join("src", "SConscript"), 
-    variant_dir=os.path.join("build", "src"))
+    variant_dir=os.path.join("build", "src", global_env.conf))
 
 # vim: set filetype=python ts=4 sw=4 et:

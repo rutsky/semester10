@@ -29,6 +29,60 @@
 
 #include "freq_table.hpp"
 
+// TODO: Optimize.
+// TODO: Use visitor pattern.
+template< class CurrentCharIt, class BijectionOutIt >
+inline
+bool find_bijections( std::map<char, std::vector<char> > const &theorToEmp,  
+                      CurrentCharIt first, CurrentCharIt beyond,
+                      std::map<char, char> &currentBijection,
+                      std::set<char> usedChars,
+                      BijectionOutIt outIt )
+{
+  typedef std::vector<char> possible_symb_t;
+  typedef std::map<char, possible_symb_t> theor_to_emp_symbs_t;
+
+  if (first == beyond)
+  {
+    //*outIt++ = currentBijection;
+    
+    // DEBUG
+    static int cc(0);
+    //std::cout << cc << "\n";
+    if (cc == 100000)
+    {
+      std::cout << "return";
+      return false;
+    }
+    ++cc;
+  }
+  else
+  {
+    char ch = *first++;
+
+    BOOST_ASSERT(currentBijection.find(ch) == currentBijection.end());
+    BOOST_ASSERT(theorToEmp.find(ch) != theorToEmp.end());
+
+    BOOST_FOREACH(char empCh, theorToEmp.find(ch)->second)
+    {
+      if (usedChars.find(empCh) == usedChars.end())
+      {
+        currentBijection[ch] = empCh;
+        usedChars.insert(empCh);
+        
+        if (!find_bijections(theorToEmp, first, beyond, 
+            currentBijection, usedChars, outIt))
+          return false;
+
+        usedChars.erase(usedChars.find(empCh));
+        currentBijection.erase(currentBijection.find(ch));
+      }
+    }
+  }
+
+  return true;
+}
+
 template< class CharInIt >
 inline
 int decode( freq1_map_t const &fm1, freq2_map_t const &fm2, 
@@ -37,7 +91,8 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
 {
   char const 
       *freq1FileName = "frequency1.dat",
-      *freq2FileName = "frequency2.dat";
+      *freq2FileName = "frequency2.dat",
+      *bijectionsFileName = "bijections.dat";
 
   // Read input.
   std::vector<char> input(first, beyond);
@@ -146,9 +201,42 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
     std::cout << "\n";
   }
 
+
+  // Generate all possible bijections.
+  typedef std::map<char, char> bijection_t;
+  typedef std::vector<bijection_t> bijections_vec_t;
+  bijections_vec_t bijections;
+  bijection_t tmpBijection;
+  std::set<char> tmpChars;
+  find_bijections(theorToEmp, chars.begin(), chars.end(), 
+      tmpBijection, tmpChars, std::back_inserter(bijections));
+
+  std::cout << "Found " << bijections.size() << " bijections.\n";
+
+  // Write bijections to file.
+  {
+    std::ofstream os(bijectionsFileName);
+    if (!os)
+    {
+      perror(bijectionsFileName);
+      return 1;
+    }
+    else
+    {
+      BOOST_FOREACH(bijections_vec_t::value_type bijection, bijections)
+      {
+        BOOST_FOREACH(bijection_t::value_type const &pair, bijection)
+        {
+          os << pair.second;
+        }
+        os << "\n";
+      }
+    }
+  }
+
   // Go over all possible bijections and store bijections that pass Pearson's
   // Chi-square test.
-
+  
 
   // For each bijection that passed Pearson's Chi-square test output bijections
   // which probability in Markov's chain is not less than zeta.

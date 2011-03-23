@@ -147,6 +147,7 @@ bool is_normalized( freq_map_t<SymbT, ScalarT, Len> const &fm )
       (scalar_t(1.0) - sum) >= scalar_t(-1e-3);
 }
 
+// TODO: Sort in ascending order and later reverse.
 template< class SymbT, class ScalarT, size_t Len >
 inline
 void sort( freq_vec_t<SymbT, ScalarT, Len> &fv )

@@ -33,11 +33,13 @@
 // TODO: Use visitor pattern.
 template< class CurrentCharIt, class BijectionOutIt >
 inline
-bool find_bijections( std::map<char, std::vector<char> > const &theorToEmp,  
-                      CurrentCharIt first, CurrentCharIt beyond,
-                      std::map<char, char> &currentBijection,
-                      std::set<char> usedChars,
-                      BijectionOutIt outIt )
+size_t find_bijections( std::map<char, std::vector<char> > const &theorToEmp,  
+                        CurrentCharIt first, CurrentCharIt beyond,
+                        std::vector<int> &currentBijection,
+                        std::vector<int> &usedChars,
+                        size_t numFoundBijections,
+                        size_t maxNumberOfBijections,
+                        BijectionOutIt outIt )
 {
   typedef std::vector<char> possible_symb_t;
   typedef std::map<char, possible_symb_t> theor_to_emp_symbs_t;
@@ -46,41 +48,53 @@ bool find_bijections( std::map<char, std::vector<char> > const &theorToEmp,
   {
     //*outIt++ = currentBijection;
     
+    if ((numFoundBijections + 1) % 1000000 == 0)
+      std::cout << "Already found " << numFoundBijections + 1 << 
+          " bijections..." << std::endl;
+    
     // DEBUG
-    static int cc(0);
+    //static int cc(0);
     //std::cout << cc << "\n";
-    if (cc == 100000)
-    {
-      std::cout << "return";
-      return false;
-    }
-    ++cc;
+    //if (cc == 100000000)
+    //{
+    //  std::cout << "limit exceeded!\n";
+    //  return false;
+    //}
+    //++cc;
+
+    return 1;
   }
   else
   {
     char ch = *first++;
 
-    BOOST_ASSERT(currentBijection.find(ch) == currentBijection.end());
+    BOOST_ASSERT(!currentBijection.at(ch));
     BOOST_ASSERT(theorToEmp.find(ch) != theorToEmp.end());
 
+    size_t foundOnThisStep(0);
     BOOST_FOREACH(char empCh, theorToEmp.find(ch)->second)
     {
-      if (usedChars.find(empCh) == usedChars.end())
+      if (!usedChars.at((unsigned char)empCh))
       {
-        currentBijection[ch] = empCh;
-        usedChars.insert(empCh);
+        currentBijection.at(ch) = empCh;
+        usedChars.at((unsigned char)empCh) = 1;
         
-        if (!find_bijections(theorToEmp, first, beyond, 
-            currentBijection, usedChars, outIt))
-          return false;
+        foundOnThisStep += find_bijections(theorToEmp, first, beyond, 
+            currentBijection, usedChars, 
+            numFoundBijections + foundOnThisStep, maxNumberOfBijections, 
+            outIt);
 
-        usedChars.erase(usedChars.find(empCh));
-        currentBijection.erase(currentBijection.find(ch));
+        usedChars.at((unsigned char)empCh) = 0;
+        currentBijection.at(ch) = 0;
+        
+        BOOST_ASSERT(
+            numFoundBijections + foundOnThisStep <= maxNumberOfBijections);
+        if (numFoundBijections + foundOnThisStep >= maxNumberOfBijections)
+          return foundOnThisStep;
       }
     }
+    return foundOnThisStep;
   }
-
-  return true;
 }
 
 template< class CharInIt >
@@ -93,6 +107,15 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
       *freq1FileName = "frequency1.dat",
       *freq2FileName = "frequency2.dat",
       *bijectionsFileName = "bijections.dat";
+  size_t const maxNumberOfBijections(1e8);
+
+  std::cout << 
+      "Confidence level of reducing number of bijections confidence "
+      "intervals, gamma = " << gamma << std::endl <<
+      "Significance level for Pearson's Chi-square test, alpha = " << 
+          alpha << std::endl <<
+      "Minimal acceptable probability of observed Markov chain, zeta = " <<
+          zeta << std::endl; 
 
   // Read input.
   std::vector<char> input(first, beyond);
@@ -181,9 +204,11 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   // Output all matches.
   // TODO: Order by intervals.
   // TODO: Also output is identity bijection included.
+  size_t worstNumOfBijections(1);
   std::cout << "Found " << totalMatches << " matches of empirical frequencies "
       "with theoretical confidence intervals.\n";
   std::cout << "Symbol (confidence interval): matched symbols\n";
+  bool identityBijectionIncluded(true);
   BOOST_FOREACH(theor_to_emp_symbs_t::value_type const &pair, theorToEmp)
   {
     std::cout << "'" << pair.first << "': (" << 
@@ -199,17 +224,33 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
         std::cout << symb << " ";
     }
     std::cout << "\n";
-  }
 
+    worstNumOfBijections *= pair.second.size();
+
+    identityBijectionIncluded = identityBijectionIncluded &&
+      (std::find(pair.second.begin(), pair.second.end(), pair.first) != 
+            pair.second.end());
+  }
+  std::cout << 
+      "Worst number of bijections: " << worstNumOfBijections << std::endl;
+  if (!identityBijectionIncluded)
+  {
+    std::cout << 
+        "Identity bijection not included, this is definitely not good.\n"
+        "Skip other checks.\n";
+    return 0;
+  }
 
   // Generate all possible bijections.
   typedef std::map<char, char> bijection_t;
   typedef std::vector<bijection_t> bijections_vec_t;
   bijections_vec_t bijections;
-  bijection_t tmpBijection;
-  std::set<char> tmpChars;
+  //bijection_t tmpBijection;
+  std::vector<int> tmpBijection(256, 0);
+  std::vector<int> tmpChars(256, 0);
   find_bijections(theorToEmp, chars.begin(), chars.end(), 
-      tmpBijection, tmpChars, std::back_inserter(bijections));
+      tmpBijection, tmpChars, 0, maxNumberOfBijections, 
+      std::back_inserter(bijections));
 
   std::cout << "Found " << bijections.size() << " bijections.\n";
 

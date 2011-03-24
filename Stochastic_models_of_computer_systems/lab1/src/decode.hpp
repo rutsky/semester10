@@ -99,9 +99,9 @@ size_t find_bijections( std::map<char, std::vector<char> > const &theorToEmp,
         if (chi2Normalized + chi2Part >= critChi2NormalizedPlus1)
         {
           // Critical Chi-squared exceeded.
-          std::cout << "Rejected '" << ch << "' - '" << empCh << "': " << 
-              chi2Part << " " << chi2Normalized << "\n";
-          exit(0);
+          //std::cout << "Rejected '" << ch << "' - '" << empCh << "': " << 
+          //    chi2Part << " " << chi2Normalized << " " << critChi2NormalizedPlus1 << "\n";
+          //exit(0);
           continue;
         }
 
@@ -144,19 +144,30 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
 
   std::cout << 
       "Confidence level of reducing number of bijections confidence "
-      "intervals, gamma = " << gamma << std::endl <<
-      "Significance level for Pearson's Chi-square test, alpha = " << 
-          alpha << std::endl <<
-      "Minimal acceptable probability of observed Markov chain, zeta = " <<
-          zeta << std::endl; 
+      "intervals,\n"
+      "    gamma = " << gamma << ".\n" <<
+      "Significance level for Pearson's Chi-square test,\n"
+      "    alpha = " << alpha << ".\n" <<
+      "Minimal acceptable probability of observed Markov chain,\n"
+      "    zeta = " << zeta << ".\n"; 
 
   // Read input.
   std::vector<char> input(first, beyond);
-  BOOST_ASSERT(input.size() >= 2);
+  size_t const n = input.size();
+  BOOST_ASSERT(n >= 2);
+
+  std::cout << 
+      "Number of trials,\n"
+      "    n = " << n << ".\n";
 
   // Construct alphabet.
   std::set<char> chars;
   alphabet(fm1, std::inserter(chars, chars.begin()));
+  size_t const N = chars.size();
+
+  std::cout <<
+      "Number of possible outcome after single trial,\n"
+      "    N = " << N << ".\n";
 
   // Calculate empiric frequencies.
   freq1_map_t efm1(fm1);
@@ -266,6 +277,7 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   }
   std::cout << 
       "Worst number of bijections: " << worstNumOfBijections << std::endl;
+
   if (!identityBijectionIncluded)
   {
     std::cout << 
@@ -273,11 +285,37 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
         "Skip other checks.\n";
     return 0;
   }
+  
+  double identityChi2(0);
+  {
+    // Calculate Chi-square statistics for identity bijection.
+    
+    double accum(0);
+    BOOST_FOREACH(unsigned char const ch, chars)
+    {
+      unsigned char const empCh = ch;
+
+      double const p = fm1.find(ch)->second;
+      double const ep = efm1.find(empCh)->second;
+      accum += sqr(ep) / p;
+    }
+    identityChi2 = (accum - 1.0) * n;
+  }
+  std::cout << "Chi-square statistics for identity bijection: " << 
+     identityChi2 << "\n";
 
   // Find critical value for Chi-square statistics.
-  boost::math::chi_squared_distribution<double> chi2(input.size() - 1);
+  boost::math::chi_squared_distribution<double> chi2(chars.size() - 1);
   double const chi2Crit = quantile(chi2, 1.0 - alpha);
-  std::cout << "Chi2(N-1, 1-alpha) = " << chi2Crit << std::endl;
+  std::cout << "Chi-square(1-alpha, N-1) = " << chi2Crit << std::endl;
+  
+  if (identityChi2 >= chi2Crit)
+  {
+    std::cout << 
+      "Identity bijection not passed Pearson's Chi-square test.\n" <<
+      "Skip other checks.\n";
+    return 0;
+  }
 
   // Generate all possible bijections.
   typedef std::vector<int> bijection_t;
@@ -317,16 +355,16 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
           size_t const n = input.size();
           double const p = fm1.find(ch)->second;
           double const ep = efm1.find(empCh)->second;
-          chi2 += sqr(n * ep - n * p) / (n * p);
+          chi2 += n * (sqr(ep) / p - 1.0);
 
-          ostr << 
-              " + (" << n << "*" << ep << "-" << n << "*" << p << ")**2/" <<
-              "(" << n << "*" << p << ")";
+          //ostr << 
+          //    " + (" << n << "*" << ep << "-" << n << "*" << p << ")**2/" <<
+          //    "(" << n << "*" << p << ")";
         }
 
         // Output it's Chi-square statistics.
         os << " " << chi2;
-        os << " == " << ostr.str();
+        //os << " == " << ostr.str();
 
         os << "\n";
       }

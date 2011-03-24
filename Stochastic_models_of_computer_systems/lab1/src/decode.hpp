@@ -53,7 +53,7 @@ size_t find_bijections( std::map<char, std::vector<char> > const &theorToEmp,
 
   if (first == beyond)
   {
-    //*outIt++ = currentBijection;
+    *outIt++ = currentBijection;
     
     if ((numFoundBijections + 1) % 1000000 == 0)
       std::cout << "Already found " << numFoundBijections + 1 << 
@@ -72,6 +72,8 @@ size_t find_bijections( std::map<char, std::vector<char> > const &theorToEmp,
     //  return false;
     //}
     //++cc;
+    
+    //exit(0); // DEBUG
 
     return 1;
   }
@@ -91,9 +93,15 @@ size_t find_bijections( std::map<char, std::vector<char> > const &theorToEmp,
         BOOST_ASSERT(efm.find(empCh) != efm.end());
         BOOST_ASSERT(fm.find(ch) != fm.end());
         double const chi2Part = sqr(efm.find(empCh)->second) / fm.find(ch)->second;
+        //std::cout << "'" << ch << "' - '" << empCh << "': " << 
+        //    chi2Part << " " << chi2Normalized << " " << critChi2NormalizedPlus1 << "\n";
+
         if (chi2Normalized + chi2Part >= critChi2NormalizedPlus1)
         {
           // Critical Chi-squared exceeded.
+          std::cout << "Rejected '" << ch << "' - '" << empCh << "': " << 
+              chi2Part << " " << chi2Normalized << "\n";
+          exit(0);
           continue;
         }
 
@@ -272,7 +280,7 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   std::cout << "Chi2(N-1, 1-alpha) = " << chi2Crit << std::endl;
 
   // Generate all possible bijections.
-  typedef std::map<char, char> bijection_t;
+  typedef std::vector<int> bijection_t;
   typedef std::vector<bijection_t> bijections_vec_t;
   bijections_vec_t bijections;
   //bijection_t tmpBijection;
@@ -297,10 +305,29 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
     {
       BOOST_FOREACH(bijections_vec_t::value_type bijection, bijections)
       {
-        BOOST_FOREACH(bijection_t::value_type const &pair, bijection)
+        std::ostringstream ostr("0");
+        double chi2(0);
+        BOOST_FOREACH(unsigned char const ch, chars)
         {
-          os << pair.second;
+          unsigned char const empCh = bijection.at(ch);
+
+          // Output bijection.
+          os << empCh;
+
+          size_t const n = input.size();
+          double const p = fm1.find(ch)->second;
+          double const ep = efm1.find(empCh)->second;
+          chi2 += sqr(n * ep - n * p) / (n * p);
+
+          ostr << 
+              " + (" << n << "*" << ep << "-" << n << "*" << p << ")**2/" <<
+              "(" << n << "*" << p << ")";
         }
+
+        // Output it's Chi-square statistics.
+        os << " " << chi2;
+        os << " == " << ostr.str();
+
         os << "\n";
       }
     }

@@ -57,6 +57,7 @@ template< class SymbT, class ScalarT, std::size_t Len >
 struct freq_map_t
   : std::map<boost::array<SymbT, Len>, ScalarT>
 {
+  typedef std::map<boost::array<SymbT, Len>, ScalarT> base_t;
   typedef freq_map_t<SymbT, ScalarT, Len> fm_t;
   typedef SymbT   symb_t;
   typedef ScalarT scalar_t;
@@ -66,6 +67,20 @@ struct freq_map_t
   static size_t const chain_length = Len;
 
   operator freq_vec_t<SymbT, ScalarT, Len>() const;
+
+  // TODO: Non-const versions.
+  // TODO: Version for multiple arguments.
+  // TODO: Use Boost's enable_if.
+  using base_t::find;
+  typename fm_t::const_iterator find( symb_t const &s0 ) const
+  {
+    BOOST_ASSERT(Len == 1);
+
+    chain_t chain;
+    chain[0] = s0;
+
+    return find(chain);
+  }
 };
 
 template< class SymbT, class ScalarT, size_t Len >

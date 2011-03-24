@@ -28,18 +28,24 @@
 #include <boost/math/distributions/binomial.hpp>
 #include <boost/math/distributions/chi_squared.hpp>
 
+#include "common.hpp"
 #include "freq_table.hpp"
 
 // TODO: Optimize.
 // TODO: Use visitor pattern.
+// TODO: Wrap in class.
 template< class CurrentCharIt, class BijectionOutIt >
 inline
 size_t find_bijections( std::map<char, std::vector<char> > const &theorToEmp,  
                         CurrentCharIt first, CurrentCharIt beyond,
                         std::vector<int> &currentBijection,
                         std::vector<int> &usedChars,
-                        size_t numFoundBijections,
-                        size_t maxNumberOfBijections,
+                        size_t const numFoundBijections,
+                        size_t const maxNumberOfBijections,
+                        freq1_map_t const &fm,
+                        freq1_map_t const &efm,
+                        double const chi2Normalized,
+                        double const critChi2NormalizedPlus1,
                         BijectionOutIt outIt )
 {
   typedef std::vector<char> possible_symb_t;
@@ -81,16 +87,30 @@ size_t find_bijections( std::map<char, std::vector<char> > const &theorToEmp,
     {
       if (!usedChars.at((unsigned char)empCh))
       {
-        currentBijection.at(ch) = empCh;
-        usedChars.at((unsigned char)empCh) = 1;
-        
-        foundOnThisStep += find_bijections(theorToEmp, first, beyond, 
-            currentBijection, usedChars, 
-            numFoundBijections + foundOnThisStep, maxNumberOfBijections, 
-            outIt);
+        // Check is critical Chi-squared exceeded.
+        BOOST_ASSERT(efm.find(empCh) != efm.end());
+        BOOST_ASSERT(fm.find(ch) != fm.end());
+        double const chi2Part = sqr(efm.find(empCh)->second) / fm.find(ch)->second;
+        if (chi2Normalized + chi2Part >= critChi2NormalizedPlus1)
+        {
+          // Critical Chi-squared exceeded.
+          continue;
+        }
 
-        usedChars.at((unsigned char)empCh) = 0;
-        currentBijection.at(ch) = 0;
+        // Use current character in bijection and try find other characters.
+        {
+          currentBijection.at(ch) = empCh;
+          usedChars.at((unsigned char)empCh) = 1;
+          
+          foundOnThisStep += find_bijections(theorToEmp, first, beyond, 
+              currentBijection, usedChars, 
+              numFoundBijections + foundOnThisStep, maxNumberOfBijections, 
+              fm, efm, chi2Normalized + chi2Part, critChi2NormalizedPlus1,
+              outIt);
+
+          usedChars.at((unsigned char)empCh) = 0;
+          currentBijection.at(ch) = 0;
+        }
         
         BOOST_ASSERT(
             numFoundBijections + foundOnThisStep <= maxNumberOfBijections);
@@ -209,7 +229,6 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
 
   // Output all matches.
   // TODO: Order by intervals.
-  // TODO: Also output is identity bijection included.
   size_t worstNumOfBijections(1);
   std::cout << "Found " << totalMatches << " matches of empirical frequencies "
       "with theoretical confidence intervals.\n";
@@ -261,6 +280,7 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   std::vector<int> tmpChars(256, 0);
   find_bijections(theorToEmp, chars.begin(), chars.end(), 
       tmpBijection, tmpChars, 0, maxNumberOfBijections, 
+      fm1, efm1, 0, chi2Crit / input.size() + 1.0,
       std::back_inserter(bijections));
 
   std::cout << "Found " << bijections.size() << " bijections.\n";

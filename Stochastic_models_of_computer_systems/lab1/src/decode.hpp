@@ -26,6 +26,7 @@
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
 #include <boost/math/distributions/binomial.hpp>
+#include <boost/math/distributions/chi_squared.hpp>
 
 #include "freq_table.hpp"
 
@@ -54,7 +55,7 @@ size_t find_bijections( std::map<char, std::vector<char> > const &theorToEmp,
 
     if (numFoundBijections + 1 == maxNumberOfBijections)
       std::cout << "Maximum number of bijections to try exceeded (" <<
-          maxNumberOfBijections << ")" << std::endl;
+          maxNumberOfBijections << ")!" << std::endl;
     
     // DEBUG
     //static int cc(0);
@@ -123,6 +124,7 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
 
   // Read input.
   std::vector<char> input(first, beyond);
+  BOOST_ASSERT(input.size() >= 2);
 
   // Construct alphabet.
   std::set<char> chars;
@@ -244,6 +246,11 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
         "Skip other checks.\n";
     return 0;
   }
+
+  // Find critical value for Chi-square statistics.
+  boost::math::chi_squared_distribution<double> chi2(input.size() - 1);
+  double const chi2Crit = quantile(chi2, 1.0 - alpha);
+  std::cout << "Chi2(N-1, 1-alpha) = " << chi2Crit << std::endl;
 
   // Generate all possible bijections.
   typedef std::map<char, char> bijection_t;

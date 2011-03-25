@@ -63,18 +63,6 @@ size_t find_bijections( std::map<char, std::vector<char> > const &theorToEmp,
       std::cout << "Maximum number of bijections to try exceeded (" <<
           maxNumberOfBijections << ")!" << std::endl;
     
-    // DEBUG
-    //static int cc(0);
-    //std::cout << cc << "\n";
-    //if (cc == 100000000)
-    //{
-    //  std::cout << "limit exceeded!\n";
-    //  return false;
-    //}
-    //++cc;
-    
-    //exit(0); // DEBUG
-
     return 1;
   }
   else
@@ -92,16 +80,11 @@ size_t find_bijections( std::map<char, std::vector<char> > const &theorToEmp,
         // Check is critical Chi-squared exceeded.
         BOOST_ASSERT(efm.find(empCh) != efm.end());
         BOOST_ASSERT(fm.find(ch) != fm.end());
-        double const chi2Part = sqr(efm.find(empCh)->second) / fm.find(ch)->second;
-        //std::cout << "'" << ch << "' - '" << empCh << "': " << 
-        //    chi2Part << " " << chi2Normalized << " " << critChi2NormalizedPlus1 << "\n";
+        double const chi2Part = 
+            sqr(efm.find(empCh)->second) / fm.find(ch)->second;
 
         if (chi2Normalized + chi2Part >= critChi2NormalizedPlus1)
         {
-          // Critical Chi-squared exceeded.
-          //std::cout << "Rejected '" << ch << "' - '" << empCh << "': " << 
-          //    chi2Part << " " << chi2Normalized << " " << critChi2NormalizedPlus1 << "\n";
-          //exit(0);
           continue;
         }
 
@@ -256,7 +239,8 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
     interval_t const &interval = confInt[theorPair.first[0]];
     BOOST_FOREACH(freq1_map_t::value_type const &empPair, efm1)
     {
-      if (empPair.second >= interval.first && empPair.second <= interval.second)
+      if (empPair.second >= interval.first && 
+          empPair.second <= interval.second)
       {
         // Found empirical symbol whom frequency lies in confidence interval 
         // of current theoretical symbol.
@@ -363,7 +347,6 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
     {
       BOOST_FOREACH(bijections_vec_t::value_type bijection, bijections)
       {
-        std::ostringstream ostr("0");
         double chi2(0);
         BOOST_FOREACH(unsigned char const ch, chars)
         {
@@ -375,16 +358,11 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
           double const p = fm1.find(ch)->second;
           double const ep = efm1.find(empCh)->second;
           chi2 += sqr(ep) / p;
-
-          //ostr << 
-          //    " + (" << n << "*" << ep << "-" << n << "*" << p << ")**2/" <<
-          //    "(" << n << "*" << p << ")";
         }
         chi2 = (chi2 - 1.0) * n;
 
         // Output it's Chi-square statistics.
         os << " " << chi2;
-        //os << " == " << ostr.str();
 
         os << "\n";
       }

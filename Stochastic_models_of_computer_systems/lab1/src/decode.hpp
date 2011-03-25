@@ -22,6 +22,7 @@
 #include <set>
 #include <fstream>
 #include <iostream>
+#include <cmath>
 
 #include <boost/foreach.hpp>
 #include <boost/assert.hpp>
@@ -122,8 +123,9 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   char const 
       *freq1FileName = "frequency1.dat",
       *freq2FileName = "frequency2.dat",
-      *bijectionsFileName = "bijections.dat";
-  size_t const maxNumberOfBijections(3e6);
+      *bijectionsFileName = "bijections.dat",
+      *passedBijectionsFileName = "passed_bijections.dat";
+  size_t const maxNumberOfBijections(1e6);
 
   std::cout << 
       "Confidence level of reducing number of bijections confidence "
@@ -149,7 +151,7 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   size_t const N = chars.size();
 
   std::cout <<
-      "Number of possible outcome after single trial,\n"
+      "Number of possible outcomes after single trial,\n"
       "    N = " << N << ".\n";
 
   // Calculate empiric frequencies.
@@ -321,7 +323,7 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
     return 0;
   }
 
-  // Generate all possible bijections.
+  // Generate all possible bijections that passes Pearson's chi-square test.
   typedef std::vector<int> bijection_t;
   typedef std::vector<bijection_t> bijections_vec_t;
   bijections_vec_t bijections;
@@ -332,7 +334,9 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
       fm1, efm1, 0, chi2Crit / input.size() + 1.0,
       std::back_inserter(bijections));
 
-  std::cout << "Found " << bijections.size() << " bijections.\n";
+  std::cout << 
+      "Bijections that passed chi-square test: " << 
+      bijections.size() << "." << std::endl;
 
   // Write bijections to file.
   {
@@ -368,13 +372,136 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
     }
   }
 
-  // Go over all possible bijections and store bijections that pass Pearson's
-  // Chi-square test.
-  
+  // Construct frequencies for each state in Markov chain.
+  typedef std::map<char, freq1_map_t> states_freq1_map_t;
+  states_freq1_map_t statesFM1, statesEFM1;
+  std::map<char, size_t> statesn; 
+  BOOST_FOREACH(char stateCh, chars)
+  {
+    freq2_map_t::chain_t chain;
+    chain[0] = stateCh;
 
-  // For each bijection that passed Pearson's Chi-square test output bijections
-  // which probability in Markov's chain is not less than zeta.
+    double sum(0), esum(0);
+    BOOST_FOREACH(char nextCh, chars)
+    {
+      chain[1] = nextCh;
 
+      BOOST_ASSERT(efm2.find(chain) != efm2.end());
+      BOOST_ASSERT(fm2.find(chain) != fm2.end());
+      sum  += fm2 .find(chain)->second;
+      esum += efm2.find(chain)->second;
+    }
+    //std::cout << "sum,esum: " << sum << " " << esum << " " << esum * n << "\n"; // DEBUG
+
+    statesn[stateCh] = round(esum * n);
+
+    BOOST_FOREACH(char nextCh, chars)
+    {
+      chain[1] = nextCh;
+
+      freq1_map_t::chain_t chain1;
+      chain1[0] = nextCh;
+
+      statesFM1 [stateCh][chain1] = fm2 .find(chain)->second / sum;
+      statesEFM1[stateCh][chain1] = efm2.find(chain)->second / esum;
+    }
+  }
+
+  //
+  {
+    std::cout << 
+        "Chi-square statistics in for states in Markov chain for identity "
+        "bijection:\n";
+
+    bijection_t identityBijection(256, 0);
+    BOOST_FOREACH(unsigned char ch, chars)
+      identityBijection[ch] = ch;
+
+    BOOST_FOREACH(char stateCh, chars)
+    {
+      double chi2(0);
+      BOOST_FOREACH(char nextCh, chars)
+      {
+        freq1_map_t::chain_t chain, chainEmp;
+        chain[0] = nextCh;
+        chainEmp[0] = identityBijection.at(nextCh);
+
+        chi2 += sqr(statesEFM1[stateCh].find(chainEmp)->second) / 
+            statesFM1[stateCh].find(chain)->second;
+      }
+      
+      chi2 = (chi2 - 1.0) * statesn[stateCh];
+
+      std::cout << "  '" << stateCh << "': " << chi2;
+      if (chi2 >= chi2Crit)
+        std::cout << " >= " << chi2Crit;
+      std::cout << "\n";
+    }
+  }
+
+  // For each bijection check if all states in Markov's process has 
+  // probabilities of transfer to next state corresponding to precalculated
+  // probabilities.
+  bijections_vec_t passedBijections;
+  BOOST_FOREACH(bijections_vec_t::value_type bijection, bijections)
+  {
+    bool rejected(false);
+    BOOST_FOREACH(char stateCh, chars)
+    {
+      double chi2(0);
+      BOOST_FOREACH(char nextCh, chars)
+      {
+        freq1_map_t::chain_t chain, chainEmp;
+        chain[0] = nextCh;
+        chainEmp[0] = bijection.at(nextCh);
+
+        chi2 += sqr(statesEFM1[stateCh].find(chainEmp)->second) / 
+            statesFM1[stateCh].find(chain)->second;
+      }
+      chi2 = (chi2 - 1.0) * statesn[stateCh];
+
+      if (chi2 >= chi2Crit)
+      {
+        rejected = true;
+        break;
+      }
+    }
+
+    if (!rejected)
+    {
+      passedBijections.push_back(bijection);
+    }
+
+    break; // DEBUG
+  }
+
+  std::cout << "Bijections that passed chi-square test for Markov chain: " <<
+      passedBijections.size() << "." << std::endl;
+
+  // Write passed bijections to file.
+  {
+    std::ofstream os(passedBijectionsFileName);
+    if (!os)
+    {
+      perror(passedBijectionsFileName);
+      return 1;
+    }
+    else
+    {
+      BOOST_FOREACH(bijections_vec_t::value_type bijection, passedBijections)
+      {
+        BOOST_FOREACH(unsigned char const ch, chars)
+        {
+          unsigned char const empCh = bijection.at(ch);
+
+          // Output bijection.
+          os << empCh;
+        }
+
+        os << "\n";
+      }
+    }
+  }
   
   return 0;
 }

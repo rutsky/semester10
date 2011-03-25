@@ -28,7 +28,7 @@ namespace po = boost::program_options;
 int main( int argc, char *argv[] )
 {
   std::string freq1FileName, freq2FileName;
-  double gamma, alpha, zeta;
+  double gamma, alpha, alpha2;
 
   // Parse command line.
   try
@@ -45,15 +45,15 @@ int main( int argc, char *argv[] )
             "intervals.")
         ("alpha", po::value<double>(&alpha),
             "significance level for Pearson's Chi-square test.")
-        ("zeta", po::value<double>(&zeta),
-            "minimal acceptable probability of observed Markov chain.");
+        ("alpha2", po::value<double>(&alpha2),
+            "significance level for Markov chain test.");
     po::positional_options_description posOptDesc;
     posOptDesc
         .add("1-frequency", 1)
         .add("2-frequency", 1)
         .add("gamma", 1)
         .add("alpha", 1)
-        .add("zeta", 1);
+        .add("alpha2", 1);
 
     po::variables_map vm;
     po::store(po::command_line_parser(argc, argv).
@@ -65,7 +65,7 @@ int main( int argc, char *argv[] )
         vm.count("2-frequency") &&
         vm.count("gamma") &&
         vm.count("alpha") &&
-        vm.count("zeta");
+        vm.count("alpha2");
 
     if (vm.count("help") || !haveRequiredOptions)
     {
@@ -173,7 +173,7 @@ int main( int argc, char *argv[] )
   */
 
   // Start decoding process.
-  return decode(fm1, fm2, gamma, alpha, zeta, 
+  return decode(fm1, fm2, gamma, alpha, alpha2, 
       filteredInput.begin(), filteredInput.end());
 }
 

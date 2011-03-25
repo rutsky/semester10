@@ -117,7 +117,7 @@ size_t find_bijections( std::map<char, std::vector<char> > const &theorToEmp,
 template< class CharInIt >
 inline
 int decode( freq1_map_t const &fm1, freq2_map_t const &fm2, 
-             double gamma, double alpha, double zeta,
+             double gamma, double alpha, double alpha2,
              CharInIt first, CharInIt beyond )
 {
   char const 
@@ -133,8 +133,8 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
       "    gamma = " << gamma << ".\n" <<
       "Significance level for Pearson's Chi-square test,\n"
       "    alpha = " << alpha << ".\n" <<
-      "Minimal acceptable probability of observed Markov chain,\n"
-      "    zeta = " << zeta << ".\n"; 
+      "Significance level for Markov chain test,\n"
+      "    alpha2 = " << alpha2 << ".\n"; 
 
   // Read input.
   std::vector<char> input(first, beyond);
@@ -372,6 +372,10 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
     }
   }
 
+  // Chi-square critical value for Markov chain.
+  double const chi2Crit2 = quantile(chi2, 1.0 - alpha2);
+  std::cout << "Chi-square(1-alpha2, N-1) = " << chi2Crit2 << std::endl;
+
   // Construct frequencies for each state in Markov chain.
   typedef std::map<char, freq1_map_t> states_freq1_map_t;
   states_freq1_map_t statesFM1, statesEFM1;
@@ -433,8 +437,8 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
       chi2 = (chi2 - 1.0) * statesn[stateCh];
 
       std::cout << "  '" << stateCh << "': " << chi2;
-      if (chi2 >= chi2Crit)
-        std::cout << " >= " << chi2Crit;
+      if (chi2 >= chi2Crit2)
+        std::cout << " >= " << chi2Crit2;
       std::cout << "\n";
     }
   }
@@ -460,7 +464,7 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
       }
       chi2 = (chi2 - 1.0) * statesn[stateCh];
 
-      if (chi2 >= chi2Crit)
+      if (chi2 >= chi2Crit2)
       {
         rejected = true;
         break;
@@ -472,7 +476,7 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
       passedBijections.push_back(bijection);
     }
 
-    break; // DEBUG
+    //break; // DEBUG
   }
 
   std::cout << "Bijections that passed chi-square test for Markov chain: " <<

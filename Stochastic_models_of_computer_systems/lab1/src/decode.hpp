@@ -203,6 +203,26 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
       os << efm2;
     }
   }
+
+  // Check that each outcome emerged at least 5 times.
+  {
+    std::vector<char> lowFreqChars;
+    BOOST_FOREACH(freq1_map_t::value_type const &pair, efm1)
+    {
+      if (pair.second * n < 5.0)
+        lowFreqChars.push_back(pair.first[0]);
+    }
+
+    if (!lowFreqChars.empty())
+    {
+      std::cout << 
+          "Warning! Theese characters emerged in text less than five "
+          "times each:\n";
+      std::copy(lowFreqChars.begin(), lowFreqChars.end(), 
+          std::ostream_iterator<char>(std::cout, " "));
+      std::cout << "\n";
+    }
+  }
   
   // Calculate confidence intervals for theoretic frequencies.
   typedef std::pair<double, double> interval_t;
@@ -352,15 +372,15 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
           // Output bijection.
           os << empCh;
 
-          size_t const n = input.size();
           double const p = fm1.find(ch)->second;
           double const ep = efm1.find(empCh)->second;
-          chi2 += n * (sqr(ep) / p - 1.0);
+          chi2 += sqr(ep) / p;
 
           //ostr << 
           //    " + (" << n << "*" << ep << "-" << n << "*" << p << ")**2/" <<
           //    "(" << n << "*" << p << ")";
         }
+        chi2 = (chi2 - 1.0) * n;
 
         // Output it's Chi-square statistics.
         os << " " << chi2;

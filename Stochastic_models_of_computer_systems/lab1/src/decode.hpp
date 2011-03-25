@@ -325,7 +325,6 @@ int decode( freq1_map_t const &fm1, freq2_map_t const &fm2,
   typedef std::vector<int> bijection_t;
   typedef std::vector<bijection_t> bijections_vec_t;
   bijections_vec_t bijections;
-  //bijection_t tmpBijection;
   std::vector<int> tmpBijection(256, 0);
   std::vector<int> tmpChars(256, 0);
   find_bijections(theorToEmp, chars.begin(), chars.end(), 

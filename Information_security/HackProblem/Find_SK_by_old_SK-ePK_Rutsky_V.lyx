@@ -1,0 +1,222 @@
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Нахождение закрытого ключа RSA по
+\begin_inset space ~
+\end_inset
+
+скомпрометированной паре ключей с
+\begin_inset space ~
+\end_inset
+
+тем
+\begin_inset space ~
+\end_inset
+
+же модулем
+\end_layout
+
+\begin_layout Author
+студент гр.
+\begin_inset space ~
+\end_inset
+
+5057/2, Владимир Руцкий
+\end_layout
+
+\begin_layout Date
+29.03.2011
+\end_layout
+
+\begin_layout Section
+Постановка задачи
+\end_layout
+
+\begin_layout Standard
+После компрометирования своего секретного ключа RSA криптограф создал новую
+ пару ключей 
+\begin_inset Formula $(\mathrm{SK},\mathrm{ePK})$
+\end_inset
+
+, не перегенерировав модуль 
+\begin_inset Formula $n$
+\end_inset
+
+\SpecialChar \@.
+ Необходимо найти 
+\begin_inset Quotes eld
+\end_inset
+
+отмычку
+\begin_inset Quotes erd
+\end_inset
+
+ для новых ключей\SpecialChar \@.
+
+\end_layout
+
+\begin_layout Paragraph*
+Дано:
+\end_layout
+
+\begin_layout Itemize
+Скомпрометированные старые ключи RSA криптографа 
+\begin_inset Formula $\mathrm{SK'}$
+\end_inset
+
+, 
+\begin_inset Formula $(\mathrm{ePK'},n)$
+\end_inset
+
+: 
+\begin_inset Formula $[M]_{n}^{\mathrm{ePK'}\cdot\mathrm{SK'}}=[M]_{n}$
+\end_inset
+
+\SpecialChar \@.
+
+\end_layout
+
+\begin_layout Itemize
+Новый открытый ключ криптографа 
+\begin_inset Formula $(\mathrm{ePK},n)$
+\end_inset
+
+\SpecialChar \@.
+
+\end_layout
+
+\begin_layout Paragraph*
+Найти:
+\end_layout
+
+\begin_layout Standard
+Секретный ключ для нового открытого ключа 
+\begin_inset Formula $\mathrm{ePK}$
+\end_inset
+
+ криптографа 
+\begin_inset Formula $\mathrm{SK}$
+\end_inset
+
+: 
+\begin_inset Formula $[M]_{n}^{\mathrm{ePK}\cdot\mathrm{SK}}=[M]_{n}$
+\end_inset
+
+ (он необязательно будет совпадать с секретным ключом криптографа)\SpecialChar \@.
+
+\end_layout
+
+\begin_layout Section
+Решение
+\end_layout
+
+\begin_layout Standard
+Из алгоритма построения ключей RSA следует, что 
+\begin_inset Formula $\mathrm{ePK'}\cdot\mathrm{SK'}=1+t\cdot\varphi(n)$
+\end_inset
+
+\SpecialChar \@.
+ Тогда можно вычислить 
+\begin_inset Formula $t\cdot\varphi(n)=\mathrm{ePK'}\cdot\mathrm{SK'}-1\neq0$
+\end_inset
+
+\SpecialChar \@.
+
+\end_layout
+
+\begin_layout Standard
+Вычислим 
+\begin_inset Formula $\gcd(t\cdot\varphi(n),\mathrm{ePK})=c$
+\end_inset
+
+\SpecialChar \@.
+ Т.
+\begin_inset space \thinspace{}
+\end_inset
+
+к.
+ 
+\begin_inset Formula $\varphi(n)$
+\end_inset
+
+ и 
+\begin_inset Formula $\mathrm{ePK}$
+\end_inset
+
+ взаимно просты по построению, то 
+\begin_inset Formula $c\nmid\varphi(n)\Longrightarrow c\mid t$
+\end_inset
+
+\SpecialChar \@.
+
+\end_layout
+
+\begin_layout Standard
+Тогда 
+\begin_inset Formula $\frac{t\cdot\varphi(n)}{c}=t'\cdot\varphi(n),\quad t'\in\mathbb{Z}$
+\end_inset
+
+, и 
+\begin_inset Formula \[
+\gcd(t'\cdot\varphi(n),\mathrm{ePK})=1=C_{1}\cdot t'\cdot\varphi(n)+C_{2}\cdot\mathrm{ePK}\Longrightarrow C_{2}\cdot\mathrm{ePK}=1-C_{1}\cdot t'\cdot\varphi(n),\]
+
+\end_inset
+
+а значит 
+\begin_inset Formula $\mathrm{SK}=C_{2}$
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+--- секретный ключ для открытого ключа криптографа 
+\begin_inset Formula $\mathrm{ePK}$
+\end_inset
+
+\SpecialChar \@.
+
+\end_layout
+
+\end_body
+\end_document

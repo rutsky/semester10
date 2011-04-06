@@ -41,7 +41,7 @@ int main( int argc, char *argv[] )
     posOptDesc
         .add("", 1)
         .add("file-name", 1)
-        .add("alpha", 1)
+        .add("alpha", 1);
 
     po::variables_map vm;
     po::store(po::command_line_parser(argc, argv).

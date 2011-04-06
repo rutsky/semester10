@@ -1,0 +1,64 @@
+#
+#  Copyright (C) 2011  Vladimir Rutsky <altsysrq@gmail.com>
+#
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import os
+
+global_env = Environment()
+Export('global_env')
+
+def get_argument(name, values, default=None):
+    if default is not None:
+        using_default = default
+        assert default in values
+    else:
+        using_default = values[0]
+
+    v = ARGUMENTS.get(name, using_default)
+    assert v in values
+
+    return v
+
+configurations = ['release', 'debug', 'valgrind', 'gprof']
+global_env.conf = get_argument('conf', configurations)
+
+if global_env.conf == 'debug':
+    global_env.MergeFlags(global_env.ParseFlags("-O0"))
+elif global_env.conf == 'release':
+    global_env.MergeFlags(global_env.ParseFlags("-O3"))
+elif global_env.conf == 'valgrind':
+    # Leak checking.
+    global_env.MergeFlags(global_env.ParseFlags("-O -fno-inline"))
+elif global_env.conf == 'gprof':
+    # Performance profiling.
+    # For intruduction see:
+    # http://www.ibm.com/developerworks/library/l-gnuprof.html
+    # Short HOWTO:
+    # gprof ./main gmon.out -p
+    global_env.MergeFlags(global_env.ParseFlags("-O2 -pg"))
+    #global_env.AppendUnique(LIBS='c_p')
+    global_env.AppendUnique(LINKFLAGS='-pg')
+
+global_env.AppendUnique(LIBS=['m'])
+global_env.MergeFlags(global_env.ParseFlags("-g -W -Wall"))
+
+SConscript(os.path.join("report", "SConscript"), 
+    variant_dir=os.path.join("build", "report"))
+#SConscript(os.path.join("report", "SConscript"))
+
+SConscript(os.path.join("src", "SConscript"), 
+    variant_dir=os.path.join("build", "src", global_env.conf))
+
+# vim: set filetype=python ts=4 sw=4 et:

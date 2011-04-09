@@ -1,0 +1,137 @@
+% Report.
+%
+% Copyright (C) 2011  Vladimir Rutsky <altsysrq@gmail.com>
+%
+% This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 
+% Unported License. See <http://creativecommons.org/licenses/by-sa/3.0/> 
+% for details.
+
+\documentclass[a4paper,10pt]{article}
+
+% Encoding support.
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+
+\usepackage{amsmath, amsthm, amssymb}
+
+% Indenting first paragraph.
+\usepackage{indentfirst}
+
+\usepackage{url}
+\usepackage[unicode]{hyperref}
+
+%\usepackage[final]{pdfpages}
+
+\usepackage[pdftex]{graphicx}
+\usepackage{subfig}
+
+\usepackage{fancyvrb}
+\usepackage{color}
+\usepackage{texments}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+% Spaces after commas.
+\frenchspacing
+% Minimal carrying number of characters,
+\righthyphenmin=2
+
+% From K.V.Voroncov Latex in samples, 2005.
+\textheight=24cm   % text height
+\textwidth=16cm    % text width.
+\oddsidemargin=0pt % left side indention
+\topmargin=-1.5cm  % top side indention.
+\parindent=24pt    % paragraph indent
+\parskip=0pt       % distance between paragraphs.
+\tolerance=2000
+%\flushbottom       % page height aligning
+%\hoffset=0cm
+%\pagestyle{empty}  % without numeration
+
+\newcommand{\myemail}[1]{%
+\href{mailto:#1}{\nolinkurl{#1}}}
+
+\newcommand{\myfunc}[1]{%
+\textit{#1}}
+
+\begin{document}
+
+% Title page.
+\input{./title.tex}
+%\tableofcontents
+%\pagebreak
+
+% Content
+
+\section{Постановка задачи}
+Данной работе производится анализ лога загруженности процессора сервера
+при поступающих заявках на обработку информации.
+
+В отсутствие заявок величина загруженности процессора представляет собой 
+сумму некоторой постоянной величины загрузки $m$ и случайных отклонений:
+$$B(t) = m + \sigma \mathcal{W}(t),$$
+где $\mathcal{W}(t)$~--- это винеровский процесс.
+
+Количество и интенсивность поступления заявок подчиняются закону
+распределения Пуассона $\mathcal{P}(\lambda)$.
+
+При поступлении одной заявки нагрузка на процессор мгновенно возрастает,
+а затем экспоненциально снижается до прежнего уровня.
+Увеличение загрузки процессора от одной заявки, 
+поступившей в момент времени $t_c$ выражается следующим образом:
+$$K_{t_c}(t) = \mathcal{N}(m_c, \sigma_c) \cdot \mathrm{I}(t > t_c) \cdot 
+    e^{-\lambda_c(t - t_c)}.$$
+
+В логе загруженности процессора наблюдается общая загрузка процессора:
+$$X(t) = B(t) + \sum\limits_{t_c \in T_c}K_{t_c}(t),$$
+где $T_c$~--- это моменты времени поступления заявок.
+
+Необходимо по дискретным наблюдениям $X(t_i)$
+\begin{enumerate}
+ \item оценить моменты времени поступления заявок $T_c$,
+ \item оценить параметры модели $m$, $\sigma$, $\lambda$, $m_c$, 
+ $\sigma_c$, $\lambda_c$.
+\end{enumerate}
+
+Для упрощения решения $\lambda$ принимается равным величине близкой к нулю,
+т.\,е.~каждая пришедшая заявка увеличивает загрузку процессора на некоторую 
+фиксированную величину.
+
+\cite{ivchmed2010matstat}
+
+\section{Решение}
+\subsection{Оценка моментов времени поступления заявок}
+Предположим, что в интервале $(t_i, t_{i+n})$ не пришло ни одной заявки.
+Тогда наблюдения $X(t_i),\ldots,X(t_{i+n})$ представляют собой наблюдения
+$B(t)$.
+Оценим по этим наблюдениям параметры $B(t)$.
+
+При условии, что интервал $(t_i, t_{i+n})$ небольшой, 
+$B(t)$ можно считать нормально распределённой случайной величиной:
+$$B(t) = \mathcal{N}(m_{t_i}, \sigma_{t_i}^2).$$
+
+Построим точечные оценки $m_{t_i}$ и $\sigma_{t_i}$ 
+методом максимального правдоподобия:
+$$m_{t_i} = \frac{1}{n}\sum\limits_1^n X(t_i),$$
+$$\sigma_{t_i}^2 = \frac{1}{n - 1}\sum\limits_1^n (X(t_i) - m_{t_i})^2.$$
+
+\section{Результаты работы}
+
+%\appendix
+%\section{Исходный код}
+%\label{appendix:sources}
+
+%\usestyle{default}
+
+%\subsection{Title}
+%\label{appendix:sources:sources-name}
+%\includecode[python -O linenos=1]{data/source.py}
+
+\pagebreak
+
+\bibliographystyle{unsrt}
+\bibliography{references}
+
+\end{document}

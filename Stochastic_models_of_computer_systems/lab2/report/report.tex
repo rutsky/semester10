@@ -174,6 +174,20 @@ $$H_0 \  \mathrm{rejected} \Longleftrightarrow T(X_{k+n+2}) < \alpha.$$
 $$\widehat{\lambda} = 
     \frac{1}{|T_c|} \sum\limits_{i=0}^{|T_c| - 1} (t_{c_{i+1}} - t_{c_i}).$$
 
+\subsection{Оценка параметров распределения величины нагрузки %
+поступающих заявок}
+Рассмотрим разности наблюдаемой величины в момент поступления заявки и 
+в~предыдущий момент времени:
+\begin{eqnarray*}
+dX(t_c) 
+  & = & X(t_c) - X(t_c - \Delta t) = 
+      B(t_c) + K_{t_c}(t_c) - B(t_c - \Delta t) = \\
+  & = & \sigma \mathcal{W}(t_c - \Delta t) - \sigma \mathcal{W}(t_c) + 
+      \mathcal{N}(m_c, \sigma_c^2) = \\
+  & = & \sigma \mathcal{N}(0, \Delta t) + \mathcal{N}(m_c, \sigma_c^2),
+\end{eqnarray*}
+предполагая, что в момент времени $t_c - \Delta t$ заявки не было.
+
 \section{Результаты работы}
 
 %\appendix

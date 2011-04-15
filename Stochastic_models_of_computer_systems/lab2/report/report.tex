@@ -129,7 +129,7 @@ $$B(t_{i+1}) - B(t_i) =
     \mathcal{N}(0, \sigma \Delta t).$$
 
 Построим точечную оценку $\hat{\sigma}$ методом максимального правдоподобия:%
-\footnote{\S\,3.5 пункт~1 в \cite{ivchmed2010matstat}.}
+\footnote{\S\,3.5 пункт~1 в~\cite{ivchmed2010matstat}.}
 $$\hat{\sigma} = 
     \frac{1}{\Delta t}\cdot\frac{1}{n-1}
         \sum\limits_{i=1}^n ((X(t_{k+i+1}) - X(t_{k+i})) - 0)^2.$$
@@ -169,7 +169,8 @@ $$H_0 \  \mathrm{rejected} \Longleftrightarrow T(X_{k+n+2}) < \alpha.$$
 \subsection{Оценка интенсивности поступления заявок $\lambda$}
 Зная время прибытия заявок $T_c$ интенсивность поступления заявок можно оценить
 методом максимального правдоподобия:
-\footnote{\url{http://en.wikipedia.org/wiki/Poisson\_distribution\#Maximum\_likelihood}}
+\footnote{{\url{http://en.wikipedia.org/wiki/Poisson\_distribution\#Maximum\_likelihood}} 
+или в общем случае в \S\,3.5 пункт~1 в~\cite{ivchmed2010matstat}.}
 $$\hat{\lambda} = 
     \frac{1}{|T_c|} \sum\limits_{i=0}^{|T_c| - 1} (t_{c_{i+1}} - t_{c_i}).$$
 

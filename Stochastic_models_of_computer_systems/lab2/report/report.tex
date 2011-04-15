@@ -126,11 +126,11 @@ $B(t)$.
 $$B(t_{i+1}) - B(t_i) = 
     \sigma \mathcal{W}(t_{i+1}) - \sigma \mathcal{W}(t_i) = 
     \sigma \mathcal{N}(0, \Delta t) = 
-    \mathcal{N}(0, \sigma \Delta t).$$
+    \mathcal{N}(0, \sigma^2 \Delta t).$$
 
 Построим точечную оценку $\widehat{\sigma}$ методом максимального правдоподобия:%
 \footnote{\S\,3.5 пункт~1 в~\cite{ivchmed2010matstat}.}
-$$\widehat{\sigma} = 
+$$\widehat{\sigma}^2 = 
     \frac{1}{\Delta t}\cdot\frac{1}{n-1}
         \sum\limits_{i=1}^n ((X(t_{k+i+1}) - X(t_{k+i})) - 0)^2.$$
 
@@ -139,14 +139,14 @@ $[t_{k+n+1}, t_{k+n+2}]$ не пришло ни одной заявки,
 как $H_0$.
 Тогда 
 $$\mathcal{L}(X(t_{k+n+2})-X(t_{k+n+1}) | H_0) = 
-    \mathcal{N}(0, \sigma \Delta t).$$
+    \mathcal{N}(0, \sigma^2 \Delta t).$$
 
 В качестве статистики для отвержения гипотезы $H_0$ возьмём вероятность 
 наблюдения $X(t_{k+n+2})$:
 $$T(X_{k+n+2}) = 
     \mathbf{P}\big(B(t_{k+n+2})= X(t_{k+n+2})\big) = 
     \mathbf{P}\big(
-      \mathcal{N}(0, \widehat{\sigma} \Delta t) = 
+      \mathcal{N}(0, \widehat{\sigma}^2 \Delta t) = 
                      X(t_{k+n+2})-X(t_{k+n+1})\big),$$
 а критерием отвержения гипотезы $H_0$ с уровнем значимости $\alpha$ 
 будет служить следующее выражение:

@@ -224,10 +224,8 @@ $$
 Пусть $\mathbf{P}(Z_i=1) = \tau_1$ и $\mathbf{P}(Z_i=2) = 
 \tau_2 = 1 - \tau_1.$
 
-Необходимо оценить 
-$\theta = (\tau_1, \tau_2, \mu_1, \mu_2, \sigma_1^2, \sigma_2^2).$
-
 Введём обозначения: 
+$\theta = (\tau_1, \tau_2, \mu_1, \mu_2, \sigma_1^2, \sigma_2^2),$
 $\mathbf{x} = (X(t_1), \ldots, X(t_N)),$
 $\mathbf{z} = (Z_1, \ldots, Z_N).$
 
@@ -262,6 +260,19 @@ L(\theta; \mathbf{x}, \mathbf{z}) =
       \log(\sigma_j) -
       \frac{(x_i - \mu_j)^2}{2 \sigma_j^2}}}.
 $$
+
+Пусть имеется начальная оценка параметров $\theta$: $\theta_0$ 
+(использованный способ вычисления $\theta_0$ будет описан ниже).
+Последовательно выполняя E- и M-шаги будем уточнять оценку $\theta_k$,
+пока она не сойдётся к какой-то величине 
+$\theta_k \xrightarrow[k \rightarrow \infty]{} \theta$, 
+которую и примем за результат.
+
+\paragraph*{E-шаг}%
+
+\paragraph*{M-шаг}%
+
+\paragraph*{Вычисление $\theta_0$}
 
 \section{Результаты работы}
 

@@ -211,9 +211,56 @@ $$
 принимающие значения 1 или 2, в зависимости от того, 
 пришла ли заявка в момент времени $t_i$ или нет соответственно.
 $$
-\diff X(t_i) \vert (Z_i = 1)
+\begin{array}{rclcll}
+\dif X(t_i) \vert (Z_i = 1) &\sim& \mathcal{N}(\mu_1, \sigma_1^2) &=& 
+  \mathcal{N}(m_c, \sigma^2 \Delta t + \sigma_c^2), &
+  \quad (\mathrm{\text{случай}}~t_i \in T_c), \\
+\dif X(t_i) \vert (Z_i = 2) &\sim& \mathcal{N}(\mu_2, \sigma_2^2) &=& 
+  \mathcal{N}(0, \sigma^2 \Delta t), &
+  \quad (\mathrm{\text{случай}}~t_i \notin T_c).
+\end{array}
+$$
+Пусть $\mathbf{P}(Z_i=1) = \tau_1$ и $\mathbf{P}(Z_i=2) = 
+\tau_2 = 1 - \tau_1.$
+
+Необходимо оценить 
+$\theta = (\tau_1, \tau_2, \mu_1, \mu_2, \sigma_1^2, \sigma_2^2).$
+
+Введём обозначения: 
+$\mathbf{x} = (X(t_1), \ldots, X(t_N)),$
+$\mathbf{z} = (Z_1, \ldots, Z_N).$
+
+Построим функцию правдоподобия:
+$$
+L(\theta; \mathbf{x}, \mathbf{z}) = 
+  \mathbf{P}(\mathbf{x}, \mathbf{z} \vert \theta) = 
+  \prod\limits_{i=1}^{N} \sum\limits_{j=1}^2 
+    \mathbb{I}(z_i=j) \, \tau_j \, f(x_i,\mu_j,\sigma_j^2),
+$$
+где $\mathbb{I}(expr)$~--- функция индикатор,%
+\footnote{%
+Функция индикатор: $\mathbb{I}(\mathrm{expr}) = \left\{
+  \begin{array}{rl}
+    0, & \mathrm{expr} = \mathrm{False} \\
+    1, & \mathrm{expr} = \mathrm{True}
+  \end{array}\right.$.
+} а $f(x, \mu, \sigma^2)$~--- это функция плотности распределения, 
+в данном случае нормального:
+$$
+  f(x, \mu, \sigma^2) = 
+    \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{(x - \mu)^2}{2 \sigma^2}}.
 $$
 
+Перепишем функцию правдоподобия в экспоненциальной форме:
+$$
+L(\theta; \mathbf{x}, \mathbf{z}) =
+  \exp \cbr{ \sum\limits_{i=1}^{N} \sum\limits_{j=1}^2 
+    \mathbb{I}(z_i=j) \sbr{
+      \log \tau_j - 
+      \frac{1}{2}\log(2\pi) -
+      \log(\sigma_j) -
+      \frac{(x_i - \mu_j)^2}{2 \sigma_j^2}}}.
+$$
 
 \section{Результаты работы}
 

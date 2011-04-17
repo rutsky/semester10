@@ -57,6 +57,8 @@
 \newcommand{\myfunc}[1]{%
 \textit{#1}}
 
+\DeclareMathOperator*{\argmax}{\arg\!\max}
+
 \begin{document}
 
 % Title page.
@@ -289,9 +291,39 @@ T_{j,i}^{(k)} = \mathbf{P}(Z_i = j \vert X(t_i) = x_i; \theta^{(k)}) =
        {\tau_2^{(k)} f(x_i; \mu_2^{(k)}, \sigma_2^{(k)})}}.
 $$
 
+Построим функцию~--- математическое ожидание логарифма функции правдоподобия:
+$$
+Q\del{\theta \vert \theta^{(k)}} = 
+  \mathbf{E}\sbr{\log L(\theta; \mathbf{x}, \mathbf{z})} =
+  \sum\limits_{i=1}^{N} \sum\limits_{j=1}^2
+    T_{j,i}^{(k)} 
+      \sbr{
+        \log \tau_j - 
+        \frac{1}{2}\log(2\pi) -
+        \log(\sigma_j) -
+        \frac{(x_i - \mu_j)^2}{2 \sigma_j^2}
+      }.
+$$
+
 \paragraph*{M-шаг}%
+Теперь найдём параметры $\theta^{(k+1)}$ максимизирующие 
+$Q\del{\theta \vert \theta^{(k)}}$:
+$$
+\theta^{(k+1)} = \argmax\limits_{\theta} Q\del{\theta \vert \theta^{(k)}}.
+$$
+В соответствии с вычислениями в \cite{wiki:em-algorithm}:
+$$
+\tau_j^{(k+1)} = \frac{1}{n} \sum\limits_{i=1}^{N} T_{j,i}^{(k)},\quad
+\mu_j^{(k+1)} = \frac
+  {\sum\limits_{i=1}^{N} T_{j,i}^{(k)} x_i}
+  {\sum\limits_{i=1}^{N} T_{j,i}^{(k)}},\quad
+\sigma_j^{(k+1)} = \frac
+  {\sum\limits_{i=1}^{N} T_{j,i}^{(k)} (x_i - \mu_j^{(k+1)})^2}
+  {\sum\limits_{i=1}^{N} T_{j,i}^{(k)}}.
+$$
 
 \paragraph*{Вычисление $\theta_0$}
+
 
 \section{Результаты работы}
 

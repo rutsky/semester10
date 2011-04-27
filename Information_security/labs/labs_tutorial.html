@@ -316,9 +316,10 @@ ul.auto-toc {
 <pre class="literal-block">
 SurName_N := &quot;SurName_N&quot;;
 </pre>
-<p>на фамилию и первую букву имени, например на <tt class="docutils literal">&quot;Rutsky_V&quot;</tt>.
-Далее везде необходимо будет соответственным образом заменять
-<tt class="docutils literal">&quot;Surname_N&quot;</tt>.</p>
+<p>на фамилию и первую букву имени, например на <tt class="docutils literal">&quot;Rutsky_V&quot;</tt>:</p>
+<blockquote>
+<p>SurName_N := &quot;Rutsky_V&quot;;</p>
+</blockquote>
 </li>
 <li><p class="first">Заменяем:</p>
 <pre class="literal-block">
@@ -328,7 +329,7 @@ My_Seed:= 123412345567678998012342435357789980;
 </li>
 <li><p class="first">Выполняем скрипт.</p>
 <p>Теперь в директории <tt class="docutils literal">RSAbegin</tt> создан файл
-<tt class="docutils literal">RNDseed_Surname_N.byt</tt> ---
+<tt class="docutils literal">RNDseed_Rutsky_V.byt</tt> ---
 в нём записано произвольное число, которое было указано ранее,
 в двоичном формате.</p>
 </li>
@@ -356,14 +357,37 @@ TargetFileName:= &quot;RSAnPK_&quot;||SurName_N;
 <li><p class="first">Выполняем скрипт.</p>
 <p>Теперь в директории RSAbegin созданы следующие файлы:</p>
 <ol class="arabic simple">
-<li><tt class="docutils literal">RSAfact_Surname_N.byt</tt> --- <cite>[p1, p2, L(n)]</cite> --- два простых
+<li><tt class="docutils literal">RSAfact_Rutsky_V.byt</tt> --- <cite>[p1, p2, L(n)]</cite> --- два простых
 числа и значение <a class="reference external" href="http://en.wikipedia.org/wiki/Carmichael_function">функции Кармайкла</a>
 от <cite>n = p1 * p2</cite>,</li>
-<li><tt class="docutils literal">RSAnPK_Surname_N.byt</tt> --- <cite>[n, ePK]</cite> ---
+<li><tt class="docutils literal">RSAnPK_Rutsky_V.byt</tt> --- <cite>[n, ePK]</cite> ---
 сгенерированный открытый ключ,</li>
-<li><tt class="docutils literal">RSASK_Surname_N.byt</tt> --- <cite>[SK]</cite> --- сгенерированный закрытый
+<li><tt class="docutils literal">RSASK_Rutsky_V.byt</tt> --- <cite>[SK]</cite> --- сгенерированный закрытый
 ключ, <cite>SK = ePK^-1 mod phi(n)</cite>.</li>
 </ol>
+</li>
+</ol>
+</blockquote>
+<ol class="upperroman simple" start="3">
+<li>Открываем <tt class="docutils literal">RSAbegin/SendMy_nPK_RSAECBencr.mws</tt> в Maple.</li>
+</ol>
+<blockquote>
+<ol class="arabic">
+<li><p class="first">Заменяем:</p>
+<pre class="literal-block">
+SurName_N := &quot;SurName_N&quot;;
+</pre>
+</li>
+<li><p class="first">Создаём файл вида <tt class="docutils literal">Rutsky_V_passw.txt</tt>,
+в котором сохраним пароль,
+который был ранее передан С.В. Стахову.</p>
+</li>
+<li><p class="first">Выполняем скрипт.</p>
+<p>Теперь в директории <tt class="docutils literal">RSAbegin</tt> создан файл
+<tt class="docutils literal">RSAnPK_Rutsky_V_ECB.byt</tt> содержащий в себе сгенерированный ранее
+открытый ключ
+и пароль, защифрованный открытым ключом С.В. Стахова ---
+его необходимо отправить С.В. Стахову.</p>
 </li>
 </ol>
 </blockquote>

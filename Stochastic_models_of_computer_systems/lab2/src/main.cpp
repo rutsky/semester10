@@ -84,11 +84,20 @@ void estimate( measurements_t const &measurements, double dt,
           quantile(complement(
               normalDistr, 
               requests_detection_alpha / 2.0));
+
+      // DEBUG
+      std::cout << idx << " ";
+      std::cout << "  sigma2: " << sigma2 << 
+        ", loQuantile: " << loQuantile <<
+        ", hiQuantile: " << hiQuantile << 
+        ", det: " << der[idx] << "\n";
+      // END OF DEBUG
       
       // Check if next observing value lies in rare quantiles.
       if (der[idx] < loQuantile || der[idx] > hiQuantile)
       {
         // Rare event happened - request.
+        std::cout << "***\n"; // DEBUG
         foundRequest = true;
         T_c.push_back(idx);
         lastRequestIdx = idx;

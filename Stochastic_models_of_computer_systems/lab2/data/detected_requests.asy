@@ -4,7 +4,7 @@ from "csv_graph.asy" access draw_graph;
 
 real dt = 1;
 
-//real[][] requests = draw_graph("requests.csv", "Requests");
+draw_graph("requests.csv", "Requests");
 real[][] requests = draw_graph("total_load.csv", "Requests");
 
 file in = input("detected_requests.txt").line().csv();

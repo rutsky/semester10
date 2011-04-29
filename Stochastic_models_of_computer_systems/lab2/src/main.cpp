@@ -41,7 +41,7 @@ void estimate( measurements_t const &measurements, double dt,
   BOOST_ASSERT(dt >= 1e-8);
   BOOST_ASSERT(0 <= requests_detection_alpha && requests_detection_alpha <= 1);
 
-  char const *detectedRequestsFile = "detected_requests.csv";
+  char const *detectedRequestsFile = "detected_requests.txt";
 
   // Calculate numeric derivative.
   std::vector<double> der;

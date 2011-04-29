@@ -1,6 +1,6 @@
 import graph;
 
-void draw_graph(string data_file_name, string ch_label)
+real[][] draw_graph(string data_file_name, string ch_label)
 {
   //size(200, 150, IgnoreAspect);
 
@@ -17,6 +17,7 @@ void draw_graph(string data_file_name, string ch_label)
   yaxis(ch_label, RightTicks, EndArrow);
   xaxis("t", LeftTicks, EndArrow);
 
+  return a;
 }
 
 // vim: set ts=2 sw=2 et:

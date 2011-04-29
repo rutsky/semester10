@@ -55,6 +55,9 @@ def main():
 
     args = parser.parse_args()
 
+    random.seed(0)
+    numpy.random.seed(0)
+
     time_marks = [i * args.dt for i in xrange(args.N)]
     requests = list(generate_requests(args.N, args.dt, args.lambda_))
     requests_value = list(generate_requests_value(

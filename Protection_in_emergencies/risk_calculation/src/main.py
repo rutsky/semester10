@@ -21,11 +21,16 @@ __license__ = "GPL"
 import sys
 
 from PyQt4.QtGui import *
+from PyQt4.QtCore import *
 
 from main_window import MainWindow
 
 def main():
+    translator = QTranslator()
+    translator.load('i18n/ru_RU')
+
     app = QApplication(sys.argv)
+    app.installTranslator(translator)
 
     main_window = MainWindow()
 
@@ -35,3 +40,5 @@ def main():
     
 if __name__ == "__main__":
     main()
+
+# vim: set ts=4 sw=4 et:

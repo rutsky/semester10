@@ -20,16 +20,15 @@ __license__ = "GPL"
 
 import sys
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+import qtall as qt4
 
 from main_window import MainWindow
 
 def main():
-    translator = QTranslator()
+    translator = qt4.QTranslator()
     translator.load('i18n/ru_RU')
 
-    app = QApplication(sys.argv)
+    app = qt4.QApplication(sys.argv)
     app.installTranslator(translator)
 
     main_window = MainWindow()

@@ -1,4 +1,4 @@
-#  This file is part of risc calculation suite.
+#  This file is part of risk calculation suite.
 #
 #  Copyright (C) 2011  Vladimir Rutsky <altsysrq@gmail.com>
 #
@@ -18,20 +18,15 @@
 __author__  = "Vladimir Rutsky <altsysrq@gmail.com>"
 __license__ = "GPL"
 
-__all__ = ["MainWindow"]
+# Solution as in Veusz by Jeremy S. Sanders
 
 import config
 
-import qtall as qt4
-
-class MainWindow(qt4.QMainWindow):
-    def __init__(self, parent=None):
-        super(MainWindow, self).__init__(parent)
-
-        # TODO: Use installation path.
-        qt4.loadUi('forms/main_window.ui', self)
-
-    def closeEvent(self, event):
-        super(MainWindow, self).closeEvent(event)
+from PyQt4.QtGui import *
+from PyQt4.QtCore import *
+from PyQt4.Qt import *
+from PyQt4.uic import loadUi
+if config.use_OpenGL:
+    from PyQt4.QtOpenGL import *
 
 # vim: set ts=4 sw=4 et:

@@ -25,7 +25,9 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-include_files = [('main_window.ui', 'main_window.ui')]
+include_files = [
+    ('forms/main_window.ui', 'forms/main_window.ui'), 
+    ('i18n/ru_RU.qm', 'i18n/ru_RU.qm')]
 includes = ['sip', 'encodings.ascii', 'encodings.utf_8', 'encodings.hex_codec']
 
 setup(
@@ -42,3 +44,5 @@ setup(
         },
     executables=[Executable("main.py", base=base)],
     )
+
+# vim: set ts=4 sw=4 et:

@@ -21,8 +21,8 @@ Import('env')
 
 sources = \
     Glob("*.py", strings=True) + \
-    Glob("forms/*.ui", strings=True) + \
-    Glob("i18n/*.ts", strings=True)
+    Glob(os.path.join("forms", "*.ui"), strings=True) + \
+    Glob(os.path.join("i18n", "*.ts"), strings=True)
 
 build_cx_freeze = env.Command("build_cx-freeze", sources,
     "python setup_cx-freeze.py build",

@@ -20,3 +20,4 @@ TRANSLATIONS = \
     il8n/en_US.ts \
     il8n/ru_RU.ts \
     # end of TRANSLATIONS
+FORMS = main_window.ui

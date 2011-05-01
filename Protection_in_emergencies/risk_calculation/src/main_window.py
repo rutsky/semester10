@@ -22,6 +22,7 @@ __all__ = ["MainWindow"]
 
 import config
 
+import os
 import random
 import logging
 import threading
@@ -39,7 +40,7 @@ class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
 
-        PyQt4.uic.loadUi('main_window.ui', self)
+        PyQt4.uic.loadUi(os.path.join('forms', 'main_window.ui'), self)
 
     def closeEvent(self, event):
         super(MainWindow, self).closeEvent(event)

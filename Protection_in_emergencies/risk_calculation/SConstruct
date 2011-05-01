@@ -19,3 +19,5 @@ env = Environment(tools=["default"])
 Export('env')
 
 SConscript("src/SConscript")
+
+# vim: set filetype=python ts=4 sw=4 et:

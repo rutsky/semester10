@@ -15,7 +15,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SOURCES = main.py
-TRANSLATIONS = i18n/en_US.ts \
-    i18n/ru_RU.ts
-FORMS = main_window.ui
+SOURCES = main.py config.py main_window.py
+TRANSLATIONS = i18n/ru_RU.ts
+FORMS = forms/main_window.ui

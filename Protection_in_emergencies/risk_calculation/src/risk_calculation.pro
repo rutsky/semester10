@@ -16,8 +16,6 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SOURCES = main.py
-TRANSLATIONS = \
-    il8n/en_US.ts \
-    il8n/ru_RU.ts \
-    # end of TRANSLATIONS
+TRANSLATIONS = i18n/en_US.ts \
+    i18n/ru_RU.ts
 FORMS = main_window.ui

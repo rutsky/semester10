@@ -123,12 +123,24 @@ class MainWindow(qt4.QMainWindow):
         self.top_curve.setData(x, y)
 
     def reset_parameters(self):
+        self.bottom_lo_spin.setRange(1, 12)
         self.bottom_lo_spin.setValue(2)
+
+        self.bottom_hi_spin.setRange(1, 12)
         self.bottom_hi_spin.setValue(8)
+
+        self.top_lo_spin.setRange(1, 12)
         self.top_lo_spin.setValue(6.883)
+
+        self.top_hi_spin.setRange(1, 12)
         self.top_hi_spin.setValue(8.2)
+
+        self.r_lo_spin.setRange(1, 10)
         self.r_lo_spin.setValue(3.5)
+
+        self.r_hi_spin.setRange(1, 10)
         self.r_hi_spin.setValue(1)
+
         self.step_spin.setValue(1)
         self.delta_spin.setValue(22)
         self.h_spin.setValue(0.85)

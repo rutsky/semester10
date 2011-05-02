@@ -1,0 +1,1 @@
+1. cx_freeze generates not complete distribution in Ubuntu.

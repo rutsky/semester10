@@ -49,37 +49,57 @@ class MainWindow(qt4.QMainWindow):
     def closeEvent(self, event):
         super(MainWindow, self).closeEvent(event)
 
+    @property
+    def bottom_lo(self):
+        return 10**(-self.bottom_lo_spin.value())
+
+    @property
+    def bottom_hi(self):
+        return 10**(-self.bottom_hi_spin.value())
+
+    @property
+    def top_lo(self):
+        return 10**(-self.top_lo_spin.value())
+
+    @property
+    def top_hi(self):
+        return 10**(-self.top_hi_spin.value())
+
+    @property
+    def r_lo(self):
+        return 10**(-self.r_lo_spin.value())
+
+    @property
+    def r_hi(self):
+        return 10**(-self.r_hi_spin.value())
+
     def init_plot(self):
         self.bottom_curve = qwt5.QwtPlotCurve()
         self.bottom_curve.attach(self.qwtPlot)
         self.bottom_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
-        x = [10**(-self.bottom_lo_spin.value()), 
-             10**(-self.bottom_hi_spin.value())]
+        x = [self.bottom_lo, self.bottom_hi]
         y = [1, 1]
         self.bottom_curve.setData(x, y)
 
         self.left_curve = qwt5.QwtPlotCurve()
         self.left_curve.attach(self.qwtPlot)
         self.left_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
-        x = [10**(-self.bottom_lo_spin.value()), 
-             10**(-self.bottom_lo_spin.value())]
-        y = [1, 10**(-self.r_lo_spin.value())]
+        x = [self.bottom_lo, self.bottom_lo]
+        y = [1, self.r_lo]
         self.left_curve.setData(x, y)
 
         self.right_curve = qwt5.QwtPlotCurve()
         self.right_curve.attach(self.qwtPlot)
         self.right_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
-        x = [10**(-self.bottom_hi_spin.value()), 
-             10**(-self.bottom_hi_spin.value())]
-        y = [1, 10**(-self.r_hi_spin.value())]
+        x = [self.bottom_hi, self.bottom_hi]
+        y = [1, self.r_hi]
         self.right_curve.setData(x, y)
 
         self.top_curve = qwt5.QwtPlotCurve()
         self.top_curve.attach(self.qwtPlot)
         self.top_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
-        x = [10**(-self.bottom_lo_spin.value()), 
-             10**(-self.bottom_hi_spin.value())]
-        y = [10**(-self.r_lo_spin.value()), 10**(-self.r_hi_spin.value())]
+        x = [self.bottom_lo, self.bottom_hi]
+        y = [self.r_lo, self.r_hi]
         self.top_curve.setData(x, y)
 
         self.qwtPlot.setAxisScaleEngine(

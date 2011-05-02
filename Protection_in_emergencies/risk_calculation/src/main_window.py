@@ -22,6 +22,8 @@ __all__ = ["MainWindow"]
 
 import config
 
+import math
+
 import qtall as qt4
 
 # Using formulaes:
@@ -39,6 +41,17 @@ class MainWindow(qt4.QMainWindow):
 
         # Connect signals and slots.
         self.actionNew_Parameters.triggered.connect(self.on_new_parameters)
+
+        # DEBUG
+        # attach a curve
+        curve = qt4.Qwt5.QwtPlotCurve('y = pi*sin(x)')
+        curve.attach(self.qwtPlot)
+        curve.setPen(qt4.QPen(qt4.Qt.black, 2))
+        x = range(100)
+        y = [3.14 * math.sin(x_) for x_ in x]
+        print x, y
+        curve.setData(x, y)
+        self.qwtPlot.replot()
 
     def closeEvent(self, event):
         super(MainWindow, self).closeEvent(event)

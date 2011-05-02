@@ -31,6 +31,9 @@ qwt5 = qt4.Qwt5
 #  ...
 #
 
+class Constants(object):
+    min_hi_lo_dist = 0.5
+
 class MainWindow(qt4.QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -39,6 +42,7 @@ class MainWindow(qt4.QMainWindow):
         qt4.loadUi('forms/main_window.ui', self)
 
         self.reset_parameters()
+        self.update_ranges()
 
         # Connect signals and slots.
         self.actionNew_Parameters.triggered.connect(self.on_new_parameters)
@@ -145,6 +149,20 @@ class MainWindow(qt4.QMainWindow):
         self.delta_spin.setValue(22)
         self.h_spin.setValue(0.85)
         self.s_text.setText(u"qp * R")
+
+    def update_ranges(self):
+        assert self.bottom_lo_spin.value() + Constants.min_hi_lo_dist <= \
+            self.bottom_hi_spin.value()
+        assert self.top_lo_spin.value() + Constants.min_hi_lo_dist <= \
+            self.top_hi_spin.value()
+        self.bottom_lo_spin.setMaximum(
+            self.bottom_hi_spin.value() - Constants.min_hi_lo_dist)
+        self.bottom_hi_spin.setMinimum(
+            self.bottom_lo_spin.value() + Constants.min_hi_lo_dist)
+        self.top_lo_spin.setMaximum(
+            self.top_hi_spin.value() - Constants.min_hi_lo_dist)
+        self.top_hi_spin.setMinimum(
+            self.top_lo_spin.value() + Constants.min_hi_lo_dist)
 
     @qt4.Slot(bool)
     def on_new_parameters(self, checked):

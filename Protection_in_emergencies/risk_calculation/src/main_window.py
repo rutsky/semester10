@@ -49,7 +49,6 @@ class MainWindow(qt4.QMainWindow):
         curve.setPen(qt4.QPen(qt4.Qt.black, 2))
         x = range(100)
         y = [3.14 * math.sin(x_) for x_ in x]
-        print x, y
         curve.setData(x, y)
         self.qwtPlot.replot()
 

@@ -67,6 +67,7 @@ def excepthook(excepttype, exceptvalue, tracebackobj):
         msg_box.setDetailedText(full_exception_text)
         #msg_box.setSizeGripEnabled(True)
         #msg_box.adjustSize()
+        msg_box.setDefaultButton(qt4.QMessageBox.Close)
 
         msg_box.exec_()
         #raise IgnoreException

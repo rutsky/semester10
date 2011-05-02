@@ -35,14 +35,15 @@ class MainWindow(qt4.QMainWindow):
         # TODO: Use installation path.
         qt4.loadUi('forms/main_window.ui', self)
 
+        self.reset_parameters()
+
         # Connect signals and slots.
         self.actionNew_Parameters.triggered.connect(self.on_new_parameters)
 
     def closeEvent(self, event):
         super(MainWindow, self).closeEvent(event)
 
-    @qt4.Slot(bool)
-    def on_new_parameters(self, checked):
+    def reset_parameters(self):
         self.bottom_lo_spin.setValue(6)
         self.bottom_hi_spin.setValue(8)
         self.top_lo_spin.setValue(6.883)
@@ -53,5 +54,9 @@ class MainWindow(qt4.QMainWindow):
         self.delta_spin.setValue(22)
         self.h_spin.setValue(0.85)
         self.s_text.setText(u"qp * R")
+
+    @qt4.Slot(bool)
+    def on_new_parameters(self, checked):
+        self.reset_parameters()
 
 # vim: set ts=4 sw=4 et:

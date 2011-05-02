@@ -25,6 +25,7 @@ import config
 import math
 
 import qtall as qt4
+qwt5 = qt4.Qwt5
 
 # Using formulaes:
 #  ...
@@ -42,21 +43,57 @@ class MainWindow(qt4.QMainWindow):
         # Connect signals and slots.
         self.actionNew_Parameters.triggered.connect(self.on_new_parameters)
 
-        # DEBUG
-        # attach a curve
-        curve = qt4.Qwt5.QwtPlotCurve('y = pi*sin(x)')
-        curve.attach(self.qwtPlot)
-        curve.setPen(qt4.QPen(qt4.Qt.black, 2))
-        x = range(100)
-        y = [3.14 * math.sin(x_) for x_ in x]
-        curve.setData(x, y)
-        self.qwtPlot.replot()
+        # Initialize plot.
+        self.init_plot()
 
     def closeEvent(self, event):
         super(MainWindow, self).closeEvent(event)
 
+    def init_plot(self):
+        self.bottom_curve = qwt5.QwtPlotCurve()
+        self.bottom_curve.attach(self.qwtPlot)
+        self.bottom_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
+        x = [10**(-self.bottom_lo_spin.value()), 
+             10**(-self.bottom_hi_spin.value())]
+        y = [1, 1]
+        self.bottom_curve.setData(x, y)
+
+        self.left_curve = qwt5.QwtPlotCurve()
+        self.left_curve.attach(self.qwtPlot)
+        self.left_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
+        x = [10**(-self.bottom_lo_spin.value()), 
+             10**(-self.bottom_lo_spin.value())]
+        y = [1, 10**(-self.r_lo_spin.value())]
+        self.left_curve.setData(x, y)
+
+        self.right_curve = qwt5.QwtPlotCurve()
+        self.right_curve.attach(self.qwtPlot)
+        self.right_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
+        x = [10**(-self.bottom_hi_spin.value()), 
+             10**(-self.bottom_hi_spin.value())]
+        y = [1, 10**(-self.r_hi_spin.value())]
+        self.right_curve.setData(x, y)
+
+        self.top_curve = qwt5.QwtPlotCurve()
+        self.top_curve.attach(self.qwtPlot)
+        self.top_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
+        x = [10**(-self.bottom_lo_spin.value()), 
+             10**(-self.bottom_hi_spin.value())]
+        y = [10**(-self.r_lo_spin.value()), 10**(-self.r_hi_spin.value())]
+        self.top_curve.setData(x, y)
+
+        self.qwtPlot.setAxisScaleEngine(
+            qwt5.QwtPlot.xBottom, qwt5.QwtLog10ScaleEngine())
+        self.qwtPlot.setAxisScaleEngine(
+            qwt5.QwtPlot.yLeft, qwt5.QwtLog10ScaleEngine())
+
+        self.qwtPlot.replot()
+
+    def update_plot(self):
+        pass
+
     def reset_parameters(self):
-        self.bottom_lo_spin.setValue(6)
+        self.bottom_lo_spin.setValue(2)
         self.bottom_hi_spin.setValue(8)
         self.top_lo_spin.setValue(6.883)
         self.top_hi_spin.setValue(8.2)

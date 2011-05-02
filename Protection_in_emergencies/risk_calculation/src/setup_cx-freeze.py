@@ -27,8 +27,10 @@ if sys.platform == "win32":
 
 include_files = [
     ('forms/main_window.ui', 'forms/main_window.ui'), 
-    ('i18n/ru_RU.qm', 'i18n/ru_RU.qm')]
-includes = ['sip', 'encodings.ascii', 'encodings.utf_8', 'encodings.hex_codec']
+    ('i18n/ru_RU.qm', 'i18n/ru_RU.qm'),
+    ('qwt_plot.py', 'qwt_plot.py')]
+includes = ['sip', 'encodings.ascii', 'encodings.utf_8', 
+    'encodings.hex_codec', 'numpy.core.multiarray']
 
 setup(
     name="risk_calculation",

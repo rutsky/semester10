@@ -272,15 +272,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="delta_spin"/>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_10">
-          <property name="text">
-           <string>&amp;deg;</string>
-          </property>
-          <property name="textFormat">
-           <enum>Qt::RichText</enum>
+         <widget class="QDoubleSpinBox" name="delta_spin">
+          <property name="suffix">
+           <string>°</string>
           </property>
          </widget>
         </item>

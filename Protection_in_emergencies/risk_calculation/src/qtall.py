@@ -22,7 +22,7 @@ __license__ = "GPL"
 
 import config
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtCore, QtGui, Qwt5
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *

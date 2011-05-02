@@ -24,6 +24,10 @@ import config
 
 import qtall as qt4
 
+# Using formulaes:
+#  ...
+#
+
 class MainWindow(qt4.QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -31,7 +35,23 @@ class MainWindow(qt4.QMainWindow):
         # TODO: Use installation path.
         qt4.loadUi('forms/main_window.ui', self)
 
+        # Connect signals and slots.
+        self.actionNew_Parameters.triggered.connect(self.on_new_parameters)
+
     def closeEvent(self, event):
         super(MainWindow, self).closeEvent(event)
+
+    @qt4.Slot(bool)
+    def on_new_parameters(self, checked):
+        self.bottom_lo_spin.setValue(6)
+        self.bottom_hi_spin.setValue(8)
+        self.top_lo_spin.setValue(6.883)
+        self.top_hi_spin.setValue(8.2)
+        self.r_lo_spin.setValue(3.5)
+        self.r_hi_spin.setValue(1)
+        self.step_spin.setValue(1)
+        self.delta_spin.setValue(22)
+        self.h_spin.setValue(0.85)
+        self.s_text.setText(u"qp * R")
 
 # vim: set ts=4 sw=4 et:

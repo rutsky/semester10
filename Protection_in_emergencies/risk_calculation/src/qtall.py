@@ -29,4 +29,7 @@ from PyQt4.uic import loadUi
 if config.use_OpenGL:
     from PyQt4.QtOpenGL import *
 
+Slot = pyqtSlot
+Signal = pyqtSignal
+
 # vim: set ts=4 sw=4 et:

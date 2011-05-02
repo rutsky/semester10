@@ -388,11 +388,6 @@
     <string>Ctrl+Shift+S</string>
    </property>
   </action>
-  <action name="action_Load_Parameters">
-   <property name="text">
-    <string>&amp;Load Parameters</string>
-   </property>
-  </action>
   <action name="actionLoad_Parameters">
    <property name="text">
     <string>L&amp;oad Parameters...</string>

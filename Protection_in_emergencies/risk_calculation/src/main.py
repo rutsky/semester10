@@ -40,9 +40,34 @@ def excepthook(excepttype, exceptvalue, tracebackobj):
         # Next exception is ignored to clear out the stack frame of the
         # previous exception.
 
-        msg_box = qt4.QMessageBox()
-        msg_box.setText("".join(traceback.format_exception(
-            excepttype, exceptvalue, tracebackobj)))
+        full_exception_text = "".join(traceback.format_exception(
+            excepttype, exceptvalue, tracebackobj))
+        exception_text = "".join(traceback.format_exception_only(
+            excepttype, exceptvalue))
+
+        sys.stderr.write(full_exception_text)
+
+        msg_box = qt4.QMessageBox(
+            qt4.QMessageBox.Critical,
+            "Unhandled exception", 
+            "Unhandled exception.",
+            qt4.QMessageBox.Close,
+            # TODO: Fails with:
+            # TypeError: arguments did not match any overloaded call:
+            #   QMessageBox(QWidget parent=None): argument 1 has unexpected type 'Icon'
+            #   QMessageBox(QMessageBox.Icon, QString, QString, QMessageBox.StandardButtons buttons=QMessageBox.NoButton, QWidget parent=None, Qt.WindowFlags flags=Qt.Dialog|Qt.MSWindowsFixedSizeDialogHint): argument 5 has unexpected type 'WindowFlags'
+            #   QMessageBox(QString, QString, QMessageBox.Icon, int, int, int, QWidget parent=None, Qt.WindowFlags flags=Qt.Dialog|Qt.MSWindowsFixedSizeDialogHint): argument 1 has unexpected type 'Icon'
+            #qt4.Qt.WindowFlags(qt4.Qt.Dialog)
+            #qt4.QtCore.Qt.WindowFlags(0)
+            )
+        # Looks like it's quite hard to make QMessageBox normally resizable,
+        # see <http://bugreports.qt.nokia.com/browse/QTBUG-3696> for details.
+        #msg_box.setWindowFlags(qt4.Qt.Window)
+        msg_box.setInformativeText(exception_text)
+        msg_box.setDetailedText(full_exception_text)
+        #msg_box.setSizeGripEnabled(True)
+        #msg_box.adjustSize()
+
         msg_box.exec_()
         #raise IgnoreException
 

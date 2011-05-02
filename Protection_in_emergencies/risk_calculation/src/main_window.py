@@ -41,15 +41,28 @@ class MainWindow(qt4.QMainWindow):
         # TODO: Use installation path.
         qt4.loadUi('forms/main_window.ui', self)
 
+        # Initialize parameters in GUI.
         self.reset_parameters()
         self.update_ranges()
-
-        # Connect signals and slots.
-        self.actionNew_Parameters.triggered.connect(self.on_new_parameters)
 
         # Initialize plot.
         self.init_plot()
         self.update_plot()
+
+        # Connect signals and slots.
+        self.actionNew_Parameters.triggered.connect(self.on_new_parameters)
+        self.bottom_lo_spin.valueChanged[float].connect(
+            self.on_bound_spin_changed)
+        self.bottom_hi_spin.valueChanged[float].connect(
+            self.on_bound_spin_changed)
+        self.top_lo_spin.valueChanged[float].connect(
+            self.on_bound_spin_changed)
+        self.top_hi_spin.valueChanged[float].connect(
+            self.on_bound_spin_changed)
+        self.r_lo_spin.valueChanged[float].connect(
+            self.on_bound_spin_changed)
+        self.r_hi_spin.valueChanged[float].connect(
+            self.on_bound_spin_changed)
 
     def closeEvent(self, event):
         super(MainWindow, self).closeEvent(event)
@@ -167,5 +180,12 @@ class MainWindow(qt4.QMainWindow):
     @qt4.Slot(bool)
     def on_new_parameters(self, checked):
         self.reset_parameters()
+        self.update_ranges()
+
+    @qt4.Slot(float)
+    def on_bound_spin_changed(self, val):
+        self.update_ranges()
+        self.update_plot()
+        self.qwtPlot.replot()
 
 # vim: set ts=4 sw=4 et:

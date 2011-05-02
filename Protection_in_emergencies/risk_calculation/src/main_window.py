@@ -102,10 +102,17 @@ class MainWindow(qt4.QMainWindow):
         y = [self.r_lo, self.r_hi]
         self.top_curve.setData(x, y)
 
+        # Use logarithmic axes.
         self.qwtPlot.setAxisScaleEngine(
             qwt5.QwtPlot.xBottom, qwt5.QwtLog10ScaleEngine())
         self.qwtPlot.setAxisScaleEngine(
             qwt5.QwtPlot.yLeft, qwt5.QwtLog10ScaleEngine())
+
+        # Invert axes.
+        self.qwtPlot.axisScaleEngine(qwt5.QwtPlot.xBottom).setAttribute(
+            qwt5.QwtScaleEngine.Inverted, True)
+        self.qwtPlot.axisScaleEngine(qwt5.QwtPlot.yLeft).setAttribute(
+            qwt5.QwtScaleEngine.Inverted, True)
 
         self.qwtPlot.replot()
 

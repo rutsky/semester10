@@ -45,6 +45,7 @@ class MainWindow(qt4.QMainWindow):
 
         # Initialize plot.
         self.init_plot()
+        self.update_plot()
 
     def closeEvent(self, event):
         super(MainWindow, self).closeEvent(event)
@@ -77,30 +78,18 @@ class MainWindow(qt4.QMainWindow):
         self.bottom_curve = qwt5.QwtPlotCurve()
         self.bottom_curve.attach(self.qwtPlot)
         self.bottom_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
-        x = [self.bottom_lo, self.bottom_hi]
-        y = [1, 1]
-        self.bottom_curve.setData(x, y)
 
         self.left_curve = qwt5.QwtPlotCurve()
         self.left_curve.attach(self.qwtPlot)
         self.left_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
-        x = [self.bottom_lo, self.bottom_lo]
-        y = [1, self.r_lo]
-        self.left_curve.setData(x, y)
 
         self.right_curve = qwt5.QwtPlotCurve()
         self.right_curve.attach(self.qwtPlot)
         self.right_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
-        x = [self.bottom_hi, self.bottom_hi]
-        y = [1, self.r_hi]
-        self.right_curve.setData(x, y)
 
         self.top_curve = qwt5.QwtPlotCurve()
         self.top_curve.attach(self.qwtPlot)
         self.top_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
-        x = [self.bottom_lo, self.bottom_hi]
-        y = [self.r_lo, self.r_hi]
-        self.top_curve.setData(x, y)
 
         # Use logarithmic axes.
         self.qwtPlot.setAxisScaleEngine(
@@ -117,7 +106,21 @@ class MainWindow(qt4.QMainWindow):
         self.qwtPlot.replot()
 
     def update_plot(self):
-        pass
+        x = [self.bottom_lo, self.bottom_hi]
+        y = [1, 1]
+        self.bottom_curve.setData(x, y)
+
+        x = [self.bottom_lo, self.bottom_lo]
+        y = [1, self.r_lo]
+        self.left_curve.setData(x, y)
+
+        x = [self.bottom_hi, self.bottom_hi]
+        y = [1, self.r_hi]
+        self.right_curve.setData(x, y)
+
+        x = [self.bottom_lo, self.bottom_hi]
+        y = [self.r_lo, self.r_hi]
+        self.top_curve.setData(x, y)
 
     def reset_parameters(self):
         self.bottom_lo_spin.setValue(2)

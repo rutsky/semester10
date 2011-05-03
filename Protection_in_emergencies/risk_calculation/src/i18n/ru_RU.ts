@@ -9,17 +9,17 @@
         <translation>Вычисление рисков</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="344"/>
+        <location filename="forms/main_window.ui" line="338"/>
         <source>&amp;File</source>
         <translation>&amp;Файл</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="369"/>
+        <location filename="forms/main_window.ui" line="363"/>
         <source>&amp;Quit</source>
         <translation>&amp;Выход</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="372"/>
+        <location filename="forms/main_window.ui" line="366"/>
         <source>Ctrl+Q</source>
         <translation></translation>
     </message>
@@ -39,17 +39,17 @@
         <translation>lg |&lt;i&gt;R&lt;sub&gt;0&lt;/sub&gt;&lt;/i&gt;| =</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="111"/>
+        <location filename="forms/main_window.ui" line="108"/>
         <source>-lg &lt;i&gt;q&lt;sub&gt;project, 0&lt;/sub&gt;&lt;/i&gt; =</source>
         <translation>-lg &lt;i&gt;q&lt;sub&gt;проектн, 0&lt;/sub&gt;&lt;/i&gt; =</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="137"/>
+        <location filename="forms/main_window.ui" line="134"/>
         <source>-lg &lt;i&gt;step&lt;/i&gt; =</source>
         <translation>-lg &lt;i&gt;шаг&lt;/i&gt; =</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="160"/>
+        <location filename="forms/main_window.ui" line="157"/>
         <source>-lg &lt;i&gt;q&lt;sub&gt;project, 1&lt;/sub&gt;&lt;/i&gt; =</source>
         <translation>-lg &lt;i&gt;q&lt;sub&gt;проектн, 1&lt;/sub&gt;&lt;/i&gt; =</translation>
     </message>
@@ -66,25 +66,25 @@
     <message>
         <location filename="forms/main_window.ui" line="280"/>
         <source>&amp;deg;</source>
-        <translation>&amp;deg;</translation>
+        <translation type="obsolete">&amp;deg;</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="307"/>
+        <location filename="forms/main_window.ui" line="301"/>
         <source>&lt;i&gt;S&lt;/i&gt; =</source>
         <translation>&lt;i&gt;S&lt;/i&gt; =</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="359"/>
+        <location filename="forms/main_window.ui" line="353"/>
         <source>&amp;Edit</source>
         <translation>&amp;Правка</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="377"/>
+        <location filename="forms/main_window.ui" line="371"/>
         <source>&amp;Save Parameters</source>
         <translation>&amp;Сохранить параметры</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="380"/>
+        <location filename="forms/main_window.ui" line="374"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
@@ -94,69 +94,84 @@
         <translation type="obsolete">Сохранить параметры &amp;как...</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="388"/>
+        <location filename="forms/main_window.ui" line="382"/>
         <source>Ctrl+Shift+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="393"/>
+        <location filename="forms/main_window.ui" line="387"/>
         <source>L&amp;oad Parameters...</source>
         <translation>&amp;Загрузить параметры...</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="396"/>
+        <location filename="forms/main_window.ui" line="390"/>
         <source>Ctrl+O</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="401"/>
+        <location filename="forms/main_window.ui" line="395"/>
         <source>Save &amp;Image As...</source>
         <translation>Cохранить &amp;изображение как...</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="404"/>
+        <location filename="forms/main_window.ui" line="398"/>
         <source>Ctrl+I</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="412"/>
+        <location filename="forms/main_window.ui" line="406"/>
         <source>Ctrl+P</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="417"/>
+        <location filename="forms/main_window.ui" line="411"/>
         <source>&amp;New Parameters</source>
         <translation>&amp;Новые параметры</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="420"/>
+        <location filename="forms/main_window.ui" line="414"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="425"/>
+        <location filename="forms/main_window.ui" line="419"/>
         <source>&amp;Clear Marks</source>
         <translation>&amp;Очистить метки</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="428"/>
+        <location filename="forms/main_window.ui" line="422"/>
         <source>Del</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="187"/>
+        <location filename="forms/main_window.ui" line="184"/>
         <source>lg |&lt;i&gt;R&lt;sub&gt;1&lt;/sub&gt;&lt;/i&gt;| =</source>
         <translation>lg |&lt;i&gt;R&lt;sub&gt;1&lt;/sub&gt;&lt;/i&gt;| =</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="385"/>
+        <location filename="forms/main_window.ui" line="379"/>
         <source>Save Parameters &amp;As...</source>
         <translation>Сохранить параметры &amp;как...</translation>
     </message>
     <message>
-        <location filename="forms/main_window.ui" line="409"/>
+        <location filename="forms/main_window.ui" line="403"/>
         <source>&amp;Print...</source>
         <translation>&amp;Печать...</translation>
+    </message>
+    <message utf8="true">
+        <location filename="forms/main_window.ui" line="277"/>
+        <source>°</source>
+        <translation>°</translation>
+    </message>
+    <message>
+        <location filename="main_window.py" line="118"/>
+        <source>&lt;big&gt;lg &lt;i&gt;q&lt;sub&gt;project&lt;/sub&gt;&lt;/i&gt;&lt;/big&gt;</source>
+        <translation>&lt;big&gt;lg &lt;i&gt;q&lt;sub&gt;проектн&lt;/sub&gt;&lt;/i&gt;&lt;/big&gt;</translation>
+    </message>
+    <message>
+        <location filename="main_window.py" line="120"/>
+        <source>&lt;big&gt;lg |R|&lt;/big&gt;</source>
+        <translation>&lt;big&gt;lg |R|&lt;/big&gt;</translation>
     </message>
 </context>
 </TS>

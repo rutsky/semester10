@@ -188,7 +188,12 @@ class MainWindow(qt4.QMainWindow):
         self.markers_qreal = []
         self.markers_qproject = []
         self.update_markers()
+
+        self.top_label = None
+        self.update_top_label()
     
+        self.qwtPlot.setMargin(0)
+
         self.qwtPlot.replot()
 
     def update_plot(self):
@@ -247,6 +252,18 @@ class MainWindow(qt4.QMainWindow):
             self.top_hi_spin.value() - Constants.min_hi_lo_dist)
         self.top_hi_spin.setMinimum(
             self.top_lo_spin.value() + Constants.min_hi_lo_dist)
+
+    def update_top_label(self):
+        if self.top_label is None:
+            self.top_label = qwt.QwtPlotMarker()
+            self.top_label.attach(self.qwtPlot)
+
+        self.top_label.setValue(
+            10**((self.bottom_hi_log + self.bottom_lo_log) / 2.0), 
+            min(self.r_lo, self.r_hi))
+        self.top_label.setLabel(
+            qwt.QwtText(self.tr("<big>lg <i>q<sub>real</sub></i></big>")))
+        self.top_label.setLabelAlignment(qt4.Qt.AlignTop)
 
     def update_markers(self):
         for m in self.top_markers:
@@ -310,6 +327,7 @@ class MainWindow(qt4.QMainWindow):
         self.update_ranges()
         self.update_plot()
         self.update_markers()
+        self.update_top_label()
         self.qwtPlot.replot()
 
 # vim: set ts=4 sw=4 et:

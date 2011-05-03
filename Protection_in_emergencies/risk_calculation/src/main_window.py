@@ -229,6 +229,7 @@ class MainWindow(qt4.QMainWindow):
 
         self.step_spin.setValue(1)
         self.step_spin.setRange(0.5, 5)
+
         self.delta_spin.setValue(22)
         self.h_spin.setValue(0.85)
         self.s_text.setText(u"qp * R")

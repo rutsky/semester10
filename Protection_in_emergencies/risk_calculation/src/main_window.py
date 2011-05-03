@@ -256,7 +256,7 @@ class MainWindow(qt4.QMainWindow):
             #print qreal, qproject # DEBUG
             m.setXValue(qproject)
             m.setYValue(self.project_to_top_r(qproject))
-            m.setLabel(qwt.QwtText("<i>test</i>"))
+            m.setLabel(qwt.QwtText("{0:.1e}".format(qreal)))
             m.attach(self.qwtPlot)
 
             self.top_markers.append(m)

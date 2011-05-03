@@ -114,6 +114,15 @@ class MainWindow(qt4.QMainWindow):
         self.qwtPlot.setAxisScaleEngine(
             qwt5.QwtPlot.yLeft, qwt5.QwtLog10ScaleEngine())
 
+        # Set axes titles.
+        self.qwtPlot.setAxisTitle(qwt5.QwtPlot.xBottom, 
+            qwt5.QwtText(self.tr("<big>lg <i>q<sub>project</sub></i></big>")))
+        self.qwtPlot.setAxisTitle(qwt5.QwtPlot.yLeft, 
+            qwt5.QwtText(self.tr("<big>lg |R|</big>")))
+        # No top axis currently.
+        #self.qwtPlot.setAxisTitle(qwt5.QwtPlot.xTop, 
+        #    qwt5.QwtText(self.tr("<big>lg <i>q<sub>real</sub></i></big>")))
+
         # Invert axes.
         self.qwtPlot.axisScaleEngine(qwt5.QwtPlot.xBottom).setAttribute(
             qwt5.QwtScaleEngine.Inverted, True)

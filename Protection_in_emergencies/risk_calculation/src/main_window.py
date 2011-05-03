@@ -245,6 +245,9 @@ class MainWindow(qt4.QMainWindow):
             self.bottom_hi_spin.value()
         assert self.top_lo_spin.value() + Constants.min_hi_lo_dist <= \
             self.top_hi_spin.value()
+        assert self.r_hi_spin.value() + Constants.min_hi_lo_dist <= \
+            self.r_lo_spin.value()
+
         self.bottom_lo_spin.setMaximum(
             self.bottom_hi_spin.value() - Constants.min_hi_lo_dist)
         self.bottom_hi_spin.setMinimum(

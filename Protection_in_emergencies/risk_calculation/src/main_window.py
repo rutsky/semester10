@@ -253,6 +253,10 @@ class MainWindow(qt4.QMainWindow):
             self.top_hi_spin.value() - Constants.min_hi_lo_dist)
         self.top_hi_spin.setMinimum(
             self.top_lo_spin.value() + Constants.min_hi_lo_dist)
+        self.r_hi_spin.setMaximum(
+            self.r_lo_spin.value() - Constants.min_hi_lo_dist)
+        self.r_lo_spin.setMinimum(
+            self.r_hi_spin.value() + Constants.min_hi_lo_dist)
 
     def update_top_label(self):
         if self.top_label is None:

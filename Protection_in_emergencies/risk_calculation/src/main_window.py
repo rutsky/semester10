@@ -256,6 +256,7 @@ class MainWindow(qt4.QMainWindow):
             #print qreal, qproject # DEBUG
             m.setValue(qproject, self.project_to_top_r(qproject))
             m.setLabel(qwt.QwtText("{0:.1e}".format(qreal)))
+            m.setLabelAlignment(qt4.Qt.AlignTop | qt4.Qt.AlignRight)
             m.attach(self.qwtPlot)
 
             self.top_markers.append(m)

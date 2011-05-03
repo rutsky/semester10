@@ -25,7 +25,7 @@ import config
 import math
 
 import qtall as qt4
-qwt5 = qt4.Qwt5
+qwt = qt4.Qwt5
 
 # Using formulaes:
 #  ...
@@ -92,42 +92,42 @@ class MainWindow(qt4.QMainWindow):
         return 10**(-self.r_hi_spin.value())
 
     def init_plot(self):
-        self.bottom_curve = qwt5.QwtPlotCurve()
+        self.bottom_curve = qwt.QwtPlotCurve()
         self.bottom_curve.attach(self.qwtPlot)
         self.bottom_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
 
-        self.left_curve = qwt5.QwtPlotCurve()
+        self.left_curve = qwt.QwtPlotCurve()
         self.left_curve.attach(self.qwtPlot)
         self.left_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
 
-        self.right_curve = qwt5.QwtPlotCurve()
+        self.right_curve = qwt.QwtPlotCurve()
         self.right_curve.attach(self.qwtPlot)
         self.right_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
 
-        self.top_curve = qwt5.QwtPlotCurve()
+        self.top_curve = qwt.QwtPlotCurve()
         self.top_curve.attach(self.qwtPlot)
         self.top_curve.setPen(qt4.QPen(qt4.Qt.black, 1))
 
         # Use logarithmic axes.
         self.qwtPlot.setAxisScaleEngine(
-            qwt5.QwtPlot.xBottom, qwt5.QwtLog10ScaleEngine())
+            qwt.QwtPlot.xBottom, qwt.QwtLog10ScaleEngine())
         self.qwtPlot.setAxisScaleEngine(
-            qwt5.QwtPlot.yLeft, qwt5.QwtLog10ScaleEngine())
+            qwt.QwtPlot.yLeft, qwt.QwtLog10ScaleEngine())
 
         # Set axes titles.
-        self.qwtPlot.setAxisTitle(qwt5.QwtPlot.xBottom, 
-            qwt5.QwtText(self.tr("<big>lg <i>q<sub>project</sub></i></big>")))
-        self.qwtPlot.setAxisTitle(qwt5.QwtPlot.yLeft, 
-            qwt5.QwtText(self.tr("<big>lg |R|</big>")))
+        self.qwtPlot.setAxisTitle(qwt.QwtPlot.xBottom, 
+            qwt.QwtText(self.tr("<big>lg <i>q<sub>project</sub></i></big>")))
+        self.qwtPlot.setAxisTitle(qwt.QwtPlot.yLeft, 
+            qwt.QwtText(self.tr("<big>lg |R|</big>")))
         # No top axis currently.
-        #self.qwtPlot.setAxisTitle(qwt5.QwtPlot.xTop, 
-        #    qwt5.QwtText(self.tr("<big>lg <i>q<sub>real</sub></i></big>")))
+        #self.qwtPlot.setAxisTitle(qwt.QwtPlot.xTop, 
+        #    qwt.QwtText(self.tr("<big>lg <i>q<sub>real</sub></i></big>")))
 
         # Invert axes.
-        self.qwtPlot.axisScaleEngine(qwt5.QwtPlot.xBottom).setAttribute(
-            qwt5.QwtScaleEngine.Inverted, True)
-        self.qwtPlot.axisScaleEngine(qwt5.QwtPlot.yLeft).setAttribute(
-            qwt5.QwtScaleEngine.Inverted, True)
+        self.qwtPlot.axisScaleEngine(qwt.QwtPlot.xBottom).setAttribute(
+            qwt.QwtScaleEngine.Inverted, True)
+        self.qwtPlot.axisScaleEngine(qwt.QwtPlot.yLeft).setAttribute(
+            qwt.QwtScaleEngine.Inverted, True)
 
         self.qwtPlot.replot()
 

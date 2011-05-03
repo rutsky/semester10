@@ -23,6 +23,7 @@ __all__ = ["MainWindow"]
 import config
 
 import math
+import itertools
 
 import qtall as qt4
 qwt = qt4.Qwt5
@@ -32,7 +33,25 @@ qwt = qt4.Qwt5
 #
 
 class Constants(object):
-    min_hi_lo_dist = 0.5
+    min_hi_lo_dist = 1.0
+
+def lerp(x0, x1, y0, y1):
+    assert x0 != x1
+    k = (y1 - y0) / (x1 - x0)
+    def lerp_impl(x):
+        return y0 + k * (x - x0)
+    return lerp_impl
+
+def xfrange(start, stop, step):
+    for i in itertools.count():
+        value = start + step * i
+        if step >= 0 and value < stop:
+            yield value
+        elif stop < value:
+            yield value
+        else:
+            break
+lg = lambda x: math.log(x, 10)
 
 class MainWindow(qt4.QMainWindow):
     def __init__(self, parent=None):
@@ -68,28 +87,60 @@ class MainWindow(qt4.QMainWindow):
         super(MainWindow, self).closeEvent(event)
 
     @property
+    def bottom_lo_log(self):
+        return -self.bottom_lo_spin.value()
+
+    @property
+    def bottom_hi_log(self):
+        return -self.bottom_hi_spin.value()
+
+    @property
+    def top_lo_log(self):
+        return -self.top_lo_spin.value()
+
+    @property
+    def top_hi_log(self):
+        return -self.top_hi_spin.value()
+
+    @property
+    def r_lo_log(self):
+        return -self.r_lo_spin.value()
+
+    @property
+    def r_hi_log(self):
+        return -self.r_hi_spin.value()
+
+    @property
+    def top_step_log(self):
+        return -self.step_spin.value()
+
+    @property
     def bottom_lo(self):
-        return 10**(-self.bottom_lo_spin.value())
+        return 10**self.bottom_lo_log
 
     @property
     def bottom_hi(self):
-        return 10**(-self.bottom_hi_spin.value())
+        return 10**self.bottom_hi_log
 
     @property
     def top_lo(self):
-        return 10**(-self.top_lo_spin.value())
+        return 10**self.top_lo_log
 
     @property
     def top_hi(self):
-        return 10**(-self.top_hi_spin.value())
+        return 10**self.top_hi_log
 
     @property
     def r_lo(self):
-        return 10**(-self.r_lo_spin.value())
+        return 10**self.r_lo_log
 
     @property
     def r_hi(self):
-        return 10**(-self.r_hi_spin.value())
+        return 10**self.r_hi_log
+
+    @property
+    def top_step(self):
+        return 10**self.top_step_log
 
     def init_plot(self):
         self.bottom_curve = qwt.QwtPlotCurve()
@@ -129,6 +180,11 @@ class MainWindow(qt4.QMainWindow):
         self.qwtPlot.axisScaleEngine(qwt.QwtPlot.yLeft).setAttribute(
             qwt.QwtScaleEngine.Inverted, True)
 
+        # Upper line markers.
+        self.top_markers = []
+        self.top_markers_qreal = []
+        self.update_top_markers()
+    
         self.qwtPlot.replot()
 
     def update_plot(self):
@@ -156,10 +212,10 @@ class MainWindow(qt4.QMainWindow):
         self.bottom_hi_spin.setValue(8)
 
         self.top_lo_spin.setRange(1, 12)
-        self.top_lo_spin.setValue(6.883)
+        self.top_lo_spin.setValue(2.3)
 
         self.top_hi_spin.setRange(1, 12)
-        self.top_hi_spin.setValue(8.2)
+        self.top_hi_spin.setValue(8.4)
 
         self.r_lo_spin.setRange(1, 10)
         self.r_lo_spin.setValue(3.5)
@@ -186,15 +242,49 @@ class MainWindow(qt4.QMainWindow):
         self.top_hi_spin.setMinimum(
             self.top_lo_spin.value() + Constants.min_hi_lo_dist)
 
+    def update_top_markers(self):
+        for m in self.top_markers:
+            m.attach(None)
+
+        self.top_markers = []
+        self.top_markers_qreal = []
+
+        qreal = self.top_lo
+        while qreal > self.top_hi:
+            m = qwt.QwtPlotMarker()
+            qproject = self.top_real_to_project(qreal)
+            print qreal, qproject # DEBUG
+            m.setXValue(qproject)
+            m.setYValue(self.project_to_top_r(qproject))
+            m.setLabel(qwt.QwtText("<i>test</i>"))
+            m.attach(self.qwtPlot)
+
+            self.top_markers.append(m)
+            self.top_markers_qreal.append(qreal)
+
+            qreal *= self.top_step
+
+    def project_to_top_r(self, qproject):
+        return 10**(lerp(self.bottom_lo_log, self.bottom_hi_log, 
+            self.r_lo_log, self.r_hi_log)(lg(qproject)))
+
+    def project_to_top_real(self, qproject):
+        return 10**(lerp(self.bottom_lo_log, self.bottom_hi_log, 
+            self.top_lo_log, self.top_hi_log)(lg(qproject)))
+
+    def top_real_to_project(self, qreal):
+        return 10**lerp(self.top_lo_log, self.top_hi_log,
+            self.bottom_lo_log, self.bottom_hi_log)(lg(qreal))
+
     @qt4.Slot(bool)
     def on_new_parameters(self, checked):
         self.reset_parameters()
-        self.update_ranges()
 
     @qt4.Slot(float)
     def on_bound_spin_changed(self, val):
         self.update_ranges()
         self.update_plot()
+        self.update_top_markers()
         self.qwtPlot.replot()
 
 # vim: set ts=4 sw=4 et:

@@ -187,6 +187,7 @@ class MainWindow(qt4.QMainWindow):
         self.bottom_markers = []
         self.markers_qreal = []
         self.markers_qproject = []
+        self.markers_lines = []
         self.update_markers()
 
         self.top_label = None
@@ -279,6 +280,12 @@ class MainWindow(qt4.QMainWindow):
         qreal = 10**math.ceil(self.top_lo_log)
         while qreal > 10**math.floor(self.top_hi_log):
             qproject = self.top_real_to_project(qreal)
+
+            if qreal > self.bottom_lo or qreal < self.bottom_hi or \
+                    qproject > self.bottom_lo or qproject < self.bottom_hi:
+                qreal *= self.top_step
+                continue
+
             self.markers_qreal.append(qreal)
             self.markers_qproject.append(qproject)
 
@@ -305,6 +312,21 @@ class MainWindow(qt4.QMainWindow):
             self.bottom_markers.append(m)
 
             qreal *= self.top_step
+
+        # Update lines connecting markers.
+        for curve in self.markers_lines:
+            curve.attach(None)
+
+        self.markers_lines = []
+
+        for qreal, qproject in zip(self.markers_qreal, self.markers_qproject):
+            curve = qwt.QwtPlotCurve()
+            curve.setData(
+                [qproject, qreal],
+                [self.project_to_top_r(qproject), 1])
+            curve.attach(self.qwtPlot)
+
+            self.markers_lines.append(curve)
 
     def project_to_top_r(self, qproject):
         return 10**(lerp(self.bottom_lo_log, self.bottom_hi_log, 

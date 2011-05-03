@@ -249,11 +249,11 @@ class MainWindow(qt4.QMainWindow):
         self.top_markers = []
         self.top_markers_qreal = []
 
-        qreal = self.top_lo
-        while qreal > self.top_hi:
+        qreal = 10**math.ceil(self.top_lo_log)
+        while qreal > 10**math.floor(self.top_hi_log):
             m = qwt.QwtPlotMarker()
             qproject = self.top_real_to_project(qreal)
-            print qreal, qproject # DEBUG
+            #print qreal, qproject # DEBUG
             m.setXValue(qproject)
             m.setYValue(self.project_to_top_r(qproject))
             m.setLabel(qwt.QwtText("<i>test</i>"))

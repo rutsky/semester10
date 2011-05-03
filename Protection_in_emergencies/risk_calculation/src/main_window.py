@@ -82,6 +82,8 @@ class MainWindow(qt4.QMainWindow):
             self.on_bound_spin_changed)
         self.r_hi_spin.valueChanged[float].connect(
             self.on_bound_spin_changed)
+        self.step_spin.valueChanged[float].connect(
+            self.on_bound_spin_changed)
 
     def closeEvent(self, event):
         super(MainWindow, self).closeEvent(event)
@@ -226,6 +228,7 @@ class MainWindow(qt4.QMainWindow):
         self.r_hi_spin.setValue(1)
 
         self.step_spin.setValue(1)
+        self.step_spin.setRange(0.5, 5)
         self.delta_spin.setValue(22)
         self.h_spin.setValue(0.85)
         self.s_text.setText(u"qp * R")

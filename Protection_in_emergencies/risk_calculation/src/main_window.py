@@ -328,6 +328,7 @@ class MainWindow(qt4.QMainWindow):
 
         for qreal, qproject in zip(self.markers_qreal, self.markers_qproject):
             curve = qwt.QwtPlotCurve()
+            curve.setPen(qt4.QPen(qt4.Qt.DashLine))
             curve.setData(
                 [qproject, qreal],
                 [self.project_to_top_r(qproject), 1])

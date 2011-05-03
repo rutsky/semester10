@@ -182,8 +182,10 @@ class MainWindow(qt4.QMainWindow):
 
         # Upper line markers.
         self.top_markers = []
-        self.top_markers_qreal = []
-        self.update_top_markers()
+        self.bottom_markers = []
+        self.markers_qreal = []
+        self.markers_qproject = []
+        self.update_markers()
     
         self.qwtPlot.replot()
 
@@ -242,18 +244,25 @@ class MainWindow(qt4.QMainWindow):
         self.top_hi_spin.setMinimum(
             self.top_lo_spin.value() + Constants.min_hi_lo_dist)
 
-    def update_top_markers(self):
+    def update_markers(self):
         for m in self.top_markers:
+            m.attach(None)
+        for m in self.bottom_markers:
             m.attach(None)
 
         self.top_markers = []
-        self.top_markers_qreal = []
+        self.bottom_markers = []
+        self.markers_qproject = []
+        self.markers_qreal = []
 
         qreal = 10**math.ceil(self.top_lo_log)
         while qreal > 10**math.floor(self.top_hi_log):
-            m = qwt.QwtPlotMarker()
             qproject = self.top_real_to_project(qreal)
-            #print qreal, qproject # DEBUG
+            self.markers_qreal.append(qreal)
+            self.markers_qproject.append(qproject)
+
+            # Top marker.
+            m = qwt.QwtPlotMarker()
             m.setValue(qproject, self.project_to_top_r(qproject))
             m.setLabel(qwt.QwtText("{0:.1e}".format(qreal)))
             m.setLabelAlignment(qt4.Qt.AlignTop | qt4.Qt.AlignRight)
@@ -261,9 +270,18 @@ class MainWindow(qt4.QMainWindow):
                 qwt.QwtSymbol.Ellipse, qt4.QBrush(qt4.QColor(0, 0, 0)), 
                 qt4.QPen(qt4.QColor(0, 0, 0)), qt4.QSize(4, 4)))
             m.attach(self.qwtPlot)
-
+            
             self.top_markers.append(m)
-            self.top_markers_qreal.append(qreal)
+
+            # Bottom marker.
+            m = qwt.QwtPlotMarker()
+            m.setValue(qreal, 1)
+            m.setSymbol(qwt.QwtSymbol(
+                qwt.QwtSymbol.Ellipse, qt4.QBrush(qt4.QColor(0, 0, 0)), 
+                qt4.QPen(qt4.QColor(0, 0, 0)), qt4.QSize(4, 4)))
+            m.attach(self.qwtPlot)
+
+            self.bottom_markers.append(m)
 
             qreal *= self.top_step
 
@@ -287,7 +305,7 @@ class MainWindow(qt4.QMainWindow):
     def on_bound_spin_changed(self, val):
         self.update_ranges()
         self.update_plot()
-        self.update_top_markers()
+        self.update_markers()
         self.qwtPlot.replot()
 
 # vim: set ts=4 sw=4 et:

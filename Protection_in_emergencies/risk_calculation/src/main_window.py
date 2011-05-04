@@ -265,7 +265,7 @@ class MainWindow(qt4.QMainWindow):
         self.s_text.setText(u"qp * R")
 
         self.c_spin.setValue(7.0)
-        self.c_spin.setRange(0.001, 100)
+        self.c_spin.setRange(1, 100)
 
     def update_ranges(self):
         assert self.bottom_lo_spin.value() + Constants.min_hi_lo_dist <= \

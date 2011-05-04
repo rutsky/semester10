@@ -84,6 +84,8 @@ class MainWindow(qt4.QMainWindow):
             self.on_bound_spin_changed)
         self.step_spin.valueChanged[float].connect(
             self.on_bound_spin_changed)
+        self.c_spin.valueChanged[float].connect(
+            self.on_bound_spin_changed)
 
     def closeEvent(self, event):
         super(MainWindow, self).closeEvent(event)
@@ -144,6 +146,10 @@ class MainWindow(qt4.QMainWindow):
     def top_step(self):
         return 10**self.top_step_log
 
+    @property
+    def c_coef(self):
+        return self.c_spin.value()
+
     def init_plot(self):
         self.bottom_curve = qwt.QwtPlotCurve()
         self.bottom_curve.attach(self.qwtPlot)
@@ -188,6 +194,7 @@ class MainWindow(qt4.QMainWindow):
         self.markers_qreal = []
         self.markers_qproject = []
         self.markers_lines = []
+        self.parabolas_lines = []
         self.update_markers()
 
         self.top_label = None
@@ -239,6 +246,9 @@ class MainWindow(qt4.QMainWindow):
         self.delta_spin.setValue(22)
         self.h_spin.setValue(0.85)
         self.s_text.setText(u"qp * R")
+
+        self.c_spin.setValue(7.0)
+        self.c_spin.setRange(0.001, 100)
 
     def update_ranges(self):
         assert self.bottom_lo_spin.value() + Constants.min_hi_lo_dist <= \
@@ -335,6 +345,58 @@ class MainWindow(qt4.QMainWindow):
             curve.attach(self.qwtPlot)
 
             self.markers_lines.append(curve)
+
+        # Draw parabolas.
+        for curve in self.parabolas_lines:
+            curve.attach(None)
+
+        self.parabolas_lines = []
+
+        for qreal, qproject in zip(self.markers_qreal, self.markers_qproject):
+            curve = qwt.QwtPlotCurve()
+            curve.setPen(qt4.QPen(qt4.Qt.DashDotLine))
+            #curve.setData(
+            #    [qproject, qreal],
+            #    [self.project_to_top_r(qproject), 1])
+
+            angle = math.atan2(
+                -lg(self.project_to_top_r(qproject)), 
+                lg(qreal) - lg(qproject)) - math.pi / 2.0
+            #print angle # DEBUG
+            #angle = 0 # DEBUG
+
+            xs = []
+            ys = []
+
+            for x_log in xfrange(
+                    self.bottom_lo_log, 
+                    self.bottom_hi_log, 
+                    -0.01):
+                #print "x_log:", x_log # DEBUG
+                #print "qreal:", qreal, lg(qreal) # DEBUG
+                y_log = -self.c_coef * (lg(qreal) - x_log)**2
+                #print "y_log:", y_log # DEBUG
+
+                x_log_rot = \
+                    math.cos(angle) * (x_log - lg(qreal)) - \
+                    math.sin(angle) * (y_log) + \
+                    lg(qreal)
+                y_log_rot = \
+                    math.sin(angle) * (x_log - lg(qreal)) + \
+                    math.cos(angle) * (y_log)
+
+                if (x_log_rot < self.bottom_lo_log and
+                    x_log_rot > self.bottom_hi_log and
+                    y_log_rot < 1 and
+                    y_log_rot > lg(self.project_to_top_r(10**x_log_rot))):
+                    xs.append(10**x_log_rot)
+                    ys.append(10**y_log_rot)
+
+            curve.setData(xs, ys)
+
+            curve.attach(self.qwtPlot)
+
+            self.parabolas_lines.append(curve)
 
     def project_to_top_r(self, qproject):
         return 10**(lerp(self.bottom_lo_log, self.bottom_hi_log, 

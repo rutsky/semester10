@@ -202,6 +202,23 @@ class MainWindow(qt4.QMainWindow):
     
         self.qwtPlot.setMargin(0)
 
+        self.picker = qwt.QwtPlotPicker(
+                qwt.QwtPlot.xBottom,
+                qwt.QwtPlot.yLeft,
+                qwt.QwtPicker.NoSelection,
+                qwt.QwtPlotPicker.CrossRubberBand,
+                qwt.QwtPicker.AlwaysOn,
+                self.qwtPlot.canvas())
+        self.picker.setTrackerPen(qt4.QPen(qt4.Qt.red))
+
+        self.zoomer = qwt.QwtPlotZoomer(
+                qwt.QwtPlot.xBottom,
+                qwt.QwtPlot.yLeft,
+                qwt.QwtPicker.DragSelection,
+                qwt.QwtPicker.AlwaysOff,
+                self.qwtPlot.canvas())
+        self.zoomer.setRubberBandPen(qt4.QPen(qt4.Qt.green))
+
         self.qwtPlot.replot()
 
     def update_plot(self):

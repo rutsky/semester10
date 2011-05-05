@@ -33,44 +33,49 @@ T sqr( T const &v )
 }
 
 typedef std::vector<double> measurements_t;
+typedef std::vector<double> derivatives_t;
+typedef std::vector<size_t> request_indexes_t;
 
-void estimate( measurements_t const &measurements, double dt,
-               size_t quiet_period, double requests_detection_alpha )
+void calcDerivatives( measurements_t const &measurements, 
+                      derivatives_t &derivatives )
 {
-  BOOST_ASSERT(quiet_period >= 2);
-  BOOST_ASSERT(dt >= 1e-8);
-  BOOST_ASSERT(0 <= requests_detection_alpha && requests_detection_alpha <= 1);
-
-  char const *detectedRequestsFile = "detected_requests.txt";
-
-  // Calculate numeric derivative.
-  std::vector<double> der;
-  der.reserve(measurements.size());
-  der.push_back(0);
+  derivatives.clear();
+  derivatives.reserve(measurements.size());
+  derivatives.push_back(0);
   for (size_t i = 1; i < measurements.size(); ++i)
-  {
-    der.push_back(measurements[i] - measurements[i - 1]);
-  }
+    derivatives.push_back(measurements[i] - measurements[i - 1]);
+}
 
-  // Detect times when requests arrived.
-  std::vector<size_t> T_c;
+void calcRequestsArrival( measurements_t const &measurements,
+                          derivatives_t const &derivatives,
+                          double dt,
+                          size_t quietPeriod,
+                          double requestsDetectionAlpha,
+                          request_indexes_t &requests )
+{
+  BOOST_ASSERT(quietPeriod >= 2);
+  BOOST_ASSERT(dt >= 1e-8);
+  BOOST_ASSERT(0 <= requestsDetectionAlpha && requestsDetectionAlpha <= 1);
+
+  requests.clear();
+
   size_t lastRequestIdx = 0;
-  while (lastRequestIdx + 1 + quiet_period + 1 < measurements.size())
+  while (lastRequestIdx + 1 + quietPeriod + 1 < measurements.size())
   {
     // Estimate \sigma^2 on quiet period (period after request in 
     // which no request arrived).
     double accum(0);
-    for (size_t i = 0; i < quiet_period; ++i)
-      accum += sqr(der[lastRequestIdx + 1 + i]);
+    for (size_t i = 0; i < quietPeriod; ++i)
+      accum += sqr(derivatives[lastRequestIdx + 1 + i]);
 
-    size_t n = quiet_period;
+    size_t n = quietPeriod;
 
-    size_t idx = lastRequestIdx + 1 + quiet_period;
+    size_t idx = lastRequestIdx + 1 + quietPeriod;
     BOOST_ASSERT(idx < measurements.size());
 
     bool foundRequest(false);
     for (; idx < measurements.size(); 
-        accum += sqr(der[idx]), ++idx, ++n)
+        accum += sqr(derivatives[idx]), ++idx, ++n)
     {
       double const sigma2 = accum / ((n - 1) * dt);
 
@@ -79,11 +84,11 @@ void estimate( measurements_t const &measurements, double dt,
           normalDistr(0, std::sqrt(sigma2 * dt));
       double const loQuantile = 
           quantile(normalDistr, 
-              requests_detection_alpha / 2.0);
+              requestsDetectionAlpha / 2.0);
       double const hiQuantile = 
           quantile(complement(
               normalDistr, 
-              requests_detection_alpha / 2.0));
+              requestsDetectionAlpha / 2.0));
 
       // DEBUG
       /*
@@ -96,12 +101,12 @@ void estimate( measurements_t const &measurements, double dt,
       // END OF DEBUG
       
       // Check if next observing value lies in rare quantiles.
-      if (der[idx] < loQuantile || der[idx] > hiQuantile)
+      if (derivatives[idx] < loQuantile || derivatives[idx] > hiQuantile)
       {
         // Rare event happened - request.
         //std::cout << "***\n"; // DEBUG
         foundRequest = true;
-        T_c.push_back(idx);
+        requests.push_back(idx);
         lastRequestIdx = idx;
         break;
       }
@@ -110,6 +115,22 @@ void estimate( measurements_t const &measurements, double dt,
     if (!foundRequest)
       break;
   }
+}
+
+void estimate( measurements_t const &measurements, double dt,
+               size_t quietPeriod, double requestsDetectionAlpha )
+{
+
+  char const *detectedRequestsFile = "detected_requests.txt";
+
+  // Calculate numeric derivative.
+  derivatives_t derivatives;
+  calcDerivatives(measurements, derivatives);
+
+  // Detect times when requests arrived.
+  std::vector<size_t> T_c;
+  calcRequestsArrival(measurements, derivatives, dt, quietPeriod, 
+      requestsDetectionAlpha, T_c);  
 
   // Write detected requests in file.
   {

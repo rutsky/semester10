@@ -23,6 +23,7 @@
 #include <boost/program_options.hpp>
 #include <boost/foreach.hpp>
 #include <boost/math/distributions/normal.hpp>
+#include <boost/tuple/tuple.hpp>
 
 namespace po = boost::program_options;
 
@@ -132,6 +133,77 @@ void writeRequests( char const *fileName, request_indexes_t const &requests )
   }
 }
 
+double calcNoiseAverage( measurements_t const &measurements,
+                         request_indexes_t const &requests )
+{
+  BOOST_ASSERT(requests.size() < measurements.size());
+  
+  double sum(0);
+  size_t i = 0;
+  for (; i < measurements.size(); ++i)
+  {
+    if (!requests.empty() && requests.front() == i)
+    {
+      // Stop at request.
+      break;
+    }
+
+    sum += measurements[i];
+  }
+  if (i > 0)
+  {
+    return sum / i;
+  }
+  else
+  {
+    // TODO
+    return 0;
+  }
+}
+
+std::pair<double, double> 
+    calcNoiseStDeviation( derivatives_t const &derivatives,
+                          request_indexes_t const &requests,
+                          double dt )
+{
+  BOOST_ASSERT(requests.size() < derivatives.size());
+
+  double sum(0);
+  for (size_t i = 0, j = 0; i < derivatives.size(); ++i)
+  {
+    if (j < requests.size() && requests[j] == i)
+    {
+      // Skip measurement at request time.
+      //std::cout << derivatives[i] << "\n"; // DEBUG
+      ++j;
+      continue;
+    }
+
+    sum += derivatives[i];
+  }
+
+  double const average = sum / (derivatives.size() - requests.size());
+
+  sum = 0;
+  for (size_t i = 0, j = 0; i < derivatives.size(); ++i)
+  {
+    if (j < requests.size() && requests[j] == i)
+    {
+      // Skip measurement at request time.
+      ++j;
+      continue;
+    }
+
+    sum += sqr(derivatives[i] - average);
+  }
+
+  double const d2 = sum / (derivatives.size() - requests.size());
+
+  double const stDeviation = sqrt(d2 / dt);
+
+  return std::make_pair(average, stDeviation);
+}
+
 void estimate( measurements_t const &measurements, double dt,
                size_t quietPeriod, double requestsDetectionAlpha )
 {
@@ -143,14 +215,27 @@ void estimate( measurements_t const &measurements, double dt,
   calcDerivatives(measurements, derivatives);
 
   // Detect times when requests arrived.
-  std::vector<size_t> T_c;
+  std::vector<size_t> iterative_T_c;
   calcRequestsArrival(measurements, derivatives, dt, quietPeriod, 
-      requestsDetectionAlpha, T_c);  
+      requestsDetectionAlpha, iterative_T_c);  
 
   // Write detected requests in file.
-  writeRequests(detectedRequestsFile, T_c);
+  writeRequests(detectedRequestsFile, iterative_T_c);
 
-  std::cout << "Detected " << T_c.size() << " requests.\n";
+  std::cout << "*** Iterative method ***\n";
+  std::cout << "Detected " << iterative_T_c.size() << " requests.\n";
+
+  // Estimate noise average (m).
+  double const iterative_m = calcNoiseAverage(measurements, iterative_T_c);
+  std::cout << "Noise average m: " << iterative_m << 
+      " (by measurements until first requests)\n";
+
+  // Estimate noise standard deviation (\sigma).
+  double derivativeAverage, iterative_sigma;
+  boost::tie(derivativeAverage, iterative_sigma) = 
+    calcNoiseStDeviation(derivatives, iterative_T_c, dt);
+  std::cout << "Noise standard deviation: " << iterative_sigma << 
+    " (derivative average: " << derivativeAverage << ")\n";
 }
 
 int main( int argc, char *argv[] )

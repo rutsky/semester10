@@ -161,6 +161,16 @@ double calcNoiseAverage( measurements_t const &measurements,
   }
 }
 
+double calcPoissonParameter( request_indexes_t const &requests, double dt )
+{
+  BOOST_ASSERT(requests.size() >= 2);
+
+  double sum(0);
+  for (size_t i = 1; i < requests.size(); ++i)
+    sum += dt * (requests[i] - requests[i - 1]);
+  return sum / (requests.size() - 1);
+}
+
 std::pair<double, double> 
     calcNoiseStDeviation( derivatives_t const &derivatives,
                           request_indexes_t const &requests,
@@ -225,6 +235,11 @@ void estimate( measurements_t const &measurements, double dt,
   std::cout << "*** Iterative method ***\n";
   std::cout << "Detected " << iterative_T_c.size() << " requests.\n";
 
+  // Estimate Poisson parameter.
+  double const iterative_lambda = calcPoissonParameter(iterative_T_c, dt);
+  std::cout << "Poisson parameter: " << iterative_lambda << 
+      " (average time between requests)\n";
+
   // Estimate noise average (m).
   double const iterative_m = calcNoiseAverage(measurements, iterative_T_c);
   std::cout << "Noise average m: " << iterative_m << 
@@ -236,6 +251,7 @@ void estimate( measurements_t const &measurements, double dt,
     calcNoiseStDeviation(derivatives, iterative_T_c, dt);
   std::cout << "Noise standard deviation: " << iterative_sigma << 
     " (derivative average: " << derivativeAverage << ")\n";
+
 }
 
 int main( int argc, char *argv[] )

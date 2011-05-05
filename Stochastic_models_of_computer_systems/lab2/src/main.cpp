@@ -117,6 +117,21 @@ void calcRequestsArrival( measurements_t const &measurements,
   }
 }
 
+void writeRequests( char const *fileName, request_indexes_t const &requests )
+{
+  std::ofstream ofs(fileName);
+
+  if (ofs)
+  {
+    std::copy(requests.begin(), requests.end(), 
+        std::ostream_iterator<size_t>(ofs, "\n"));
+  }
+  else
+  {
+    perror(fileName);
+  }
+}
+
 void estimate( measurements_t const &measurements, double dt,
                size_t quietPeriod, double requestsDetectionAlpha )
 {
@@ -133,19 +148,7 @@ void estimate( measurements_t const &measurements, double dt,
       requestsDetectionAlpha, T_c);  
 
   // Write detected requests in file.
-  {
-    std::ofstream ofs(detectedRequestsFile);
-
-    if (ofs)
-    {
-      std::copy(T_c.begin(), T_c.end(), 
-          std::ostream_iterator<size_t>(ofs, "\n"));
-    }
-    else
-    {
-      perror(detectedRequestsFile);
-    }
-  }
+  writeRequests(detectedRequestsFile, T_c);
 
   std::cout << "Detected " << T_c.size() << " requests.\n";
 }

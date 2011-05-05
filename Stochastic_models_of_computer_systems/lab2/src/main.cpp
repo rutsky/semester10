@@ -86,18 +86,20 @@ void estimate( measurements_t const &measurements, double dt,
               requests_detection_alpha / 2.0));
 
       // DEBUG
+      /*
       std::cout << idx << " ";
       std::cout << "  sigma2: " << sigma2 << 
         ", loQuantile: " << loQuantile <<
         ", hiQuantile: " << hiQuantile << 
         ", det: " << der[idx] << "\n";
+      */
       // END OF DEBUG
       
       // Check if next observing value lies in rare quantiles.
       if (der[idx] < loQuantile || der[idx] > hiQuantile)
       {
         // Rare event happened - request.
-        std::cout << "***\n"; // DEBUG
+        //std::cout << "***\n"; // DEBUG
         foundRequest = true;
         T_c.push_back(idx);
         lastRequestIdx = idx;
@@ -123,6 +125,8 @@ void estimate( measurements_t const &measurements, double dt,
       perror(detectedRequestsFile);
     }
   }
+
+  std::cout << "Detected " << T_c.size() << " requests.\n";
 }
 
 int main( int argc, char *argv[] )

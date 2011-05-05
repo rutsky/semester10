@@ -214,6 +214,46 @@ std::pair<double, double>
   return std::make_pair(average, stDeviation);
 }
 
+std::pair<double, double> 
+    calcRequestsParams( derivatives_t const &derivatives,
+                        request_indexes_t const &requests,
+                        double dt, double sigma )
+{
+  BOOST_ASSERT(requests.size() < derivatives.size());
+  BOOST_ASSERT(requests.size() > 0);
+
+  double sum(0);
+  for (size_t i = 0, j = 0; i < derivatives.size(); ++i)
+  {
+    if (j < requests.size() && requests[j] == i)
+    {
+      // Count measurement only at request tim`e.
+      sum += derivatives[i];
+      ++j;
+    }
+  }
+
+  double const average = sum / requests.size();
+
+  sum = 0;
+  for (size_t i = 0, j = 0; i < derivatives.size(); ++i)
+  {
+    if (j < requests.size() && requests[j] == i)
+    {
+      // Count measurement only at request tim`e.
+      sum += derivatives[i];
+      ++j;
+    }
+  }
+
+  double const d2 = sum / requests.size();
+
+  BOOST_ASSERT(d2 - sqr(sigma) * dt);
+  double const stDeviation = sqrt(d2 - sqr(sigma) * dt);
+
+  return std::make_pair(average, stDeviation);
+}
+
 void estimate( measurements_t const &measurements, double dt,
                size_t quietPeriod, double requestsDetectionAlpha )
 {
@@ -237,7 +277,7 @@ void estimate( measurements_t const &measurements, double dt,
 
   // Estimate Poisson parameter.
   double const iterative_lambda = calcPoissonParameter(iterative_T_c, dt);
-  std::cout << "Poisson parameter: " << iterative_lambda << 
+  std::cout << "Poisson parameter lambda: " << iterative_lambda << 
       " (average time between requests)\n";
 
   // Estimate noise average (m).
@@ -249,9 +289,16 @@ void estimate( measurements_t const &measurements, double dt,
   double derivativeAverage, iterative_sigma;
   boost::tie(derivativeAverage, iterative_sigma) = 
     calcNoiseStDeviation(derivatives, iterative_T_c, dt);
-  std::cout << "Noise standard deviation: " << iterative_sigma << 
-    " (derivative average: " << derivativeAverage << ")\n";
+  std::cout << "Noise standard deviation sigma: " << iterative_sigma << 
+      " (derivative average: " << derivativeAverage << ")\n";
 
+  // Estimate requests average (m_c) and standard deviation (\sigma_c).
+  double iterative_m_c, iterative_sigma_c;
+  boost::tie(iterative_m_c, iterative_sigma_c) = 
+    calcRequestsParams(derivatives, iterative_T_c, dt, iterative_sigma);
+  std::cout << "Requests average m_c: " << iterative_m_c << "\n";
+  std::cout << "Requests standard deviation sigma_c: " << iterative_sigma_c << 
+      "\n";
 }
 
 int main( int argc, char *argv[] )

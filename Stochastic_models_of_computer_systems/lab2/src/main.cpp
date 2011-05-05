@@ -268,6 +268,7 @@ void estimate( measurements_t const &measurements, double dt,
   std::vector<size_t> iterative_T_c;
   calcRequestsArrival(measurements, derivatives, dt, quietPeriod, 
       requestsDetectionAlpha, iterative_T_c);  
+  BOOST_ASSERT(!iterative_T_c.empty());
 
   // Write detected requests in file.
   writeRequests(detectedRequestsFile, iterative_T_c);
@@ -283,7 +284,8 @@ void estimate( measurements_t const &measurements, double dt,
   // Estimate noise average (m).
   double const iterative_m = calcNoiseAverage(measurements, iterative_T_c);
   std::cout << "Noise average m: " << iterative_m << 
-      " (by measurements until first requests)\n";
+      " (by " << iterative_T_c.front() << 
+      " measurements until first requests)\n";
 
   // Estimate noise standard deviation (\sigma).
   double derivativeAverage, iterative_sigma;

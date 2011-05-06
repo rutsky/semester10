@@ -356,7 +356,7 @@ FwdIt firstHistogramLocalMax( FwdIt first, FwdIt beyond )
 
 void estimate( measurements_t const &measurements, double dt,
                size_t quietPeriod, double requestsDetectionAlpha,
-               size_t nHistogramIntervals ) 
+               size_t nHistogramIntervals, size_t maxEMIterations ) 
 {
   char const *detectedRequestsFile = "detected_requests.txt",
       *histogramFile = "histogram.csv";
@@ -448,6 +448,10 @@ void estimate( measurements_t const &measurements, double dt,
         "  sigma_1 = " << sigma1 << ", sigma_2 = " << sigma2 << "\n"
         "  tau_1 = " << tau1 << ", tau_2 = " << tau2 << "\n";
 
+    // EM-algorithm.
+    for (size_t i = 0; i < maxEMIterations; ++i)
+    {
+    }
   }
 }
 
@@ -456,7 +460,7 @@ int main( int argc, char *argv[] )
   std::string fileName;
   size_t quietPeriod;
   double dt, requestsDetectionAlpha;
-  size_t nHistogramIntervals;
+  size_t nHistogramIntervals, maxEMIterations;
 
   // Parse command line.
   try
@@ -476,6 +480,9 @@ int main( int argc, char *argv[] )
         ("histogram-intervals", 
             po::value<size_t>(&nHistogramIntervals),
             "number of intervals used in histogram.")
+        ("max-em-iterations", 
+            po::value<size_t>(&maxEMIterations),
+            "maximum number of iteration in EM-algorithm.")
         ;
     po::positional_options_description posOptDesc;
     posOptDesc
@@ -484,6 +491,7 @@ int main( int argc, char *argv[] )
         .add("quiet-period", 1)
         .add("requests-detection-alpha", 1)
         .add("histogram-intervals", 1)
+        .add("max-em-iterations", 1)
         ;
 
     po::variables_map vm;
@@ -496,7 +504,8 @@ int main( int argc, char *argv[] )
         vm.count("dt") &&
         vm.count("quiet-period") &&
         vm.count("requests-detection-alpha") &&
-        vm.count("histogram-intervals");
+        vm.count("histogram-intervals") &&
+        vm.count("max-em-iterations");
 
     if (vm.count("help") || !haveRequiredOptions)
     {
@@ -538,7 +547,7 @@ int main( int argc, char *argv[] )
 
   // Run estimation.
   estimate(measurements, dt, quietPeriod, requestsDetectionAlpha,
-      nHistogramIntervals);
+      nHistogramIntervals, maxEMIterations);
 
   return 0;
 }

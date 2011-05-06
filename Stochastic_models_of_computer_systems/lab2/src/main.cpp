@@ -415,7 +415,7 @@ void estimate( measurements_t const &measurements, double dt,
     // EM-algorithm.
     //
 
-    std::cout << "*** EM-algorithm ***\n";
+    std::cout << "\n*** EM-algorithm ***\n";
 
     // Build histogram.
     histogram_t histogram;
@@ -435,9 +435,19 @@ void estimate( measurements_t const &measurements, double dt,
         firstHistogramLocalMax(histogram.rbegin(), histogram.rend());
     BOOST_ASSERT(lastLMIt != histogram.rend());
     double mu2 = lastLMIt->first;
+    BOOST_ASSERT(mu1 < mu2);
 
-    std::cout << "Start average estimation: mu_1=" << mu1 << 
-        ", mu_2=" << mu2 <<"\n";
+    // Other parameters initial estimation.
+    double tau1(0.5), tau2(0.5);
+    double sigma1 = (mu2 - mu1) / 3.0;
+    double sigma2 = sigma1;
+
+    std::cout << 
+        "Start estimation: \n"
+        "  mu_1 = " << mu1 << ", mu_2 = " << mu2 << "\n"
+        "  sigma_1 = " << sigma1 << ", sigma_2 = " << sigma2 << "\n"
+        "  tau_1 = " << tau1 << ", tau_2 = " << tau2 << "\n";
+
   }
 }
 

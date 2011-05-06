@@ -333,11 +333,31 @@ void buildHistogram( derivatives_t const &derivatives,
   }
 }
 
+// Note: x_i is local maximum iff x_{i-1} <= x_i >= x_{i+1}
+template< class FwdIt >
+FwdIt firstHistogramLocalMax( FwdIt first, FwdIt beyond )
+{
+  if (first == beyond)
+    return beyond;
+  FwdIt pprev = first++;
+
+  if (first == beyond)
+    return beyond;
+  FwdIt prev = first++;
+
+  for (; first != beyond; pprev = prev, prev = first, ++first)
+  {
+    if (pprev->second <= prev->second && prev->second >= first->second)
+      return prev;
+  }
+
+  return beyond;
+}
+
 void estimate( measurements_t const &measurements, double dt,
                size_t quietPeriod, double requestsDetectionAlpha,
                size_t nHistogramIntervals ) 
 {
-
   char const *detectedRequestsFile = "detected_requests.txt",
       *histogramFile = "histogram.csv";
 
@@ -345,50 +365,80 @@ void estimate( measurements_t const &measurements, double dt,
   derivatives_t derivatives;
   calcDerivatives(measurements, derivatives);
 
-  // Detect times when requests arrived.
-  std::vector<size_t> iterative_T_c;
-  calcRequestsArrival(measurements, derivatives, dt, quietPeriod, 
-      requestsDetectionAlpha, iterative_T_c);  
-  BOOST_ASSERT(!iterative_T_c.empty());
+  {
+    //
+    // Iterative algorithm.
+    //
 
-  // Write detected requests in file.
-  writeRequests(detectedRequestsFile, iterative_T_c);
+    std::cout << "*** Iterative method ***\n";
 
-  std::cout << "*** Iterative method ***\n";
-  std::cout << "Detected " << iterative_T_c.size() << " requests.\n";
+    // Detect times when requests arrived.
+    std::vector<size_t> iterative_T_c;
+    calcRequestsArrival(measurements, derivatives, dt, quietPeriod, 
+        requestsDetectionAlpha, iterative_T_c);  
+    BOOST_ASSERT(!iterative_T_c.empty());
 
-  // Estimate Poisson parameter.
-  double const iterative_lambda = calcPoissonParameter(iterative_T_c, dt);
-  std::cout << "Poisson parameter lambda: " << iterative_lambda << 
-      " (average time between requests)\n";
+    // Write detected requests in file.
+    writeRequests(detectedRequestsFile, iterative_T_c);
 
-  // Estimate noise average (m).
-  double const iterative_m = calcNoiseAverage(measurements, iterative_T_c);
-  std::cout << "Noise average m: " << iterative_m << 
-      " (by " << iterative_T_c.front() << 
-      " measurements until first requests)\n";
+    std::cout << "Detected " << iterative_T_c.size() << " requests.\n";
 
-  // Estimate noise standard deviation (\sigma).
-  double derivativeAverage, iterative_sigma;
-  boost::tie(derivativeAverage, iterative_sigma) = 
-    calcNoiseStDeviation(derivatives, iterative_T_c, dt);
-  std::cout << "Noise standard deviation sigma: " << iterative_sigma << 
-      " (derivative average: " << derivativeAverage << ")\n";
+    // Estimate Poisson parameter.
+    double const iterative_lambda = calcPoissonParameter(iterative_T_c, dt);
+    std::cout << "Poisson parameter lambda: " << iterative_lambda << 
+        " (average time between requests)\n";
 
-  // Estimate requests average (m_c) and standard deviation (\sigma_c).
-  double iterative_m_c, iterative_sigma_c;
-  boost::tie(iterative_m_c, iterative_sigma_c) = 
-    calcRequestsParams(derivatives, iterative_T_c, dt, iterative_sigma);
-  std::cout << "Requests average m_c: " << iterative_m_c << "\n";
-  std::cout << "Requests standard deviation sigma_c: " << iterative_sigma_c << 
-      "\n";
+    // Estimate noise average (m).
+    double const iterative_m = calcNoiseAverage(measurements, iterative_T_c);
+    std::cout << "Noise average m: " << iterative_m << 
+        " (by " << iterative_T_c.front() << 
+        " measurements until first requests)\n";
 
-  // Build histogram.
-  histogram_t histogram;
-  buildHistogram(derivatives, nHistogramIntervals, histogram);
+    // Estimate noise standard deviation (\sigma).
+    double derivativeAverage, iterative_sigma;
+    boost::tie(derivativeAverage, iterative_sigma) = 
+      calcNoiseStDeviation(derivatives, iterative_T_c, dt);
+    std::cout << "Noise standard deviation sigma: " << iterative_sigma << 
+        " (derivative average: " << derivativeAverage << ")\n";
 
-  // Write histogram to file.
-  writeHistogram(histogramFile, histogram);
+    // Estimate requests average (m_c) and standard deviation (\sigma_c).
+    double iterative_m_c, iterative_sigma_c;
+    boost::tie(iterative_m_c, iterative_sigma_c) = 
+      calcRequestsParams(derivatives, iterative_T_c, dt, iterative_sigma);
+    std::cout << "Requests average m_c: " << iterative_m_c << "\n";
+    std::cout << "Requests standard deviation sigma_c: " << 
+        iterative_sigma_c << "\n";
+  }
+
+  {
+    //
+    // EM-algorithm.
+    //
+
+    std::cout << "*** EM-algorithm ***\n";
+
+    // Build histogram.
+    histogram_t histogram;
+    buildHistogram(derivatives, nHistogramIntervals, histogram);
+
+    // Write histogram to file.
+    writeHistogram(histogramFile, histogram);
+
+    // Calculate first and last local maximum of histogram - estimation
+    // of \mu_1, \mu_2.
+    histogram_t::const_iterator firstLMIt = 
+        firstHistogramLocalMax(histogram.begin(), histogram.end());
+    BOOST_ASSERT(firstLMIt != histogram.end());
+    double mu1 = firstLMIt->first;
+
+    histogram_t::const_reverse_iterator lastLMIt = 
+        firstHistogramLocalMax(histogram.rbegin(), histogram.rend());
+    BOOST_ASSERT(lastLMIt != histogram.rend());
+    double mu2 = lastLMIt->first;
+
+    std::cout << "Start average estimation: mu_1=" << mu1 << 
+        ", mu_2=" << mu2 <<"\n";
+  }
 }
 
 int main( int argc, char *argv[] )

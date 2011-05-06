@@ -438,20 +438,20 @@ void estimate( measurements_t const &measurements, double dt,
         firstHistogramLocalMax(histogram.begin(), histogram.end());
     BOOST_ASSERT(firstLMIt != histogram.end());
     parameters_array_t mu;
-    mu[0] = firstLMIt->first;
+    mu[1] = firstLMIt->first;
 
     histogram_t::const_reverse_iterator lastLMIt = 
         firstHistogramLocalMax(histogram.rbegin(), histogram.rend());
     BOOST_ASSERT(lastLMIt != histogram.rend());
-    mu[1] = lastLMIt->first;
-    BOOST_ASSERT(mu[0] < mu[1]);
+    mu[0] = lastLMIt->first;
+    BOOST_ASSERT(mu[1] < mu[0]);
 
     // Other parameters initial estimation.
     parameters_array_t tau;
     tau[0] = 0.5;
     tau[1] = 0.5;
     parameters_array_t sigma;
-    sigma[0] = sigma[1] = (mu[1] - mu[0]) / 3.0;
+    sigma[0] = sigma[1] = (mu[0] - mu[1]) / 3.0;
 
     std::cout << 
         "Start estimation: \n"
@@ -527,7 +527,7 @@ void estimate( measurements_t const &measurements, double dt,
       std::cout << stepIdx << ") "
         "nextTau = (" << nextTau[0] << "," << nextTau[1] << "), "
         "nextMu = (" << nextMu[0] << "," << nextMu[1] << "), "
-        "nexSigma = (" << nextSigma[0] << "," << nextSigma[1] << ")\n";
+        "nextSigma = (" << nextSigma[0] << "," << nextSigma[1] << ")\n";
 
       bool smaller(true);
       for (size_t j = 0; j < 2; ++j)
@@ -555,7 +555,7 @@ void estimate( measurements_t const &measurements, double dt,
     // Evaluate request arrival time.
     request_indexes_t em_T_c;
     for (size_t i = 0; i < T.size(); ++i)
-      if (T[i][0] < T[i][1])
+      if (T[i][0] > T[i][1])
       {
         // Request arrived;
         em_T_c.push_back(i);
@@ -565,6 +565,30 @@ void estimate( measurements_t const &measurements, double dt,
     writeRequests(detectedEMRequestsFile, em_T_c);
 
     std::cout << "Detected " << em_T_c.size() << " requests.\n";
+
+    // Estimate Poisson parameter.
+    double const em_lambda = calcPoissonParameter(em_T_c, dt);
+    std::cout << "Poisson parameter lambda: " << em_lambda << 
+        " (average time between requests)\n";
+
+    // Estimate noise average (m).
+    double const em_m = calcNoiseAverage(measurements, em_T_c);
+    std::cout << "Noise average m: " << em_m << 
+        " (by " << em_T_c.front() << 
+        " measurements until first requests)\n";
+
+    // Estimate noise standard deviation (\sigma).
+    double em_sigma = sigma[1] / sqrt(dt);
+    double derivativeAverage = mu[1];
+    std::cout << "Noise standard deviation sigma: " << em_sigma << 
+        " (derivative average: " << derivativeAverage << ")\n";
+
+    // Estimate requests average (m_c) and standard deviation (\sigma_c).
+    double em_m_c = mu[0];
+    double em_sigma_c = sqrt(sqr(sigma[0]) - sqr(em_sigma) * dt);
+    std::cout << "Requests average m_c: " << em_m_c << "\n";
+    std::cout << "Requests standard deviation sigma_c: " << 
+        em_sigma_c << "\n";
   }
 }
 

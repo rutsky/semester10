@@ -25,6 +25,7 @@
 #include <boost/foreach.hpp>
 #include <boost/math/distributions/normal.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/array.hpp>
 
 namespace po = boost::program_options;
 
@@ -356,10 +357,15 @@ FwdIt firstHistogramLocalMax( FwdIt first, FwdIt beyond )
 
 void estimate( measurements_t const &measurements, double dt,
                size_t quietPeriod, double requestsDetectionAlpha,
-               size_t nHistogramIntervals, size_t maxEMIterations ) 
+               size_t nHistogramIntervals, size_t maxEMIterations,
+               double maxDeltaEM )
 {
-  char const *detectedRequestsFile = "detected_requests.txt",
+  char const 
+      *detectedIterativeRequestsFile = "detected_iterative_requests.txt",
+      *detectedEMRequestsFile = "detected_em_requests.txt",
       *histogramFile = "histogram.csv";
+
+  size_t const N = measurements.size();
 
   // Calculate numeric derivative.
   derivatives_t derivatives;
@@ -373,13 +379,13 @@ void estimate( measurements_t const &measurements, double dt,
     std::cout << "*** Iterative method ***\n";
 
     // Detect times when requests arrived.
-    std::vector<size_t> iterative_T_c;
+    request_indexes_t iterative_T_c;
     calcRequestsArrival(measurements, derivatives, dt, quietPeriod, 
         requestsDetectionAlpha, iterative_T_c);  
     BOOST_ASSERT(!iterative_T_c.empty());
 
     // Write detected requests in file.
-    writeRequests(detectedRequestsFile, iterative_T_c);
+    writeRequests(detectedIterativeRequestsFile, iterative_T_c);
 
     std::cout << "Detected " << iterative_T_c.size() << " requests.\n";
 
@@ -424,34 +430,141 @@ void estimate( measurements_t const &measurements, double dt,
     // Write histogram to file.
     writeHistogram(histogramFile, histogram);
 
+    typedef boost::array<double, 2> parameters_array_t;
+
     // Calculate first and last local maximum of histogram - estimation
     // of \mu_1, \mu_2.
     histogram_t::const_iterator firstLMIt = 
         firstHistogramLocalMax(histogram.begin(), histogram.end());
     BOOST_ASSERT(firstLMIt != histogram.end());
-    double mu1 = firstLMIt->first;
+    parameters_array_t mu;
+    mu[0] = firstLMIt->first;
 
     histogram_t::const_reverse_iterator lastLMIt = 
         firstHistogramLocalMax(histogram.rbegin(), histogram.rend());
     BOOST_ASSERT(lastLMIt != histogram.rend());
-    double mu2 = lastLMIt->first;
-    BOOST_ASSERT(mu1 < mu2);
+    mu[1] = lastLMIt->first;
+    BOOST_ASSERT(mu[0] < mu[1]);
 
     // Other parameters initial estimation.
-    double tau1(0.5), tau2(0.5);
-    double sigma1 = (mu2 - mu1) / 3.0;
-    double sigma2 = sigma1;
+    parameters_array_t tau;
+    tau[0] = 0.5;
+    tau[1] = 0.5;
+    parameters_array_t sigma;
+    sigma[0] = sigma[1] = (mu[1] - mu[0]) / 3.0;
 
     std::cout << 
         "Start estimation: \n"
-        "  mu_1 = " << mu1 << ", mu_2 = " << mu2 << "\n"
-        "  sigma_1 = " << sigma1 << ", sigma_2 = " << sigma2 << "\n"
-        "  tau_1 = " << tau1 << ", tau_2 = " << tau2 << "\n";
+        "  mu_1 = " << mu[0] << ", mu_2 = " << mu[1] << "\n"
+        "  sigma_1 = " << sigma[0] << ", sigma_2 = " << sigma[1] << "\n"
+        "  tau_1 = " << tau[0] << ", tau_2 = " << tau[1] << "\n";
 
     // EM-algorithm.
-    for (size_t i = 0; i < maxEMIterations; ++i)
+    std::vector<parameters_array_t> T(derivatives.size());
+    size_t stepIdx = 0;
+    for (; stepIdx < maxEMIterations; ++stepIdx)
     {
+      // E-step.
+
+      for (size_t i = 0; i < derivatives.size(); ++i)
+      {
+        for (size_t j = 0; j < 2; ++j)
+        {
+          double const fj = 
+            pdf(boost::math::normal_distribution<>(mu[j], sigma[j]), 
+                derivatives[i]);
+          double const f0 = 
+            pdf(boost::math::normal_distribution<>(mu[0], sigma[0]),
+                derivatives[i]);
+          double const f1 = 
+            pdf(boost::math::normal_distribution<>(mu[1], sigma[1]),
+                derivatives[i]);
+
+          T[i][j] = tau[j] * fj / (tau[0] * f0 + tau[1] * f1);
+        }
+      }
+
+      // M-step.
+      parameters_array_t nextMu, nextSigma, nextTau;
+
+      // \tau estimation.
+      parameters_array_t sumT;
+      {
+        sumT[0] = sumT[1] = 0;
+        for (size_t i = 0; i < derivatives.size(); ++i)
+          for (size_t j = 0; j < 2; ++j)
+            sumT[j] += T[i][j];
+
+        for (size_t j = 0; j < 2; ++j)
+          nextTau[j] = sumT[j] / static_cast<double>(N);
+      }
+
+      // \mu estimation.
+      {
+        parameters_array_t sumTx;
+        sumTx[0] = sumTx[1] = 0;
+        for (size_t i = 0; i < derivatives.size(); ++i)
+          for (size_t j = 0; j < 2; ++j)
+            sumTx[j] += T[i][j] * derivatives[i];
+
+        for (size_t j = 0; j < 2; ++j)
+          nextMu[j] = sumTx[j] / sumT[j];
+      }
+
+      // \sigma estimation.
+      {
+        parameters_array_t sumTxmu;
+        sumTxmu[0] = sumTxmu[1] = 0;
+        for (size_t i = 0; i < derivatives.size(); ++i)
+          for (size_t j = 0; j < 2; ++j)
+            sumTxmu[j] += T[i][j] * sqr(derivatives[i] - nextMu[j]);
+
+        for (size_t j = 0; j < 2; ++j)
+          nextSigma[j] = sumTxmu[j] / sumT[j];
+      }
+      
+      // DEBUG
+      std::cout << stepIdx << ") "
+        "nextTau = (" << nextTau[0] << "," << nextTau[1] << "), "
+        "nextMu = (" << nextMu[0] << "," << nextMu[1] << "), "
+        "nexSigma = (" << nextSigma[0] << "," << nextSigma[1] << ")\n";
+
+      bool smaller(true);
+      for (size_t j = 0; j < 2; ++j)
+        if (std::fabs(nextTau[j] - tau[j]) > maxDeltaEM ||
+            std::fabs(nextMu[j] - mu[j]) > maxDeltaEM ||
+            std::fabs(nextSigma[j] - sigma[j]) > maxDeltaEM)
+        {
+          smaller = false;
+          break;
+        }
+
+      // Assign new value.
+      for (size_t j = 0; j < 2; ++j)
+      {
+        tau[j] = nextTau[j];
+        mu[j] = nextMu[j];
+        sigma[j] = nextSigma[j];
+      }
+
+      // Break if approximate limit reached.
+      if (smaller)
+        break;
     }
+
+    // Evaluate request arrival time.
+    request_indexes_t em_T_c;
+    for (size_t i = 0; i < T.size(); ++i)
+      if (T[i][0] < T[i][1])
+      {
+        // Request arrived;
+        em_T_c.push_back(i);
+      }
+
+    // Write detected requests in file.
+    writeRequests(detectedEMRequestsFile, em_T_c);
+
+    std::cout << "Detected " << em_T_c.size() << " requests.\n";
   }
 }
 
@@ -461,6 +574,7 @@ int main( int argc, char *argv[] )
   size_t quietPeriod;
   double dt, requestsDetectionAlpha;
   size_t nHistogramIntervals, maxEMIterations;
+  double maxDeltaEM;
 
   // Parse command line.
   try
@@ -483,6 +597,9 @@ int main( int argc, char *argv[] )
         ("max-em-iterations", 
             po::value<size_t>(&maxEMIterations),
             "maximum number of iteration in EM-algorithm.")
+        ("max-em-delta", 
+            po::value<double>(&maxDeltaEM),
+            "EM-algorithm loop stop parameter.")
         ;
     po::positional_options_description posOptDesc;
     posOptDesc
@@ -492,6 +609,7 @@ int main( int argc, char *argv[] )
         .add("requests-detection-alpha", 1)
         .add("histogram-intervals", 1)
         .add("max-em-iterations", 1)
+        .add("max-em-delta", 1)
         ;
 
     po::variables_map vm;
@@ -505,7 +623,8 @@ int main( int argc, char *argv[] )
         vm.count("quiet-period") &&
         vm.count("requests-detection-alpha") &&
         vm.count("histogram-intervals") &&
-        vm.count("max-em-iterations");
+        vm.count("max-em-iterations") &&
+        vm.count("max-em-delta");
 
     if (vm.count("help") || !haveRequiredOptions)
     {
@@ -547,7 +666,7 @@ int main( int argc, char *argv[] )
 
   // Run estimation.
   estimate(measurements, dt, quietPeriod, requestsDetectionAlpha,
-      nHistogramIntervals, maxEMIterations);
+      nHistogramIntervals, maxEMIterations, maxDeltaEM);
 
   return 0;
 }

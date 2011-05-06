@@ -136,6 +136,23 @@ void writeRequests( char const *fileName, request_indexes_t const &requests )
   }
 }
 
+void writeHistogram( char const *fileName, histogram_t const &histogram )
+{
+  std::ofstream ofs(fileName);
+
+  if (ofs)
+  {
+    BOOST_FOREACH(histogram_t::value_type const &pair, histogram)
+    {
+      ofs << pair.first << "," << pair.second << "\n";
+    }
+  }
+  else
+  {
+    perror(fileName);
+  }
+}
+
 double calcNoiseAverage( measurements_t const &measurements,
                          request_indexes_t const &requests )
 {
@@ -321,7 +338,8 @@ void estimate( measurements_t const &measurements, double dt,
                size_t nHistogramIntervals ) 
 {
 
-  char const *detectedRequestsFile = "detected_requests.txt";
+  char const *detectedRequestsFile = "detected_requests.txt",
+      *histogramFile = "histogram.csv";
 
   // Calculate numeric derivative.
   derivatives_t derivatives;
@@ -368,6 +386,9 @@ void estimate( measurements_t const &measurements, double dt,
   // Build histogram.
   histogram_t histogram;
   buildHistogram(derivatives, nHistogramIntervals, histogram);
+
+  // Write histogram to file.
+  writeHistogram(histogramFile, histogram);
 }
 
 int main( int argc, char *argv[] )

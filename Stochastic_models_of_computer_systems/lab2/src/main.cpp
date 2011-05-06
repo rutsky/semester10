@@ -19,6 +19,7 @@
 #include <fstream>
 #include <fstream>
 #include <vector>
+#include <map>
 
 #include <boost/program_options.hpp>
 #include <boost/foreach.hpp>
@@ -36,6 +37,8 @@ T sqr( T const &v )
 typedef std::vector<double> measurements_t;
 typedef std::vector<double> derivatives_t;
 typedef std::vector<size_t> request_indexes_t;
+// TODO: Is using of double as key is safe? Rounding problems?
+typedef std::map<double, size_t> histogram_t;
 
 void calcDerivatives( measurements_t const &measurements, 
                       derivatives_t &derivatives )
@@ -78,7 +81,7 @@ void calcRequestsArrival( measurements_t const &measurements,
     for (; idx < measurements.size(); 
         accum += sqr(derivatives[idx]), ++idx, ++n)
     {
-      double const sigma2 = accum / ((n - 1) * dt);
+      double const sigma2 = accum / ((static_cast<double>(n) - 1) * dt);
 
       // Construct normal distribution for currently estimated \sigma^2
       boost::math::normal_distribution<> 
@@ -152,7 +155,7 @@ double calcNoiseAverage( measurements_t const &measurements,
   }
   if (i > 0)
   {
-    return sum / i;
+    return sum / static_cast<double>(i);
   }
   else
   {
@@ -167,8 +170,8 @@ double calcPoissonParameter( request_indexes_t const &requests, double dt )
 
   double sum(0);
   for (size_t i = 1; i < requests.size(); ++i)
-    sum += dt * (requests[i] - requests[i - 1]);
-  return sum / (requests.size() - 1);
+    sum += dt * static_cast<double>(requests[i] - requests[i - 1]);
+  return sum / static_cast<double>(requests.size() - 1);
 }
 
 std::pair<double, double> 
@@ -192,7 +195,8 @@ std::pair<double, double>
     sum += derivatives[i];
   }
 
-  double const average = sum / (derivatives.size() - requests.size());
+  double const average = 
+      sum / static_cast<double>(derivatives.size() - requests.size());
 
   sum = 0;
   for (size_t i = 0, j = 0; i < derivatives.size(); ++i)
@@ -207,7 +211,8 @@ std::pair<double, double>
     sum += sqr(derivatives[i] - average);
   }
 
-  double const d2 = sum / (derivatives.size() - requests.size());
+  double const d2 = sum / 
+      static_cast<double>(derivatives.size() - requests.size());
 
   double const stDeviation = sqrt(d2 / dt);
 
@@ -233,7 +238,7 @@ std::pair<double, double>
     }
   }
 
-  double const average = sum / requests.size();
+  double const average = sum / static_cast<double>(requests.size());
 
   sum = 0;
   for (size_t i = 0, j = 0; i < derivatives.size(); ++i)
@@ -246,7 +251,7 @@ std::pair<double, double>
     }
   }
 
-  double const d2 = sum / requests.size();
+  double const d2 = sum / static_cast<double>(requests.size());
 
   BOOST_ASSERT(d2 - sqr(sigma) * dt);
   double const stDeviation = sqrt(d2 - sqr(sigma) * dt);
@@ -254,8 +259,66 @@ std::pair<double, double>
   return std::make_pair(average, stDeviation);
 }
 
+void buildHistogram( derivatives_t const &derivatives, 
+                     size_t nIntervals,
+                     histogram_t &histogram )
+{
+  BOOST_ASSERT(derivatives.size() >= 2);
+  BOOST_ASSERT(nIntervals >= 2);
+
+  histogram.clear();
+
+  double const minDerivative = 
+      *std::min_element(derivatives.begin(), derivatives.end());
+  double const maxDerivative = 
+      *std::max_element(derivatives.begin(), derivatives.end());
+
+  struct ToIntervalCenter
+  {
+    ToIntervalCenter( size_t nIntervals, double minDer, double maxDer )
+      : nIntervals_(nIntervals)
+      , minDer_(minDer)
+      , maxDer_(maxDer)
+    {
+      BOOST_ASSERT(minDer < maxDer);
+    }
+
+    double operator () ( double val ) const
+    {
+      BOOST_ASSERT(minDer_ <= val && val <= maxDer_);
+
+      double const step = 
+          (maxDer_ - minDer_) / static_cast<double>(nIntervals_ - 1);
+      BOOST_ASSERT(step != 0);
+
+      int const intervalIdx = 
+        static_cast<int>(std::floor((val - (minDer_ - step / 2.0)) / step));
+      BOOST_ASSERT(intervalIdx >= 0 && 
+        static_cast<size_t>(intervalIdx) < nIntervals_);
+
+      return minDer_ + step * intervalIdx;
+    }
+
+  private:
+    size_t nIntervals_;
+    double minDer_, maxDer_;
+  };
+
+  ToIntervalCenter const toCenter(nIntervals, minDerivative, maxDerivative);
+
+  BOOST_FOREACH(double derivative, derivatives)
+  {
+    double const intervalCenter = toCenter(derivative);
+    if (histogram.find(intervalCenter) == histogram.end())
+      histogram[intervalCenter] = 0;
+
+    ++histogram[intervalCenter];
+  }
+}
+
 void estimate( measurements_t const &measurements, double dt,
-               size_t quietPeriod, double requestsDetectionAlpha )
+               size_t quietPeriod, double requestsDetectionAlpha,
+               size_t nHistogramIntervals ) 
 {
 
   char const *detectedRequestsFile = "detected_requests.txt";
@@ -301,6 +364,10 @@ void estimate( measurements_t const &measurements, double dt,
   std::cout << "Requests average m_c: " << iterative_m_c << "\n";
   std::cout << "Requests standard deviation sigma_c: " << iterative_sigma_c << 
       "\n";
+
+  // Build histogram.
+  histogram_t histogram;
+  buildHistogram(derivatives, nHistogramIntervals, histogram);
 }
 
 int main( int argc, char *argv[] )
@@ -308,6 +375,7 @@ int main( int argc, char *argv[] )
   std::string fileName;
   size_t quietPeriod;
   double dt, requestsDetectionAlpha;
+  size_t nHistogramIntervals;
 
   // Parse command line.
   try
@@ -324,6 +392,9 @@ int main( int argc, char *argv[] )
         ("requests-detection-alpha", 
             po::value<double>(&requestsDetectionAlpha),
             "request detection hypothesis confident level.")
+        ("histogram-intervals", 
+            po::value<size_t>(&nHistogramIntervals),
+            "number of intervals used in histogram.")
         ;
     po::positional_options_description posOptDesc;
     posOptDesc
@@ -331,6 +402,7 @@ int main( int argc, char *argv[] )
         .add("dt", 1)
         .add("quiet-period", 1)
         .add("requests-detection-alpha", 1)
+        .add("histogram-intervals", 1)
         ;
 
     po::variables_map vm;
@@ -342,7 +414,8 @@ int main( int argc, char *argv[] )
         vm.count("load-file-name") && 
         vm.count("dt") &&
         vm.count("quiet-period") &&
-        vm.count("requests-detection-alpha");
+        vm.count("requests-detection-alpha") &&
+        vm.count("histogram-intervals");
 
     if (vm.count("help") || !haveRequiredOptions)
     {
@@ -383,7 +456,8 @@ int main( int argc, char *argv[] )
   }
 
   // Run estimation.
-  estimate(measurements, dt, quietPeriod, requestsDetectionAlpha);
+  estimate(measurements, dt, quietPeriod, requestsDetectionAlpha,
+      nHistogramIntervals);
 
   return 0;
 }

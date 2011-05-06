@@ -1,6 +1,6 @@
 import graph;
 
-real[][] draw_graph(string data_file_name, string ch_label)
+real[][] draw_graph(string data_file_name, string x_label, string y_label)
 {
   //size(200, 150, IgnoreAspect);
 
@@ -12,10 +12,10 @@ real[][] draw_graph(string data_file_name, string ch_label)
   real[] time = a[0];
   real[] value = a[1];
 
-  draw(graph(time, value), black, ch_label);
+  draw(graph(time, value), black);
 
-  yaxis(ch_label, RightTicks, EndArrow);
-  xaxis("t", LeftTicks, EndArrow);
+  yaxis(y_label, RightTicks, EndArrow);
+  xaxis(x_label, LeftTicks, EndArrow);
 
   return a;
 }

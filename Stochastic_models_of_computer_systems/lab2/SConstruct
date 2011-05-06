@@ -52,7 +52,9 @@ elif global_env.conf == 'gprof':
     global_env.AppendUnique(LINKFLAGS='-pg')
 
 global_env.AppendUnique(LIBS=['m'])
-global_env.MergeFlags(global_env.ParseFlags("-g -W -Wall"))
+# TODO: Use strong warnings from e.g. 
+# <http://www.gnu.org/software/gsl/manual/html_node/GCC-warning-options-for-numerical-programs.html>
+global_env.MergeFlags(global_env.ParseFlags("-g -W -Wall -Wconversion"))
 
 SConscript(os.path.join("report", "SConscript"), 
     variant_dir=os.path.join("build", "report"))

@@ -14,6 +14,8 @@ function process()
           for max_em_it in 100; do
             for max_em_delta in 0.01; do
               run_suffix=_quiet-period="$quiet_period"_req-det-alpha="$request_det_alpha"_hist-ints="$n_hist_intervals"_max-em-it="$max_em_it"_max-em-delta="$max_em_delta"
+              echo
+              echo "**********"
               echo "Generated: "$gen_suffix
               echo "Run: --load-file-name=$load_file --quiet-period=$quiet_period --requests-detection-alpha=$request_det_alpha --histogram-intervals=$n_hist_intervals --max-em-iterations=$max_em_it --max-em-delta=$max_em_delta"
               ../build/src/release/main $load_file $dt $quiet_period \
@@ -37,7 +39,7 @@ function process()
   done
 }
 
-for N in 1000; do
+for N in 1000 10000; do
   for dt in 1; do
     for m in 0; do
       for sigma in 1; do

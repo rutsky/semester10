@@ -1,11 +1,11 @@
 #!/bin/bash
 
-set -x
+#set -x
 
 function process()
 {
   gen_prefix=$1
-  load_file=$2
+  load_file="total_load.csv"
 
   for dt in 1; do
     for quiet_period in 10; do
@@ -14,9 +14,11 @@ function process()
           for max_em_it in 100; do
             for max_em_delta in 0.01; do
               run_suffix=_quiet-period="$quiet_period"_req-det-alpha="$request_det_alpha"_hist-ints="$n_hist_intervals"_max-em-it="$max_em_it"_max-em-delta="$max_em_delta"
-              echo "  --load-file-name=$load_file --quiet-period=$quiet_period --requests-detection-alpha=$request_det_alpha --histogram-intervals=$n_hist_intervals --max-em-iterations=$max_em_it --max-em-delta=$max_em_delta"
+              echo "Generated: "$gen_suffix
+              echo "Run: --load-file-name=$load_file --quiet-period=$quiet_period --requests-detection-alpha=$request_det_alpha --histogram-intervals=$n_hist_intervals --max-em-iterations=$max_em_it --max-em-delta=$max_em_delta"
               ../build/src/release/main $load_file $dt $quiet_period \
-                  $request_det_alpha $n_hist_intervals $max_em_it $max_em_delta
+                  $request_det_alpha $n_hist_intervals $max_em_it \
+                  $max_em_delta | tee result$gen_suffix$run_suffix"_output.txt"
 
               ./draw_detection.sh
 
@@ -25,7 +27,7 @@ function process()
                     detected_em_requests.txt \
                     detected_em_requests.pdf \
                     histogram.csv histogram.pdf; do
-                mv $f result_${f%.*}$gen_suffix$run_suffix.${f##*.}
+                mv $f result$gen_suffix$run_suffix"_"$f
               done
             done
           done
@@ -47,14 +49,15 @@ for N in 1000; do
               ./generate.py $N $dt $m $sigma $lambda $m_signal $sigma_signal
               ./draw_graphs.sh
 
-              #process $gen_prefix total_load.csv
+              process "$gen_prefix" total_load.csv
 
               for f in requests.csv requests.pdf \
                     requests_num.csv requests_num.pdf \
                     noise.csv noise.pdf \
                     total_load.csv total_load.pdf \
-                    total_load_der.csv total_load_der.pdf; do
-                mv $f result_${f%.*}$gen_suffix$run_suffix.${f##*.}
+                    total_load_der.csv total_load_der.pdf \
+                    true_histogram.pdf; do
+                mv $f result"$gen_suffix"_$f
               done
             done
           done

@@ -47,11 +47,11 @@ def main():
             help='Wiener process multiplication factor')
     parser.add_argument('lambda_', metavar='lambda', type=float,
             help='signal emerging Poisson distribution parameter '
-                 '(average number of requests per one second)')
+                 '(average time between requests)')
     parser.add_argument('m_signal', type=float,
             help='signal value expectation')
-    parser.add_argument('sigma_signal2', type=float,
-            help='signal value dispersion')
+    parser.add_argument('sigma_signal', type=float,
+            help='signal value standart deviation')
 
     args = parser.parse_args()
 
@@ -59,9 +59,9 @@ def main():
     numpy.random.seed(0)
 
     time_marks = [i * args.dt for i in xrange(args.N)]
-    requests = list(generate_requests(args.N, args.dt, args.lambda_))
+    requests = list(generate_requests(args.N, args.dt, args.dt / args.lambda_))
     requests_value = list(generate_requests_value(
-            requests, args.m_signal, args.sigma_signal2))
+            requests, args.m_signal, args.sigma_signal**2))
     wiener_noise_value = list(generate_wiener_noise(
             args.N, args.dt, args.m, args.sigma))
 

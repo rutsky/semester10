@@ -39,7 +39,7 @@ for N in 1000; do
   for dt in 1; do
     for m in 0; do
       for sigma in 1; do
-        for lambda in 0.02; do
+        for lambda in 50; do
           for m_signal in 10; do
             for sigma_signal in 1; do
               gen_suffix=_N="$N"_dt="$dt"_m="$m"_sigma="$sigma"_lambda="$lambda"_m_c="$m_signal"_sigma_c="$sigma_signal"

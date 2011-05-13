@@ -59,7 +59,7 @@ def main():
     numpy.random.seed(0)
 
     time_marks = [i * args.dt for i in xrange(args.N)]
-    requests = list(generate_requests(args.N, args.dt, args.dt / args.lambda_))
+    requests = list(generate_requests(args.N, args.dt, float(args.dt) / args.lambda_))
     requests_value = list(generate_requests_value(
             requests, args.m_signal, args.sigma_signal**2))
     wiener_noise_value = list(generate_wiener_noise(

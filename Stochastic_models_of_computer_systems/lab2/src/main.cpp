@@ -250,7 +250,7 @@ std::pair<double, double>
   {
     if (j < requests.size() && requests[j] == i)
     {
-      // Count measurement only at request tim`e.
+      // Count measurement only at request time.
       sum += derivatives[i];
       ++j;
     }

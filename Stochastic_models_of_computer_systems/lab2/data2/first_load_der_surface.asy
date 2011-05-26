@@ -27,6 +27,10 @@ triple f( pair t )
     sum += v * v;
   }
 
+  // TODO: Use `cond' argument of `surface'.
+  if (sum > 200)
+    sum = 200;
+
   return (N, lambda_c, sum);
 }
 
@@ -35,13 +39,14 @@ bool cut( pair t )
   return f(t).z < 200;
 }
 
-currentprojection = orthographic(10, 10, 10);
+currentprojection = orthographic(
+    camera=(-86, 0.52, 362), target=(50, 0.12, 0));
 
 size(400, 300, IgnoreAspect);
 
 defaultrender.merge = true;
 
-surface s = surface(f, (10, 0.01), (110, 0.2), 50, Spline, cond=cut);
+surface s = surface(f, (10, 0.01), (110, 0.25), 50, Spline);
 
 draw(s, mean(palette(s.map(zpart), Rainbow())), black);
 

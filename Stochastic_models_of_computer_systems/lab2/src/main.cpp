@@ -434,17 +434,23 @@ void estimate( measurements_t const &measurements, double dt,
 
     // Calculate first and last local maximum of histogram - estimation
     // of \mu_1, \mu_2.
-    histogram_t::const_iterator firstLMIt = 
-        firstHistogramLocalMax(histogram.begin(), histogram.end());
-    BOOST_ASSERT(firstLMIt != histogram.end());
     parameters_array_t mu;
-    mu[1] = firstLMIt->first;
+    {
+      histogram_t::const_iterator firstLMIt = 
+          firstHistogramLocalMax(histogram.begin(), histogram.end());
+      BOOST_ASSERT(firstLMIt != histogram.end());
+      // First local maximum is noise maximum near zero --- \mu_2.
+      mu[1] = firstLMIt->first;
+    }
 
-    histogram_t::const_reverse_iterator lastLMIt = 
-        firstHistogramLocalMax(histogram.rbegin(), histogram.rend());
-    BOOST_ASSERT(lastLMIt != histogram.rend());
-    mu[0] = lastLMIt->first;
-    BOOST_ASSERT(mu[1] < mu[0]);
+    {
+      histogram_t::const_reverse_iterator lastLMIt = 
+          firstHistogramLocalMax(histogram.rbegin(), histogram.rend());
+      BOOST_ASSERT(lastLMIt != histogram.rend());
+      // Last local maximum is requests maximum near \m_c --- \mu_1.
+      mu[0] = lastLMIt->first;
+      BOOST_ASSERT(mu[1] < mu[0]);
+    }
 
     // Other parameters initial estimation.
     parameters_array_t tau;

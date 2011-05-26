@@ -62,5 +62,7 @@ SConscript(os.path.join("report", "SConscript"),
 
 SConscript(os.path.join("src", "SConscript"), 
     variant_dir=os.path.join("build", "src", global_env.conf))
+SConscript(os.path.join("src2", "SConscript"), 
+    variant_dir=os.path.join("build", "src2", global_env.conf))
 
 # vim: set filetype=python ts=4 sw=4 et:

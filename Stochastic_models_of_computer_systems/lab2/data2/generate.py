@@ -6,6 +6,7 @@ import random
 import csv
 import math
 import operator
+import itertools
 
 import numpy
 
@@ -82,6 +83,15 @@ def main():
 
     result_signal_derivative = map(lambda x: x[0] - x[1], 
             zip(result_signal[1:], result_signal))
+
+    # Store derivative values after first request.
+    (first_signal_idx, _), (second_signal_idx, _) = filter(
+            lambda x: x[1], 
+            zip(itertools.count(), requests))[:2]
+    write_stat_to_file('first_load_der.csv', 
+            zip(time_marks, 
+                result_signal_derivative[
+                    first_signal_idx:second_signal_idx - 1]))
 
     write_stat_to_file('requests.csv', zip(time_marks, requests_value))
     write_stat_to_file('requests_num.csv', zip(time_marks, requests))

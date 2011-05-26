@@ -55,11 +55,13 @@ def main():
 
     args = parser.parse_args()
 
-    random.seed(0)
-    numpy.random.seed(0)
+    random.seed(1)
+    numpy.random.seed(1)
 
     time_marks = [i * args.dt for i in xrange(args.N)]
-    requests = list(generate_requests(args.N, args.dt, float(args.dt) / args.lambda_))
+    requests = list(generate_requests(args.N, args.dt, 
+            float(args.dt) / args.lambda_))
+    n_requests = sum(requests)
     requests_value = list(generate_requests_value(
             requests, args.m_signal, args.sigma_signal**2))
     wiener_noise_value = list(generate_wiener_noise(
@@ -69,6 +71,13 @@ def main():
 
     result_signal_derivative = map(lambda x: x[0] - x[1], 
             zip(result_signal[1:], result_signal))
+
+    # DEBUG
+    print "Number of requests:", n_requests
+    print "Requests value average:", requests_value[-1] / n_requests
+    print "Wiener noise average:", \
+            sum(wiener_noise_value) / len(wiener_noise_value)
+    print
 
     write_stat_to_file('requests.csv', zip(time_marks, requests_value))
     write_stat_to_file('requests_num.csv', zip(time_marks, requests))

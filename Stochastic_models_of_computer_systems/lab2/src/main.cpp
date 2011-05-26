@@ -486,9 +486,16 @@ void estimate( measurements_t const &measurements, double dt,
             pdf(boost::math::normal_distribution<>(mu[1], sigma[1]),
                 derivatives[i]);
 
-          T[i][j] = tau[j] * fj / (tau[0] * f0 + tau[1] * f1);
+          double const denominator = tau[0] * f0 + tau[1] * f1;
+          BOOST_ASSERT(fabs(denominator) > 1e-10);
+          T[i][j] = tau[j] * fj / denominator;
+          BOOST_ASSERT(T[i][j] >= 0);
+          BOOST_ASSERT(T[i][j] <= 1);
+
+          //std::cout << "(" << i << "," << j << "," << T[i][j] << ")"; // DEBUG
         }
       }
+      //std::cout << "\n"; // DEBUG
 
       // M-step.
       parameters_array_t nextMu, nextSigma, nextTau;
@@ -500,6 +507,8 @@ void estimate( measurements_t const &measurements, double dt,
         for (size_t i = 0; i < derivatives.size(); ++i)
           for (size_t j = 0; j < 2; ++j)
             sumT[j] += T[i][j];
+        BOOST_ASSERT(fabs(sumT[0]) > 1e-10);
+        BOOST_ASSERT(fabs(sumT[1]) > 1e-10);
 
         for (size_t j = 0; j < 2; ++j)
           nextTau[j] = sumT[j] / static_cast<double>(N);
@@ -527,6 +536,11 @@ void estimate( measurements_t const &measurements, double dt,
 
         for (size_t j = 0; j < 2; ++j)
           nextSigma[j] = sumTxmu[j] / sumT[j];
+
+        // HACK: Limit standard deviation so it will never be too close to 
+        // zero.
+        //for (size_t j = 0; j < 2; ++j)
+        //  nextSigma[j] = std::max(nextSigma[j], 0.05);
       }
       
       // DEBUG

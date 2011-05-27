@@ -69,69 +69,64 @@ void calcVariationalSeries( measurements_t const &measurements,
 }
 
 void calcRequestsArrival( variational_series_t const &varseries,
-                          double varSeriesPickPart,
-                          size_t joinDist,
+                          double dt,
+                          size_t quietPeriod,
+                          double requestsDetectionAlpha,
                           request_indexes_t &requests )
 {
-  BOOST_ASSERT(0 < varSeriesPickPart && varSeriesPickPart < 1);
-  BOOST_ASSERT(joinDist >= 2);
+  BOOST_ASSERT(quietPeriod >= 2);
+  BOOST_ASSERT(dt >= 1e-8);
+  BOOST_ASSERT(0 <= requestsDetectionAlpha && requestsDetectionAlpha <= 1);
 
   requests.clear();
 
-  // Get right part of variational series.
-  variational_series_t vs;
+  variational_series_t::const_reverse_iterator it = varseries.rbegin();
+
+  // Estimate \sigma^2 on quiet period.
+  double muAccum(0), sigmaAccum(0);
+  for (size_t i = 0; i < quietPeriod && it != varseries.rend(); ++i, ++it)
   {
-    variational_series_t::const_reverse_iterator it = varseries.rbegin();
-    std::advance(it, 
-      static_cast<int>(
-        static_cast<double>(varseries.size()) * varSeriesPickPart));
-    std::copy(
-        varseries.rbegin(),
-        it, 
-        std::inserter(vs, vs.end()));
+    muAccum += it->first;
+    sigmaAccum += sqr(it->first);
+    requests.push_back(it->second);
   }
 
-  /*
-  std::cout << vs.size() << "\n";
-  BOOST_FOREACH(variational_series_t::value_type const &p, varseries)
-    std::cout << "(" << p.first << "," << p.second << ")";
-  std::cout << "\n";*/
+  size_t n = quietPeriod;
 
-  // Iteratively select requests.
-  while (!vs.empty())
+  for (; it != varseries.rend(); 
+      muAccum += it->first, sigmaAccum += sqr(it->first), ++it, ++n)
   {
-    // Locate left-most item --- request.
-    variational_series_t::iterator it = 
-        std::min_element(vs.begin(), vs.end(), compare_second_t());
-    size_t idx = it->second;
-    requests.push_back(idx);
-    vs.erase(it);
+    double const mu = muAccum / (static_cast<double>(n) * dt);
+    double const sigma2 = sigmaAccum / ((static_cast<double>(n) - 1) * dt);
 
-    // Remove close to request values.
-    while (!vs.empty())
+    // Construct normal distribution for currently estimated \sigma^2
+    boost::math::normal_distribution<> 
+        normalDistr(mu, std::sqrt(sigma2 * dt));
+    double const loQuantile = 
+        quantile(normalDistr, 
+            requestsDetectionAlpha / 2.0);
+    double const hiQuantile = 
+        quantile(complement(
+            normalDistr, 
+            requestsDetectionAlpha / 2.0));
+
+    // DEBUG
+    std::cout << n << " ";
+    std::cout << "  sigma2: " << sigma2 << 
+      ", loQuantile: " << loQuantile <<
+      ", hiQuantile: " << hiQuantile << 
+      ", det: " << it->first << "\n";
+    // END OF DEBUG
+    
+    // Check if next observing value lies in rare quantiles.
+    if (it->first >= loQuantile && it->first <= hiQuantile)
     {
-      bool removed = false;
-      for (it = vs.begin(); it != vs.end();)
-      {
-        if (it->second < idx + joinDist)
-        {
-          if (it->second > idx)
-            idx = it->second;
-
-          variational_series_t::iterator eraseIt = it++;
-          vs.erase(eraseIt);
-
-          removed = true;
-        }
-        else
-        {
-          ++it;
-        }
-      }
-
-      if (!removed)
-        break;
+      // Request.
+      requests.push_back(it->second);
+      ++it;
     }
+    else
+      break;
   }
 }
 
@@ -279,6 +274,10 @@ void estimate( measurements_t const &measurements, double dt,
   char const 
       *detectedRequestsFile = "detected_requests.txt";
 
+  // TODO:
+  size_t const quietPeriod = 5;
+  double const requestsDetectionAlpha = 0.8;
+
   size_t const N = measurements.size();
 
   // Calculate numeric derivative.
@@ -291,7 +290,7 @@ void estimate( measurements_t const &measurements, double dt,
 
   // Estimate requests arrival time.
   request_indexes_t T_c;
-  calcRequestsArrival(varseries, varSeriesPickPart, joinDist, T_c);
+  calcRequestsArrival(varseries, dt, quietPeriod, requestsDetectionAlpha, T_c);
 
   // Write detected requests in file.
   writeRequests(detectedRequestsFile, T_c);

@@ -8,7 +8,7 @@ function process()
   load_file="total_load.csv"
 
   for dt in 1; do
-    for pick_part in 0.1; do
+    for pick_part in 0.003; do
       for join_dist in 4; do
         run_suffix=_p-p="$pick_part"_j-d="$join_dist"
         echo "Run: --load-file-name=$load_file --dt=1 --var-series-pick-part=$pick_part --join-dist=$join_dist"

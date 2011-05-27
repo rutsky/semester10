@@ -80,18 +80,23 @@ void calcRequestsArrival( variational_series_t const &varseries,
 
   requests.clear();
 
+  // DEBUG
+  /*BOOST_FOREACH(variational_series_t::value_type const &p, varseries)
+    std::cout << "(" << p.first << "," << p.second << ")";
+  std::cout << "\n";*/
+  // END OF DEBUG
+
   variational_series_t::const_reverse_iterator it = varseries.rbegin();
 
   // Estimate \sigma^2 on quiet period.
   double muAccum(0), sigmaAccum(0);
-  for (size_t i = 0; i < quietPeriod && it != varseries.rend(); ++i, ++it)
+  size_t n = 1;
+  for (; n < quietPeriod && it != varseries.rend(); ++n, ++it)
   {
     muAccum += it->first;
     sigmaAccum += sqr(it->first);
     requests.push_back(it->second);
   }
-
-  size_t n = quietPeriod;
 
   for (; it != varseries.rend(); 
       muAccum += it->first, sigmaAccum += sqr(it->first), ++it, ++n)
@@ -123,7 +128,6 @@ void calcRequestsArrival( variational_series_t const &varseries,
     {
       // Request.
       requests.push_back(it->second);
-      ++it;
     }
     else
       break;

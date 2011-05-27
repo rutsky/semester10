@@ -72,7 +72,8 @@ def main():
 
     time_marks = [i * args.dt for i in xrange(args.N)]
     requests = list(generate_requests(args.N, args.dt, 
-            float(args.dt) / args.lambda_))
+            float(args.dt) / args.lambda_)) 
+    n_requests = sum(requests)
     requests_value = list(generate_requests_value(
             args.dt, requests, args.m_signal, args.sigma_signal**2, 
             args.lambda_signal))
@@ -92,6 +93,12 @@ def main():
             zip(time_marks, 
                 result_signal_derivative[
                     first_signal_idx:second_signal_idx - 1]))
+
+    # DEBUG
+    print "Number of requests:", n_requests
+    print "Wiener noise average:", \
+            sum(wiener_noise_value) / len(wiener_noise_value)
+    print
 
     write_stat_to_file('requests.csv', zip(time_marks, requests_value))
     write_stat_to_file('requests_num.csv', zip(time_marks, requests))

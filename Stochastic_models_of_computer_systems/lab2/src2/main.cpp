@@ -17,9 +17,9 @@
 
 #include <iostream>
 #include <fstream>
-#include <fstream>
 #include <vector>
 #include <map>
+#include <cmath>
 
 #include <boost/program_options.hpp>
 #include <boost/foreach.hpp>
@@ -132,6 +132,153 @@ void calcRequestsArrival( variational_series_t const &varseries,
     else
       break;
   }
+
+  std::sort(requests.begin(), requests.end());
+}
+
+template< class DerFwdIt >
+double sum( DerFwdIt first, DerFwdIt beyond, double dt, double N, double lc )
+{
+  double sum = 0;
+
+  for (size_t i = 0; first != beyond; ++first, ++i)
+  {
+    double const ti = dt * static_cast<double>(i);
+    double const yi = *first;
+    sum += sqr(yi - N * (exp(-lc * (ti + dt)) - exp(-lc * ti)));
+  }
+
+  return sum;
+}
+
+template< class DerFwdIt >
+double dN( DerFwdIt first, DerFwdIt beyond, double dt, double N, double lc )
+{
+  double dsum_dN = 0;
+
+  for (size_t i = 0; first != beyond; ++first, ++i)
+  {
+    double const ti = dt * static_cast<double>(i);
+    double const yi = *first;
+    dsum_dN += 
+        -2 * (yi - N * (exp(-lc * (ti + dt)) - exp(-lc * ti))) * 
+        (exp(-lc * (ti + dt)) - exp(-lc * ti));
+  }
+
+  return dsum_dN;
+}
+
+template< class DerFwdIt >
+double dlc( DerFwdIt first, DerFwdIt beyond, double dt, double N, double lc )
+{
+  double dsum_dlc = 0;
+
+  for (size_t i = 0; first != beyond; ++first, ++i)
+  {
+    double const ti = dt * static_cast<double>(i);
+    double const yi = *first;
+    dsum_dlc += 
+        -2 * (yi - N * (exp(-lc * (ti + dt)) - exp(-lc * ti))) * N *
+        (-(ti + dt) * exp(-lc * (ti + dt)) + ti * exp(-lc * ti));
+  }
+
+  return dsum_dlc;
+}
+
+template< class DerFwdIt >
+void calcExpParameters( DerFwdIt first, DerFwdIt beyond, double dt, 
+                        double startStepN, double startStepLc )
+{
+  // TODO: Start values should be estimater somehow.
+  double N = 60;
+  double lc = 0.2;
+
+  size_t const binSearchSteps = 10;
+  double const NApproxDist = 1e-3;
+  double const lcApproxDist = 1e-3;
+
+  /*
+  {
+    // DEBUG
+    std::cout << "yi = ";
+    size_t i = 0;
+    for (DerFwdIt it = first; it != beyond; ++it, ++i)
+      std::cout << i << ") " << *it << "\n";
+    std::cout << "\n";
+  }
+  */
+
+  for (size_t idx = 0; ; ++idx)
+  {
+    double const NDer = -dN(first, beyond, dt, N, lc);
+    double const lcDer = -dlc(first, beyond, dt, N, lc);
+
+    // DEBUG
+    std::cout <<
+        "N=" << N << ",lc=" << lc << "," <<
+        "sum=" << sum(first, beyond, dt, N, lc) << "," <<
+        "dn=" << NDer << ",dlc=" << lcDer;
+
+    double const len = sqrt(sqr(NDer) + sqr(lcDer));
+    if (len <= 1e-10)
+      break;
+
+    double const dx = startStepN * NDer / len;
+    double const dy = startStepLc * lcDer / len;
+
+    double optLenLeft(0), optLenRight(1);
+    for (size_t i = 0; i < binSearchSteps; ++i)
+    {
+      double const lN = N + dx * optLenLeft;
+      double const lLc = lc + dy * optLenLeft;
+      double const l = sum(first, beyond, dt, lN, lLc);
+      std::cout << "\n -- L " << lN << " " << lLc << " " << l << " ";
+      
+      double const rN = N + dx * optLenRight;
+      double const rLc = lc + dy * optLenRight;
+      double const r = sum(first, beyond, dt, rN, rLc);
+      std::cout << "\n -- R " << rN << " " << rLc << " " << r << " ";
+
+      double const optLL = optLenLeft - (optLenLeft - optLenRight) * 1 / 3.0;
+      double const llN = N + dx * optLL;
+      double const llLc = lc + dy * optLL;
+      double const ll = sum(first, beyond, dt, llN, llLc);
+      std::cout << "\n -- LL " << llN << " " << llLc << " " << ll << " " << 
+          optLL;
+
+      double const optRR = optLenLeft - (optLenLeft - optLenRight) * 2 / 3.0;
+      double const rrN = N + dx * optRR;
+      double const rrLc = lc + dy * optRR;
+      double const rr = sum(first, beyond, dt, rrN, rrLc);
+      std::cout << "\n -- RR " << rrN << " " << rrLc << " " << rr << " " <<
+          optRR << std::endl;
+      
+      BOOST_ASSERT(ll <= l || ll <= r);
+      BOOST_ASSERT(rr <= l || rr <= r);
+
+      if (l >= r)
+      {
+        BOOST_ASSERT(ll >= rr);
+        optLenLeft = optLL;
+      }
+      else
+      {
+        BOOST_ASSERT(ll <= rr);
+        optLenRight = optRR;
+      }
+    }
+
+    N += dx * optLenRight;
+    lc += dy * optLenRight;
+
+    std::cout << " optLenLeft=" << optLenLeft << 
+        ",optLenRight=" << optLenRight << "\n";
+
+    if (optLenLeft < NApproxDist && optLenRight < lcApproxDist)
+      break;
+  }
+
+  std::cout << "lambda_c=" << lc << ", N=" << N << "\n";
 }
 
 void writeRequests( char const *fileName, request_indexes_t const &requests )
@@ -272,8 +419,7 @@ std::pair<double, double>
   return std::make_pair(average, stDeviation);
 }
 
-void estimate( measurements_t const &measurements, double dt,
-               double varSeriesPickPart, size_t joinDist )
+void estimate( measurements_t const &measurements, double dt )
 {
   char const 
       *detectedRequestsFile = "detected_requests.txt";
@@ -281,8 +427,10 @@ void estimate( measurements_t const &measurements, double dt,
   // TODO:
   size_t const quietPeriod = 5;
   double const requestsDetectionAlpha = 0.8;
+  double const startStepN = 100;
+  double const startStepLc = 0.1;
 
-  size_t const N = measurements.size();
+  //size_t const N = measurements.size();
 
   // Calculate numeric derivative.
   derivatives_t derivatives;
@@ -300,6 +448,17 @@ void estimate( measurements_t const &measurements, double dt,
   writeRequests(detectedRequestsFile, T_c);
 
   std::cout << "Detected " << T_c.size() << " requests.\n";
+
+  // Estimate parameters for each period between requests.
+  for (size_t i = 1; i < T_c.size(); ++i)
+  {
+    calcExpParameters(
+        derivatives.begin() + T_c[i - 1] + 1, 
+        derivatives.begin() + T_c[i], dt, startStepN, startStepLc);
+    std::cout << "\n";
+
+    break; // DEBUG
+  }
 }
 
 int main( int argc, char *argv[] )
@@ -384,8 +543,7 @@ int main( int argc, char *argv[] )
   }
 
   // Run estimation.
-  estimate(measurements, dt, varSeriesPickPart,
-      joinDist);
+  estimate(measurements, dt);
 
   return 0;
 }

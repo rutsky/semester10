@@ -226,8 +226,9 @@ void calcExpParameters( DerFwdIt first, DerFwdIt beyond, double dt,
     {
       double const NDer = dN(first, beyond, dt, N, lc);
 
+      /*
       std::cout << "Searching minimum by N: N=" << N << ", lc=" << lc <<
-          ", dN=" << NDer << "\n";
+          ", dN=" << NDer << "\n";*/
 
       double const dir = -sign(NDer);
       double l(0), r(startStepN);
@@ -235,21 +236,21 @@ void calcExpParameters( DerFwdIt first, DerFwdIt beyond, double dt,
       {
         double const lN = N + dir * l;
         double const ls = sum(first, beyond, dt, lN, lc);
-        std::cout << " -- lN=" << lN << " ls=" << ls << "\n";
+        //std::cout << " -- lN=" << lN << " ls=" << ls << "\n";
       
         double const rN = N + dir * r;
         double const rs = sum(first, beyond, dt, rN, lc);
-        std::cout << " -- rN=" << rN << " rs=" << rs << "\n";
+        //std::cout << " -- rN=" << rN << " rs=" << rs << "\n";
 
         double const ll = l + (r - l) * 1 / 3.0;
         double const llN = N + dir * ll;
         double const lls = sum(first, beyond, dt, llN, lc);
-        std::cout << " -- llN=" << llN << " lls=" << lls << "\n";
+        //std::cout << " -- llN=" << llN << " lls=" << lls << "\n";
 
         double const rr = l + (r - l) * 2 / 3.0;
         double const rrN = N + dir * rr;
         double const rrs = sum(first, beyond, dt, rrN, lc);
-        std::cout << " -- rrN=" << rrN << " rrs=" << rrs << "\n";
+        //std::cout << " -- rrN=" << rrN << " rrs=" << rrs << "\n";
       
         // Because function is convex.
         BOOST_ASSERT(lls <= ls || lls <= rs);
@@ -257,12 +258,10 @@ void calcExpParameters( DerFwdIt first, DerFwdIt beyond, double dt,
 
         if (ls >= rs)
         {
-          BOOST_ASSERT(lls >= rrs);
           l = ll;
         }
         else
         {
-          BOOST_ASSERT(lls <= rrs);
           r = rr;
         }
       }
@@ -272,7 +271,58 @@ void calcExpParameters( DerFwdIt first, DerFwdIt beyond, double dt,
 
     N += NStep;
 
-    if (fabs(NStep) < NApproxDist /*&& RLen < lcApproxDist */)
+    // Search minimum on OY axis (\lambda_c).
+    double lcStep;
+    {
+      double const lcDer = dlc(first, beyond, dt, N, lc);
+
+      /*
+      std::cout << "Searching minimum by \\lambda_c: N=" << N << 
+          ", lc=" << lc <<
+          ", dlc=" << lcDer << "\n";*/
+
+      double const dir = -sign(lcDer);
+      double l(0), r(startStepLc);
+      for (size_t i = 0; i < binSearchSteps; ++i)
+      {
+        double const llc = lc + dir * l;
+        double const ls = sum(first, beyond, dt, N, llc);
+        //std::cout << " -- llc=" << llc << " ls=" << ls << "\n";
+      
+        double const rlc = lc + dir * r;
+        double const rs = sum(first, beyond, dt, N, rlc);
+        //std::cout << " -- rlc=" << rlc << " rs=" << rs << "\n";
+
+        double const ll = l + (r - l) * 1 / 3.0;
+        double const lllc = lc + dir * ll;
+        double const lls = sum(first, beyond, dt, N, lllc);
+        //std::cout << " -- lllc=" << lllc << " lls=" << lls << "\n";
+
+        double const rr = l + (r - l) * 2 / 3.0;
+        double const rrlc = lc + dir * rr;
+        double const rrs = sum(first, beyond, dt, N, rrlc);
+        //std::cout << " -- rrlc=" << rrlc << " rrs=" << rrs << "\n";
+      
+        // Because function is convex.
+        BOOST_ASSERT(lls <= ls || lls <= rs);
+        BOOST_ASSERT(rrs <= ls || rrs <= rs);
+
+        if (ls >= rs)
+        {
+          l = ll;
+        }
+        else
+        {
+          r = rr;
+        }
+      }
+
+      lcStep = dir * l;
+    }
+
+    lc += lcStep;
+
+    if (fabs(NStep) < NApproxDist && fabs(lcStep) < lcApproxDist)
       break;
   }
 

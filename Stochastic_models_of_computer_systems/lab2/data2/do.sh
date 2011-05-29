@@ -44,7 +44,7 @@ for N in 5000; do
                 ./generate.py $N $dt $m $sigma $lambda $m_signal \
                     $sigma_signal $lambda_signal
 
-                #./draw_graphs.sh
+                ./draw_graphs.sh
 
                 process "$gen_prefix" total_load.csv
 

@@ -498,14 +498,13 @@ void estimate( measurements_t const &measurements, double dt )
   std::cout << "Detected " << T_c.size() << " requests.\n";
 
   // Estimate parameters for each period between requests.
+  std::cout << "Estimate exponential lowering parameters for intervals "
+    "between each detected requests.";
   for (size_t i = 1; i < T_c.size(); ++i)
   {
     calcExpParameters(
         derivatives.begin() + T_c[i - 1] + 1, 
         derivatives.begin() + T_c[i], dt, startStepN, startStepLc);
-    std::cout << "\n";
-
-    break; // DEBUG
   }
 }
 

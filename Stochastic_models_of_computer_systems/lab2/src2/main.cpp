@@ -35,6 +35,17 @@ T sqr( T const &v )
   return v * v;
 }
 
+template< class T >
+int sign( T const &v )
+{
+  if (v < 0)
+    return -1;
+  else if (v > 0)
+    return +1;
+  else
+    return 0;
+}
+
 struct compare_second_t
 {
   template< class T >
@@ -193,7 +204,7 @@ void calcExpParameters( DerFwdIt first, DerFwdIt beyond, double dt,
   double N = 60;
   double lc = 0.2;
 
-  size_t const binSearchSteps = 10;
+  size_t const binSearchSteps = 12;
   double const NApproxDist = 1e-3;
   double const lcApproxDist = 1e-3;
 
@@ -210,71 +221,58 @@ void calcExpParameters( DerFwdIt first, DerFwdIt beyond, double dt,
 
   for (size_t idx = 0; ; ++idx)
   {
-    double const NDer = -dN(first, beyond, dt, N, lc);
-    double const lcDer = -dlc(first, beyond, dt, N, lc);
-
-    // DEBUG
-    std::cout <<
-        "N=" << N << ",lc=" << lc << "," <<
-        "sum=" << sum(first, beyond, dt, N, lc) << "," <<
-        "dn=" << NDer << ",dlc=" << lcDer;
-
-    double const len = sqrt(sqr(NDer) + sqr(lcDer));
-    if (len <= 1e-10)
-      break;
-
-    double const dx = startStepN * NDer / len;
-    double const dy = startStepLc * lcDer / len;
-
-    double optLenLeft(0), optLenRight(1);
-    for (size_t i = 0; i < binSearchSteps; ++i)
+    // Search minimum on OX axis (N).
+    double NStep;
     {
-      double const lN = N + dx * optLenLeft;
-      double const lLc = lc + dy * optLenLeft;
-      double const l = sum(first, beyond, dt, lN, lLc);
-      std::cout << "\n -- L " << lN << " " << lLc << " " << l << " ";
-      
-      double const rN = N + dx * optLenRight;
-      double const rLc = lc + dy * optLenRight;
-      double const r = sum(first, beyond, dt, rN, rLc);
-      std::cout << "\n -- R " << rN << " " << rLc << " " << r << " ";
+      double const NDer = dN(first, beyond, dt, N, lc);
 
-      double const optLL = optLenLeft - (optLenLeft - optLenRight) * 1 / 3.0;
-      double const llN = N + dx * optLL;
-      double const llLc = lc + dy * optLL;
-      double const ll = sum(first, beyond, dt, llN, llLc);
-      std::cout << "\n -- LL " << llN << " " << llLc << " " << ll << " " << 
-          optLL;
+      std::cout << "Searching minimum by N: N=" << N << ", lc=" << lc <<
+          ", dN=" << NDer << "\n";
 
-      double const optRR = optLenLeft - (optLenLeft - optLenRight) * 2 / 3.0;
-      double const rrN = N + dx * optRR;
-      double const rrLc = lc + dy * optRR;
-      double const rr = sum(first, beyond, dt, rrN, rrLc);
-      std::cout << "\n -- RR " << rrN << " " << rrLc << " " << rr << " " <<
-          optRR << std::endl;
-      
-      BOOST_ASSERT(ll <= l || ll <= r);
-      BOOST_ASSERT(rr <= l || rr <= r);
-
-      if (l >= r)
+      double const dir = -sign(NDer);
+      double l(0), r(startStepN);
+      for (size_t i = 0; i < binSearchSteps; ++i)
       {
-        BOOST_ASSERT(ll >= rr);
-        optLenLeft = optLL;
+        double const lN = N + dir * l;
+        double const ls = sum(first, beyond, dt, lN, lc);
+        std::cout << " -- lN=" << lN << " ls=" << ls << "\n";
+      
+        double const rN = N + dir * r;
+        double const rs = sum(first, beyond, dt, rN, lc);
+        std::cout << " -- rN=" << rN << " rs=" << rs << "\n";
+
+        double const ll = l + (r - l) * 1 / 3.0;
+        double const llN = N + dir * ll;
+        double const lls = sum(first, beyond, dt, llN, lc);
+        std::cout << " -- llN=" << llN << " lls=" << lls << "\n";
+
+        double const rr = l + (r - l) * 2 / 3.0;
+        double const rrN = N + dir * rr;
+        double const rrs = sum(first, beyond, dt, rrN, lc);
+        std::cout << " -- rrN=" << rrN << " rrs=" << rrs << "\n";
+      
+        // Because function is convex.
+        BOOST_ASSERT(lls <= ls || lls <= rs);
+        BOOST_ASSERT(rrs <= ls || rrs <= rs);
+
+        if (ls >= rs)
+        {
+          BOOST_ASSERT(lls >= rrs);
+          l = ll;
+        }
+        else
+        {
+          BOOST_ASSERT(lls <= rrs);
+          r = rr;
+        }
       }
-      else
-      {
-        BOOST_ASSERT(ll <= rr);
-        optLenRight = optRR;
-      }
+
+      NStep = dir * l;
     }
 
-    N += dx * optLenRight;
-    lc += dy * optLenRight;
+    N += NStep;
 
-    std::cout << " optLenLeft=" << optLenLeft << 
-        ",optLenRight=" << optLenRight << "\n";
-
-    if (optLenLeft < NApproxDist && optLenRight < lcApproxDist)
+    if (fabs(NStep) < NApproxDist /*&& RLen < lcApproxDist */)
       break;
   }
 
@@ -427,8 +425,8 @@ void estimate( measurements_t const &measurements, double dt )
   // TODO:
   size_t const quietPeriod = 5;
   double const requestsDetectionAlpha = 0.8;
-  double const startStepN = 100;
-  double const startStepLc = 0.1;
+  double const startStepN = 10;
+  double const startStepLc = 0.05;
 
   //size_t const N = measurements.size();
 

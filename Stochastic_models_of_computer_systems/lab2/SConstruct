@@ -59,6 +59,8 @@ global_env.MergeFlags(global_env.ParseFlags("-g -W -Wall -Wconversion"))
 SConscript(os.path.join("report", "SConscript"), 
     variant_dir=os.path.join("build", "report"))
 #SConscript(os.path.join("report", "SConscript"))
+SConscript(os.path.join("presentation", "SConscript"), 
+    variant_dir=os.path.join("build", "presentation"))
 
 SConscript(os.path.join("src", "SConscript"), 
     variant_dir=os.path.join("build", "src", global_env.conf))

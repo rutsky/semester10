@@ -120,7 +120,8 @@ $\Delta t = t_{i+1} - t_i.$
 никогда не освобождаются.
 
 \subsection{Итеративный метод}
-\subsubsection{Идентификация моментов времени прихода заявок $T_c$}
+\subsubsection{Идентификация моментов времени прихода заявок $T_c$}%
+\label{lc0-iter-Tc}
 Предположим, что в отрезке времени $\sbr{t_k, t_{k+n}}$ 
 не пришло ни одной заявки.
 Тогда $n + 1$ наблюдений $x_k,\ldots,x_{k+n}$ представляют собой наблюдения
@@ -409,10 +410,61 @@ $$\widehat{T_c} = \cbr{t_i \quad i=1,\ldots,N \vert
 
 \section{Решение в случае конечного времени обработки заявки}
 Рассмотрим случай, когда интенсивность освобождения ресурсов $\lambda_c$ 
-существенно отлична от нуля и,
+существенно больше нуля и,
 сервер успевает обрабатывать заявки: $\exists \sup\cbr{X(t)}$.
 
-\subsection{}
+$\operatorname{d}X(t)$ в момент времени, 
+когда не пришло ни одной заявки $t \notin T_c$, 
+выражается следующим образом:
+\begin{eqnarray*}
+\dif X(t) 
+  & = & X(t) - X(t - \Delta t) = \\
+  & = & \del{B(t) + \sum\limits_{t_c \in T_c,\ t_c \leqslant t} K_{t_c}(t)} - 
+      \del{B(t - \Delta t) + 
+        \sum\limits_{t_c \in T_c,\ t_c \leqslant (t - \Delta t)} 
+          K_{t_c}(t - \Delta t)}.
+\end{eqnarray*}
+
+Будем считать приход заявок достаточно редким: таким, что на уровень
+загруженности ресурсов сервера существенно влияет лишь последняя пришедшая 
+заявка в момент времени $t_c < t$:
+\begin{eqnarray*}
+\dif X(t) 
+  & = & X(t) - X(t - \Delta t) = \\
+  & = & \del{B(t) + K_{t_c}(t)} - 
+      \del{B(t - \Delta t) + K_{t_c}(t - \Delta t)} = \\
+  & = & \del{\sigma \mathcal{W}(t) - \sigma \mathcal{W}(t - \Delta t)} +
+      \del{\mathcal{N}(m_c, \sigma_c^2) \cdot e^{-\lambda_c(t - t_c)} - 
+           \mathcal{N}(m_c, \sigma_c^2) \cdot 
+              e^{-\lambda_c(t - \Delta t - t_c)}} = \\
+  & = & \mathcal{N}(0, \sigma^2 \Delta t) + 
+      \mathcal{N}(m_c, \sigma_c^2) \cdot 
+        \del{e^{-\lambda_c(t - t_c)} - e^{-\lambda_c(t - \Delta t - t_c)}}.
+\end{eqnarray*}
+
+В условиях предположения о влиянии только последней заявки, 
+в момент прихода заявки $t_c$:
+\begin{eqnarray*}
+\dif X(t_c) 
+  & = & X(t_c) - X(t_c - \Delta t) = \\
+  & = & \del{B(t_c) + K_{t_c}(t_c)} - 
+      \del{B(t_c - \Delta t) + 0} = \\
+  & = & \mathcal{N}(0, \sigma^2 \Delta t) + 
+      \mathcal{N}(m_c, \sigma_c^2) = \\
+  & = & \mathcal{N}(m_c, \sigma^2 \Delta t + \sigma_c^2).
+\end{eqnarray*}
+
+\subsection{Идентификация времени прихода заявок}
+Построим вариационный ряд наблюдений $\dif X(t_i)$:
+$$\dif x_{(1)} \leqslant \dif x_{(2)} \leqslant \ldots 
+  \leqslant \dif x_{(N)}.$$
+Приходящие заявки вносят существенно большее изменение уровня загруженности
+ресурсов сервера, чем фоновая нагрузка, 
+поэтому в правой части этого ряда будут находиться наблюдения 
+$\dif X(t_c).$
+Воспользуемся итеративным методом из пункта \ref{lc0-iter-Tc} для выделения
+наблюдений прихода заявок из вариационного ряда~--- 
+получим оценку множества моментов времени прихода заявок $\widehat{T_c}$.
 
 \section{Результаты работы}
 

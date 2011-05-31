@@ -50,11 +50,14 @@ function process()
 for N in 10000; do
   for dt in 1; do
     for m in 0; do
-      for sigma in `seq 1.3 0.01 1.45`; do
+      #for sigma in `seq 1.3 0.01 1.45`; do
+      for sigma in `seq 1`; do
         sigma=`echo $sigma | tr ',' '.'`
         for lambda in 50; do
           for m_signal in 10; do
-            for sigma_signal in 1; do
+            for sigma_signal in `seq 1.3 0.01 1.45`; do
+            #for sigma_signal in 1; do
+              sigma_signal=`echo $sigma_signal | tr ',' '.'`
               gen_suffix=_N="$N"_dt="$dt"_m="$m"_s="$sigma"_l="$lambda"_m_c="$m_signal"_s_c="$sigma_signal"
 
               echo "**********"
@@ -64,7 +67,7 @@ for N in 10000; do
               ./generate.py $N $dt $m $sigma $lambda $m_signal $sigma_signal
               #./draw_graphs.sh
 
-              process "$gen_prefix" total_load.csv $sigma
+              process "$gen_prefix" total_load.csv $sigma_signal
 
               for f in requests.csv requests.pdf \
                     requests_num.csv requests_num.pdf \

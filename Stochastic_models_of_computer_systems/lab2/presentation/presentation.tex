@@ -8,13 +8,50 @@
 
 \documentclass[utf8]{beamer}
 \usepackage[russian]{babel}
-\usetheme{Darmstadt}
-\setbeamertemplate{navigation symbols}{}
+%\usetheme{default}
+\usetheme{Madrid}
+%\usetheme{Warsaw}
+%\usetheme{Darmstadt}
+
+% Убирает меню навигации по слайдам.
+%\setbeamertemplate{navigation symbols}{}
+
+% Футер: номер слайда / общее число слайдов.
+%\setbeamertemplate{footline}
+%{\centerline{\insertframenumber/\inserttotalframenumber}}
+
+% Футер: Автор, номер слайда
+%\setbeamertemplate{footline}{\hspace*{.5cm}\scriptsize{\insertauthor
+%\hspace*{50pt} \hfill\insertframenumber\hspace*{.5cm}}}
+
+\defbeamertemplate*{footline}{my split theme}
+{%
+  \leavevmode%
+  \hbox{\begin{beamercolorbox}[wd=.5\paperwidth,ht=2.5ex,dp=1.125ex,leftskip=.3cm plus1fill,rightskip=.3cm]{author in head/foot}%
+    \usebeamerfont{author in head/foot}\insertshortauthor
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.5ex,dp=1.125ex,leftskip=.3cm,rightskip=.3cm]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\insertshorttitle
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.1\paperwidth,ht=2.5ex,dp=1.125ex,leftskip=.4cm,rightskip=.3cm plus1fil]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
 
 \title[Оценка параметров случайного процесса]{Оценка параметров модели случайного процесса нагрузки сервера, обрабатывающего заявки}
 \author{Владимир Руцкий, 5057/12}
 \institute[СПбГПУ]{Санкт-Петербургский государственный политехнический университет}
 \date{31 мая 2011}
+
+% Показывает план перед каждой сабсекцией.
+%\AtBeginSubsection[]
+%{
+%  \begin{frame}<beamer>
+%  \frametitle{План презентации}
+%  \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
 
 \begin{document}
 

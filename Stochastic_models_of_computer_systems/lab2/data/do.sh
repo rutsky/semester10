@@ -67,7 +67,7 @@ for N in 10000; do
               ./generate.py $N $dt $m $sigma $lambda $m_signal $sigma_signal
               #./draw_graphs.sh
 
-              process "$gen_prefix" total_load.csv $sigma_signal
+              process "$gen_prefix" total_load.csv $sigma
 
               for f in requests.csv requests.pdf \
                     requests_num.csv requests_num.pdf \

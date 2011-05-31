@@ -4,7 +4,7 @@ real dt = 1;
 
 string data_file_name = "K_of_sigma.csv";
 string x_label = "$\frac{\sigma}{m_c}$";
-string y_label = "$\frac{|K - \widehat{K}|}{K}$";
+string y_label = "$\frac{\big||T_c| - |\widehat{T_c}|\big|}{|T_c|}$";
 
 size(10cm, 10cm, IgnoreAspect);
 

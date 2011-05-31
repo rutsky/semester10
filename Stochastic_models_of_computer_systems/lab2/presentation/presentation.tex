@@ -14,7 +14,7 @@
 %\usetheme{Darmstadt}
 
 % Убирает меню навигации по слайдам.
-%\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{navigation symbols}{}
 
 % Футер: номер слайда / общее число слайдов.
 %\setbeamertemplate{footline}
@@ -93,11 +93,70 @@
 \end{block}
 \end{frame}
 
-\begin{frame}{Математическая модель}
-\begin{itemize}
-  \item 
-\end{itemize}
+
+\begin{frame}{Математическая модель (1)}
+Загрузка сервера~--- случайный процесс $X(t)\colon \mathbb{R} \rightarrow \mathbb{R}$
+\begin{block}{Фоновая загрузка сервера}
+  Сумма постоянной загрузки и винеровского процесса (шум): 
+  $$B(t) = m + \sigma \mathcal{W}(t)$$
+\end{block}
+\begin{block}{Загрузка сервера при обработке заявки}
+  Заявка, пришедшая в $t=t_c$, увеличивает загрузку сервера на:
+  $$K_{t_c}(t) = \mathcal{N}(m_c, \sigma_c^2) \cdot \mathrm{I}(t - t_c) \cdot 
+    e^{-\lambda_c(t - t_c)}$$
+  {\footnotesize $\mathrm{I}(x) = \left\{
+    \begin{array}{rl}
+      0, & x < 0 \\
+      1, & x \geqslant 0
+    \end{array}\right.$~--- Функция Хевисайда}
+\end{block}
 \end{frame}
+
+
+\begin{frame}{Математическая модель (2)}
+$T_c = \{ t_{c_1}, \ldots, t_{c_R} \}$~--- 
+множество моментов времени, когда поступили заявки 
+(всего $R$ заявок за время наблюдения за сервером)
+\begin{block}{Интенсивность поступления заявок}
+  Интервал времени между поступлением двух последовательных заявок распределён экспоненциально:
+  $$(t_{c_i} - t_{c_{i-1}}) \sim \mathrm{Exp}(\lambda)$$
+\end{block}
+\begin{block}{Общая загрузка сервера}
+  $$X(t) = B(t) + \sum\limits_{t_c \in T_c}K_{t_c}(t)$$
+\end{block}
+\begin{block}{Перейдём к дискретному случайному процессу}
+  $$X(t_i), \quad t_i = t_0 + i \cdot \Delta t \quad 
+    (t_0 \mathrm{\text{ и }} \Delta t \mathrm{\text{ даны}})$$
+\end{block}
+\end{frame}
+
+
+\begin{frame}{Входные данные}
+\begin{block}{Лог загрузки сервера}
+  Траектория $X(t_i)\colon \{ x_i \ \vert\ i = 1, \ldots, N \}$
+\end{block}
+Считаем, что $\Delta t$ достаточно мало и $t_{c_i} = t_0 + i \cdot \Delta t$~---
+заявки пришли в некоторые наблюдаемые моменты времени $t_i.$
+
+Без ограничения общности будем рассматривать случай $t_0 = 0$
+\end{frame}
+
+
+\begin{frame}{Задача}
+\begin{block}{Задача}
+  По траектории $X(t_i)$ 
+  \begin{enumerate}
+    \item идентифицировать моменты поступления заявок,
+    \item оценить параметры модели:
+      \begin{itemize}
+        \item $m, \sigma$~--- параметры фоновой загрузки,
+        \item $\lambda$~--- интенсивность поступления заявок,
+        \item $m_c, \sigma_c, \lambda_c$~--- параметры загрузки сервера при обработке заявок
+      \end{itemize}
+  \end{enumerate}
+\end{block}
+\end{frame}
+
 
 \section[$\lambda_c \approx 0$]{Решение в случае бесконечного времени обработки заявки}
 \subsection{Итеративный метод}

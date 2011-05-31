@@ -2,7 +2,7 @@ import graph;
 
 real dt = 1;
 
-string data_file_name = "stat.csv";
+string data_file_name = "K_of_sigma.csv";
 string x_label = "$\frac{\sigma}{m_c}$";
 string y_label = "$\frac{|K - \widehat{K}|}{K}$";
 

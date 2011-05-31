@@ -8,12 +8,13 @@
 
 \documentclass[utf8]{beamer}
 \usepackage[russian]{babel}
-\usetheme{Warsaw}
+\usetheme{Darmstadt}
+\setbeamertemplate{navigation symbols}{}
 
 \title[Оценка параметров случайного процесса]{Оценка параметров модели случайного процесса нагрузки сервера, обрабатывающего заявки}
 \author{Владимир Руцкий, 5057/12}
-\institute{Санкт-Петербургский государственный политехнический университет}
-\date{30 мая 2011}
+\institute[СПбГПУ]{Санкт-Петербургский государственный политехнический университет}
+\date{31 мая 2011}
 
 \begin{document}
 
@@ -22,8 +23,75 @@
 \end{frame}
 
 
-\begin{frame}{Introduction}
-This is a short introduction to Beamer class.
+\begin{frame}
+\frametitle{План презентации}
+\tableofcontents
 \end{frame}
 
+
+\section{Постановка задачи}
+\begin{frame}{Постановка задачи}
+\begin{block}{Сервер}
+  \begin{itemize}
+    \item Сервер обрабатывает приходящие заявки
+    \item Для обработки заявки используются ресурсы сервера
+      \begin{itemize}
+        \item Количество используемых ресурсов сервера~--- загрузка сервера ~--- скалярная величина, например процессорное время
+      \end{itemize}
+  \end{itemize}
+\end{block}
+
+\begin{block}{Задача}
+  Дан лог загрузки сервера. 
+  Необходимо:
+  \begin{enumerate}
+    \item идентифицировать моменты прихода заявок,
+    \item оценить:
+      \begin{itemize}
+        \item интенсивность прихода заявок,
+        \item загрузку сервера в фоновом режиме,
+        \item использование ресурсов сервера для обработки одной заявки
+      \end{itemize}
+  \end{enumerate}
+\end{block}
+\end{frame}
+
+\begin{frame}{Математическая модель}
+\begin{itemize}
+  \item 
+\end{itemize}
+\end{frame}
+
+\section[$\lambda_c \approx 0$]{Решение в случае бесконечного времени обработки заявки}
+\subsection{Итеративный метод}
+\begin{frame}{Итеративный метод}
+\end{frame}
+
+\subsection[EM-алгоритм]{Оценивание EM-алгоритмом}
+\begin{frame}{EM-алгоритм}
+\end{frame}
+
+\section[$\lambda_c \gg 0$]{Решение в случае конечного времени обработки заявки}
+\subsection[МНК]{Метод наименьших квадратов}
+\begin{frame}{Метод наименьших квадратов}
+\end{frame}
+
+\section{Результаты работы}
+\begin{frame}{Результаты работы (1)}
+\end{frame}
+
+\begin{frame}{Выводы}
+\end{frame}
+
+\begin{frame}{Список литературы}
+  \begin{thebibliography}{10}
+    \bibitem{Goldbach1742}[Goldbach, 1742] Christian Goldbach.
+    \newblock A problem we should try to solve before the ISPN ’43 deadline,
+    \newblock \emph{Letter to Leonhard Euler}, 1742.
+  \end{thebibliography}
+\end{frame}
+
+
 \end{document}
+
+% vim: set ts=2 sw=2 et:

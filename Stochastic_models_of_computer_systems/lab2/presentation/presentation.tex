@@ -8,6 +8,7 @@
 
 \documentclass[utf8]{beamer}
 \usepackage[russian]{babel}
+\usepackage{commath}
 %\usetheme{default}
 \usetheme{Madrid}
 %\usetheme{Warsaw}
@@ -135,7 +136,7 @@ $T_c = \{ t_{c_1}, \ldots, t_{c_R} \}$~---
 \begin{block}{Лог загрузки сервера}
   Траектория $X(t_i)\colon \{ x_i \ \vert\ i = 1, \ldots, N \}$
 \end{block}
-Считаем, что $\Delta t$ достаточно мало и $t_{c_i} = t_0 + i \cdot \Delta t$~---
+Считаем, что $\Delta t$ достаточно мало и $t_{c_j} = t_0 + i \cdot \Delta t$~---
 заявки пришли в некоторые наблюдаемые моменты времени $t_i.$
 
 Без ограничения общности будем рассматривать случай $t_0 = 0$
@@ -159,9 +160,65 @@ $T_c = \{ t_{c_1}, \ldots, t_{c_R} \}$~---
 
 
 \section[$\lambda_c \approx 0$]{Решение в случае бесконечного времени обработки заявки}
-\subsection{Итеративный метод}
-\begin{frame}{Итеративный метод}
+\begin{frame}{Случай бесконечного времени обработки заявки}
+\begin{block}{$\lambda_c \approx 0$}
+  При поступлении заявки в момент времени $t_c$ загрузка сервера увеличивается на 
+  $\Delta x \sim \mathcal{N}(m_c, \sigma_c)$
+
+  $$K_{t_c}(t) = \mathcal{N}(m_c, \sigma_c^2) \cdot \mathrm{I}(t - t_c)$$
+\end{block}
 \end{frame}
+
+
+\begin{frame}{Разностный аналог производной}
+\begin{block}{$\dif X(t)$}
+  Рассмотрим ненормированный разностный аналог производной:
+  $$\dif X(t) = X(t) - X(t - \Delta t)$$
+\end{block}
+\begin{block}{$\dif X(t)$ в момент времени поступления заявки $t_c$}
+  $$\dif X(t_c) = \mathcal{N}(m_c, \sigma^2 \Delta t + \sigma_c^2)$$
+  (при условии, что в момент времени $(t_c - \Delta t)$ заявки не было)
+\end{block}
+\begin{block}{$\dif X(t)$ в момент времени отсутствия заявок $t$}
+  $$\dif X(t) = \mathcal{N}(0, \sigma^2 \Delta t)$$
+  (при условии, что в момент времени $(t - \Delta t)$ заявки не было)
+\end{block}
+\end{frame}
+
+
+\subsection{Итеративный метод}
+\begin{frame}{Итеративный метод идентификации поступления заявок}
+Предположим, что в отрезке времени $\sbr{t_k, t_{k+n}}$ не пришло ни одной заявки.
+
+Тогда $\dif x_k, \dots, \dif x_{k+n}$~--- наблюдения 
+$\mathcal{N}(0, \sigma^2 \Delta t) = \dif X(t).$
+
+Оценим $\sigma^2$ по $\sbr{x_k, x_{k+n}}$ (ММП):
+$$\Delta t \cdot \widehat{\sigma}^2 = 
+    \frac{1}{n-1}
+        \sum\limits_{i=1}^n ((x_{k+i} - x_{k+i-1}) - 0)^2$$
+
+\begin{block}{Гипотеза $H_0$}
+  В отрезке времени $\sbr{t_{k+n}, t_{k+n} + \Delta t}$ не поступило ни 
+  одной заявки
+\end{block}
+\begin{block}{Критерий принятия $H_0$ с уровнем значимости $\alpha$}
+Разность значений наблюдений $(x_{k+n+1}-x_{k+n})$
+лежит в $\del{1 - \alpha}$ квантиле
+нормального распределения $\mathcal{N}(0, \widehat{\sigma}^2 \Delta t)$:
+$$
+H_0 \  \mathrm{\text{принимается}} \iff
+        (x_{k+n+1}-x_{k+n}) < 
+	    \mathcal{N}_{1 - \alpha}
+$$
+\end{block}
+\end{frame}
+
+
+\begin{frame}
+
+\end{frame}
+
 
 \subsection[EM-алгоритм]{Оценивание EM-алгоритмом}
 \begin{frame}{EM-алгоритм}
@@ -179,13 +236,14 @@ $T_c = \{ t_{c_1}, \ldots, t_{c_R} \}$~---
 \begin{frame}{Выводы}
 \end{frame}
 
-\begin{frame}{Список литературы}
-  \begin{thebibliography}{10}
-    \bibitem{Goldbach1742}[Goldbach, 1742] Christian Goldbach.
-    \newblock A problem we should try to solve before the ISPN ’43 deadline,
-    \newblock \emph{Letter to Leonhard Euler}, 1742.
-  \end{thebibliography}
-\end{frame}
+%\begin{frame}{Список литературы}
+%  \begin{thebibliography}{10}
+%    \bibitem{ivchmed2010matstat}[Ивченко, 2010] Г.\,И.~Ивченко, Медведев~Ю.\,И.
+%    \emph{{Введение в математическую статистику}}
+%    %\newblock A problem we should try to solve before the ISPN ’43 deadline,
+%    %\newblock \emph{Letter to Leonhard Euler}, 1742.
+%  \end{thebibliography}
+%\end{frame}
 
 
 \end{document}

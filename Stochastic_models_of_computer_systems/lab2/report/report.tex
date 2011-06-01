@@ -207,10 +207,11 @@ $$\sigma \approx \sigma_c.$$
 Оценку произведём методом максимального правдоподобия для нормального 
 распределения:%
 \footnote{{\url{http://en.wikipedia.org/wiki/Normal\_distribution\#Estimation_of_parameters}}.} 
+%TODO: Это не ММП!
 $$
-  \widehat{m} = \frac{1}{n} \sum\limits_{i=1}^{K-1} x_i, \quad
+  \widehat{m} = \frac{1}{K-1} \sum\limits_{i=1}^{K-1} x_i, \quad
   \widehat{\sigma}^2 = 
-      \frac{1}{n} \sum\limits_{i=1}^{K-1} (x_i - \widehat{m})^2,
+      \frac{1}{K-2} \sum\limits_{i=1}^{K-1} (x_i - \widehat{m})^2,
 $$
 где $K = t_{c_1} / \Delta t$~--- 
 номер наблюдения $x_i$, когда, согласно приведённой выше оценке,

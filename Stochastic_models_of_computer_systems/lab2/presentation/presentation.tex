@@ -8,7 +8,13 @@
 
 \documentclass[utf8]{beamer}
 \usepackage[russian]{babel}
+
+% \dif, \del{}, \cbr{}, \sbr.
 \usepackage{commath}
+
+% Pseudocode as in Cormen book.
+\usepackage{clrscode}
+
 %\usetheme{default}
 \usetheme{Madrid}
 %\usetheme{Warsaw}
@@ -115,7 +121,7 @@
 
 
 \begin{frame}{Математическая модель (2)}
-$T_c = \{ t_{c_1}, \ldots, t_{c_R} \}$~--- 
+$T_c = \cbr{ t_{c_1}, \ldots, t_{c_R} }$~--- 
 множество моментов времени, когда поступили заявки 
 (всего $R$ заявок за время наблюдения за сервером)
 \begin{block}{Интенсивность поступления заявок}
@@ -134,7 +140,7 @@ $T_c = \{ t_{c_1}, \ldots, t_{c_R} \}$~---
 
 \begin{frame}{Входные данные}
 \begin{block}{Лог загрузки сервера}
-  Траектория $X(t_i)\colon \{ x_i \ \vert\ i = 1, \ldots, N \}$
+  Траектория $X(t_i)\colon \cbr{ x_i \ \vert\ i = 1, \ldots, N }$
 \end{block}
 Считаем, что $\Delta t$ достаточно мало и $t_{c_j} = t_0 + i \cdot \Delta t$~---
 заявки пришли в некоторые наблюдаемые моменты времени $t_i.$
@@ -187,14 +193,14 @@ $T_c = \{ t_{c_1}, \ldots, t_{c_R} \}$~---
 
 
 \subsection{Итеративный метод}
-\begin{frame}{Итеративный метод идентификации поступления заявок}
+\begin{frame}{Итеративный метод идентификации заявок (1)}
 Предположим, что в отрезке времени $\sbr{t_k, t_{k+n}}$ не пришло ни одной заявки.
 
 Тогда $\dif x_k, \dots, \dif x_{k+n}$~--- наблюдения 
 $\mathcal{N}(0, \sigma^2 \Delta t) = \dif X(t).$
 
-Оценим $\sigma^2$ по $\sbr{x_k, x_{k+n}}$ (ММП):
-$$\Delta t \cdot \widehat{\sigma}^2 = 
+Оценим $\sigma^2$ по $\sbr{x_k, x_{k+n}}$:
+$$\widehat{\sigma}^2 \Delta t = 
     \frac{1}{n-1}
         \sum\limits_{i=1}^n ((x_{k+i} - x_{k+i-1}) - 0)^2$$
 
@@ -215,8 +221,76 @@ $$
 \end{frame}
 
 
-\begin{frame}
+\begin{frame}{Итеративный метод идентификации заявок (2)}
+\begin{block}{Алгоритм итеративной идентификации первой заявки}
+  \begin{codebox}
+  \Procname{$\proc{Find-Request-Index}
+      \del{D = \cbr{\dif x_{i + \mathrm{offset}}}, n, \alpha}$}
+  \li \For $k \gets n$ \To $\id{length}[D] - 1$
+  \li \Do
+        $\id{H_0-criterion} \gets
+          \proc{Build-H0-Criterion}\del{D[1 \twodots k], \alpha}$
+  \li   \If \kw{not} $\id{H_0-criterion}(D[k+1])$
+  \zi   \Then
+          \Comment $(k+1)$-й выброс отвергает $H_0 \implies$ заявка      
+  \li     \Return $k+1$
+        \End
+  \li   \Return 0 \Comment Заявка не обнаружена
+      \End
+  \end{codebox}
+\end{block}
+\end{frame}
 
+
+\begin{frame}{Итеративный метод идентификации заявок (3)}
+\begin{block}{Алгоритм итеративной идентификации всех заявок}
+  \begin{codebox}
+  \Procname{$\proc{Find-Requests-Iterative}
+      \del{D=\cbr{\dif x_i}, n, \alpha}$}
+  \li $\widehat{T_c} \gets \varnothing$
+  \li $\id{idx} \gets 0$ \Comment Индекс последней идентифицированной заявки
+  \li \While \const{true}
+  \li \Do
+        \Comment Находим индекс следующей заявки
+  \li   $\id{idx} \gets \proc{Find-Request-Index}
+            \del{D\sbr{\id{idx} + 1 \twodots \id{length}[D]}, 
+            n, \alpha}$
+  \li   \If $\id{idx} \neq 0$
+  \li   \Then
+          $\widehat{T_c} \gets \widehat{T_c} \cup \cbr{t_{idx}}$
+  \li   \Else
+          \Return $\widehat{T_c}$
+        \End
+      \End
+  \end{codebox}
+\end{block}
+\end{frame}
+
+
+\begin{frame}{Оценка параметров модели}
+
+\begin{block}{Интенсивность поступления заявок}
+$$\widehat{\lambda} = 
+    \frac{1}{|\widehat{T_c}|} 
+        \sum\limits_{i=1}^{|\widehat{T_c}|} (t_{c_{i+1}} - t_{c_i})$$
+\end{block}
+\begin{block}{Параметры фоновой загрузки}
+$$
+  \widehat{m} = \frac{1}{K-1} \sum\limits_{i=1}^{K-1} x_i, \quad
+  \widehat{\sigma}^2 = 
+      \frac{1}{K-2} \sum\limits_{i=1}^{K-1} \del{x_i - \widehat{m}}^2, \quad
+  K = t_{c_1} / \Delta t
+$$
+\end{block}
+\begin{block}{Параметры загрузки при обработке заявок}
+$$
+  \widehat{m_c} = \frac{1}{\envert{T_c}} \sum\limits_{t_c \in T_c} 
+      \dif x_{t_c / \Delta t}, \quad
+  \widehat{\sigma}^2 \Delta t + \widehat{\sigma_c}^2 = 
+      \frac{1}{\envert{T_c} - 1} \sum\limits_{t_c \in T_c}
+      \del{\dif x_{t_c / \Delta t} - \widehat{m_c}}^2
+$$
+\end{block}
 \end{frame}
 
 

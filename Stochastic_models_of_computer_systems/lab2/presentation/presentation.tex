@@ -40,11 +40,14 @@
   \begin{beamercolorbox}[wd=.4\paperwidth,ht=2.5ex,dp=1.125ex,leftskip=.3cm,rightskip=.3cm]{title in head/foot}%
     \usebeamerfont{title in head/foot}\insertshorttitle
   \end{beamercolorbox}%
-  \begin{beamercolorbox}[wd=.1\paperwidth,ht=2.5ex,dp=1.125ex,leftskip=.4cm,rightskip=.3cm plus1fil]{title in head/foot}%
+  \begin{beamercolorbox}[wd=.1\paperwidth,ht=2.5ex,dp=1.125ex,leftskip=.3cm,rightskip=.3cm plus1fil]{title in head/foot}%
     \usebeamerfont{title in head/foot}\insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}}%
   \vskip0pt%
 }
+
+\DeclareMathOperator*{\argmax}{\arg\!\max}
+\DeclareMathOperator*{\argmin}{\arg\!\min}
 
 \title[Оценка параметров случайного процесса]{Оценка параметров модели случайного процесса нагрузки сервера, обрабатывающего заявки}
 \author{Владимир Руцкий, 5057/12}
@@ -145,7 +148,7 @@ $T_c = \cbr{ t_{c_1}, \ldots, t_{c_R} }$~---
 Считаем, что $\Delta t$ достаточно мало и $t_{c_j} = t_0 + i \cdot \Delta t$~---
 заявки поступили в некоторые наблюдаемые моменты времени $t_i.$
 
-Без ограничения общности будем рассматривать случай $t_0 = 0$
+Рассматривается случай $t_0 = 0$
 \end{frame}
 
 
@@ -236,8 +239,8 @@ $$
           \Comment $(k+1)$-й выброс отвергает $H_0 \implies$ заявка      
   \li     \Return $k+1$
         \End
-  \li   \Return 0 \Comment Заявка не обнаружена
-      \End
+  \li   \End
+  \li \Return 0 \Comment Заявка не обнаружена
   \end{codebox}
 \end{block}
 \end{frame}
@@ -296,25 +299,295 @@ $$
 
 
 \subsection[EM-алгоритм]{Оценивание EM-алгоритмом}
-\begin{frame}{EM-алгоритм. Построение функции правдоподобия}
-Введём скрытые случайные величины $Z_i, \quad i=1,\ldots,N$
-\begin{itemize}
-  \item $Z_i = 1,$ если в момент времени $t_i$ поступила заявка,
-  \item $Z_i = 2,$ если в момент времени $t_i$ 
-\end{itemize}
+\begin{frame}{EM-алгоритм. Скрытые случайные величины}
+\begin{block}{$Z_i$}
+  Введём скрытые случайные величины $Z_i, \quad i=1,\ldots,N$
+  \begin{itemize}
+    \item $Z_i = 1,$ если в момент времени $t_i$ поступила заявка,
+    \item $Z_i = 2,$ если в момент времени $t_i$ не поступила заявка
+  \end{itemize}
+  Количество поступивших за время наблюдения заявок~--- случайная величина, 
+  распределённая по закону Пуассона $\mathcal{P}(\lambda).$
+
+  $\mathcal{P}(\lambda)$ можно аппроксимировать Биномиальным законом 
+  $\mathcal{B}(N, \tau).$
+
+  $\implies$ $Z_i$ можно считать распределённой по закону Бернулли.
+
+  $\mathbf{P}(Z_i=1) = \tau_1$, $\mathbf{P}(Z_i=2) = \tau_2 = 1 - \tau_1$
+\end{block}
+
+$$
+\begin{array}{rclcll}
+\dif X(t_i) \vert (Z_i = 1) &\sim& \mathcal{N}(\mu_1, \sigma_1^2) &=& 
+  \mathcal{N}(m_c, \sigma^2 \Delta t + \sigma_c^2), &
+  \quad (t_i \in T_c), \\
+\dif X(t_i) \vert (Z_i = 2) &\sim& \mathcal{N}(\mu_2, \sigma_2^2) &=& 
+  \mathcal{N}(0, \sigma^2 \Delta t), &
+  \quad (t_i \notin T_c).
+\end{array}
+$$
+
+Введём обозначения: 
+$\theta = (\tau_1, \tau_2, \mu_1, \mu_2, \sigma_1^2, \sigma_2^2),$
+$\mathbf{x} = (x_1, \ldots, x_N),$
+$\mathbf{z} = (z_1, \ldots, z_N)$
 \end{frame}
+
+
+\subsection[EM-алгоритм]{Оценивание EM-алгоритмом}
+\begin{frame}{EM-алгоритм. Построение функции правдоподобия}
+\begin{block}{Функция правдоподобия}
+  $$
+  L(\theta; \mathbf{x}, \mathbf{z}) = 
+    \mathbf{P}(\mathbf{x}, \mathbf{z} \vert \theta) = 
+    \prod\limits_{i=1}^{N} \sum\limits_{j=1}^2 
+      \mathbb{I}(z_i=j) \, \tau_j \, f(x_i,\mu_j,\sigma_j^2),
+  $$
+
+{\footnotesize
+$\mathbb{I}(\mathrm{expr}) = \left\{
+  \begin{array}{rl}
+    0, & \mathrm{expr} = \mathrm{False} \\
+    1, & \mathrm{expr} = \mathrm{True}
+  \end{array}\right.$~--- функция индикатор
+
+$f(x, \mu, \sigma^2) = 
+    \frac{1}{\sqrt{2 \pi \sigma^2}} e^{-\frac{(x - \mu)^2}{2 \sigma^2}}$~---
+плотность нормального распределения
+}
+\end{block}
+
+В экспоненциальной форме:
+{\small
+$$
+L(\theta; \mathbf{x}, \mathbf{z}) =
+  \exp \cbr{ \sum\limits_{i=1}^{N} \sum\limits_{j=1}^2 
+    \mathbb{I}(z_i=j) \sbr{
+      \log \tau_j - 
+      \frac{1}{2}\log(2\pi) -
+      \log(\sigma_j) -
+      \frac{(x_i - \mu_j)^2}{2 \sigma_j^2}}}
+$$}
+\end{frame}
+
+
+\begin{frame}{EM-алгоритм}
+\begin{block}{EM-алгоритм}
+\begin{codebox}
+\Procname{$\proc{EM-Algorithm}$()}
+\li $\theta \gets \proc{Estimate-Initial-Parameters}()$
+\li \While \const{true}
+\li \Do
+      $\theta_{\mathrm{next}} \gets \proc{M-Step}(\proc{E-Step}())$
+\li   \If $\envert{\theta - \theta_{\mathrm{next}}} < \varepsilon$
+\li   \Then
+        \Return $\theta$
+\li   \Else
+        $\theta \gets \theta_{\mathrm{next}}$
+      \End
+    \End
+\end{codebox}
+\end{block}
+\end{frame}
+
+
+\begin{frame}{EM-алгоритм. Оценивание начальных параметров}
+\begin{block}{$\tau_j$}
+$$
+\tau_j^{(0)} = 0.5, \quad j=1,2
+$$
+\end{block}
+\begin{block}{$\mu_j$}
+Построим полигон частот $\dif x_i$.
+В качестве $\mu_1^{(0)}$ возьмём последний локальный максимум частот,
+а в качестве $\mu_2^{(0)}$~--- первый
+\end{block}
+\begin{block}{$\sigma_j$}
+$$\sigma_j^{(0)} = \frac{1}{3}\del{\mu_1^{(0)} - \mu_2^{(0)}}, \quad j=1, 2$$
+\end{block}
+\end{frame}
+
+
+\begin{frame}{EM-алгоритм. E-шаг}
+\begin{block}{Условная вероятность принадлежности $i$-го наблюдения}
+По Т.~Байеса:
+\begin{eqnarray*}
+  T_{j,i}^{(k)} 
+    &=& \mathbf{P}\del{Z_i = j \vert \dif X(t_i) = x_i; \theta^{(k)}} = \\
+    &=& 
+    \frac{\tau_j^{(k)} \cdot f\del{x_i; \mu_j^{(k)}, \sigma_j^{(k)}}}
+         {\tau_1^{(k)} \cdot f\del{x_i; \mu_1^{(k)}, \sigma_1^{(k)}} + 
+         {\tau_2^{(k)} \cdot f\del{x_i; \mu_2^{(k)}, \sigma_2^{(k)}}}}
+\end{eqnarray*}
+\end{block}
+\begin{block}{Математическое ожидание логарифма функции правдоподобия}
+\begin{eqnarray*}
+  Q\del{\theta \vert \theta^{(k)}} 
+    &=& 
+    \mathbf{E}\sbr{\log L(\theta; \mathbf{x}, \mathbf{z})} = \\
+    &=& \sum\limits_{i=1}^{N} \sum\limits_{j=1}^2
+      T_{j,i}^{(k)} 
+        \sbr{
+          \log \tau_j - 
+          \frac{1}{2}\log(2\pi) -
+          \log(\sigma_j) -
+          \frac{(x_i - \mu_j)^2}{2 \sigma_j^2}
+        }
+\end{eqnarray*}
+\end{block}
+\end{frame}
+
+
+\begin{frame}{EM-алгоритм. M-шаг}
+\begin{block}{Максимизация $Q\del{\theta \vert \theta^{(k)}}$}
+$$
+\theta^{(k+1)} = \argmax\limits_{\theta} Q\del{\theta \vert \theta^{(k)}}.
+$$
+$$
+\tau_j^{(k+1)} = \frac{1}{n} \sum\limits_{i=1}^{N} T_{j,i}^{(k)},\quad
+\mu_j^{(k+1)} = \frac
+  {\sum\limits_{i=1}^{N} T_{j,i}^{(k)} x_i}
+  {\sum\limits_{i=1}^{N} T_{j,i}^{(k)}},
+$$
+$$
+\sigma_j^{(k+1)} = \frac
+  {\sum\limits_{i=1}^{N} T_{j,i}^{(k)} \del{x_i - \mu_j^{(k+1)}}^2}
+  {\sum\limits_{i=1}^{N} T_{j,i}^{(k)}}
+$$
+\end{block}
+\end{frame}
+
+
+\begin{frame}{EM-алгоритм. Получение оценок параметров модели}
+\begin{block}{Оценка $\sigma^2$, $m_c$, $\sigma_c$}
+$$
+  \widehat{m_c} = \mu_1, \quad 
+  \widehat{\sigma}^2 = \frac{\sigma_2^2}{\Delta t}, \quad
+  \widehat{\sigma_c}^2 = \sigma_1^2 - \sigma_2^2
+$$
+\end{block}
+\begin{block}{Оценка времени поступления заявок}
+$$\widehat{T_c} = \cbr{t_i \quad i=1,\ldots,N\ \vert\ 
+    T_{1,i}^{(k)} > T_{2,i}^{(k)}}$$
+\end{block}
+
+Оценки $m$ и $\lambda$ получаем так же, как в итеративном методе
+\end{frame}
+
 
 \section[$\lambda_c \gg 0$]{Решение в случае конечного времени обработки заявки}
+\begin{frame}{Случай конечного времени обработки заявки}
+\begin{block}{$\lambda_c \gg 0$}
+\begin{eqnarray*}
+X(t) 
+  &=& B(t) + \sum\limits_{t_c \in T_c}K_{t_c}(t) = \\
+  &=& m + \sigma \mathcal{W}(t) + \sum\limits_{t_c \in T_c}
+    \mathcal{N}(m_c, \sigma_c^2) \cdot \mathrm{I}(t - t_c) \cdot 
+    e^{-\lambda_c(t - t_c)}
+\end{eqnarray*}
+\end{block}
+Считаем, что заявки поступают достаточно редко и 
+обрабатываются достаточно быстро: 
+для каждой заявки предыдущие заявки практически не влияют на уровень
+загруженности
+\end{frame}
+
+
+\begin{frame}{Разностный аналог производной}
+\begin{block}{$\dif X(t)$ в момент времени поступления заявки $t_c$}
+  \begin{eqnarray*}
+  \dif X(t_c) 
+    & = & X(t_c) - X(t_c - \Delta t) = \\
+    & = & \mathcal{N}(m_c, \sigma^2 \Delta t + \sigma_c^2).
+  \end{eqnarray*}
+  (при условии, что в момент времени $(t_c - \Delta t)$ заявки не было)
+\end{block}
+\begin{block}{$\dif X(t)$ в момент времени отсутствия заявок $t$}
+  \begin{eqnarray*}
+  \dif X(t) 
+    & = & X(t) - X(t - \Delta t) = \\
+    & = & \mathcal{N}(0, \sigma^2 \Delta t) + 
+        \mathcal{N}(m_c, \sigma_c^2) \cdot 
+          \del{e^{-\lambda_c(t - t_c)} - e^{-\lambda_c(t - \Delta t - t_c)}}.
+  \end{eqnarray*}
+  (при условии, что в момент времени $(t - \Delta t)$ заявки не было)
+\end{block}
+\end{frame}
+
+
+\subsection{Идентификация моментов времени поступления заявок}
+\begin{frame}{Идентификация моментов времени поступления заявок}
+\begin{enumerate}
+\item Построим вариационный для $\dif x_i$:
+  $$\dif x_{(1)} \leqslant \dif x_{(2)} \leqslant \ldots 
+    \leqslant \dif x_{(N)}.$$
+  Приходящие заявки вносят существенно большее изменение уровня загруженности
+  ресурсов сервера, чем фоновая нагрузка
+
+  $\implies$ все наблюдения $\dif X(t_c)$ находятся в правой части ряда.
+
+\item Используя итеративный метод для идентификации заявок 
+$\proc{Find-Request-Index},$
+найдём границу $k$ наблюдений $\dif X(t_c)$ в вариационном ряде:
+$$
+  \dif x_{(i)} \sim \dif X(t_c), \quad i \geqslant k.
+$$
+
+\item По границе $k$ выделим наблюдения из $\widehat{T_c}$
+\end{enumerate}
+\end{frame}
+
+
 \subsection[МНК]{Метод наименьших квадратов}
-\begin{frame}{Метод наименьших квадратов}
+\begin{frame}{Метод наименьших квадратов (1)}
+\begin{block}{В моменты времени между поступлениями заявок $\sbr{t_k, t_{k+n}}$}
+\begin{eqnarray*}
+\dif X(t) 
+  & = & \mathcal{N}(0, \sigma^2 \Delta t) + 
+      \mathcal{N}(m_c, \sigma_c^2) \cdot 
+        \del{e^{-\lambda_c(t - t_c)} - e^{-\lambda_c(t - \Delta t - t_c)}} \\
+  & = & \del{
+      \mathcal{N}(0, \sigma^2 \Delta t) + 
+      \mathcal{N}(0, \sigma_c^2) \cdot 
+        \del{e^{-\lambda_c(t - t_c)} - e^{-\lambda_c(t - \Delta t - t_c)}}} +\\
+      && m_c \cdot 
+        \del{e^{-\lambda_c(t - t_c)} - e^{-\lambda_c(t - \Delta t - t_c)}}.
+\end{eqnarray*}
+\end{block}
 \end{frame}
 
-\section{Результаты работы}
-\begin{frame}{Результаты работы (1)}
+
+\subsection[МНК]{Метод наименьших квадратов}
+\begin{frame}{Метод наименьших квадратов (2)}
+\begin{block}{Метод наименьших квадратов}
+\begin{eqnarray*}
+\del{m_c, \lambda_c} 
+  & = & \argmin\limits_{m_c,\ \lambda_c} S(m_c, \lambda_c) = \\
+  & = & \argmin\limits_{m_c,\ \lambda_c} \sum\limits_{i=1}^{n} 
+    \del{\dif x_i - m_c \cdot 
+      \del{e^{-\lambda_c(t_i - t_k)} - 
+           e^{-\lambda_c(t_i - \Delta t - t_k)}}}^2
+\end{eqnarray*}
+\end{block}
+$S(m_c, \lambda_c)$ выпукла вниз на интересущей для анализа области~---
+используем численный метод минимизации (метод покоординатного спуска)
 \end{frame}
 
-\begin{frame}{Выводы}
+
+\begin{frame}{Оценка параметров фоновой загрузки}
+$m$ и $\sigma$ оцениваются так же, как в итеративном методе
 \end{frame}
+
+
+%\section{Результаты работы}
+%\begin{frame}{Результаты работы (1)}
+%\end{frame}
+
+
+%\begin{frame}{Выводы}
+%\end{frame}
+
 
 %\begin{frame}{Список литературы}
 %  \begin{thebibliography}{10}

@@ -472,21 +472,112 @@ $$\widehat{T_c} = \cbr{t_i \quad i=1,\ldots,N\ \vert\
     T_{1,i}^{(k)} > T_{2,i}^{(k)}}$$
 \end{block}
 
-Оценки $m$ и $\lambda$ получаем также как в итеративном методе
+Оценки $m$ и $\lambda$ получаем так же, как в итеративном методе
 \end{frame}
 
 
 \section[$\lambda_c \gg 0$]{Решение в случае конечного времени обработки заявки}
 \begin{frame}{Случай конечного времени обработки заявки}
 \begin{block}{$\lambda_c \gg 0$}
+\begin{eqnarray*}
+X(t) 
+  &=& B(t) + \sum\limits_{t_c \in T_c}K_{t_c}(t) = \\
+  &=& m + \sigma \mathcal{W}(t) + \sum\limits_{t_c \in T_c}
+    \mathcal{N}(m_c, \sigma_c^2) \cdot \mathrm{I}(t - t_c) \cdot 
+    e^{-\lambda_c(t - t_c)}
+\end{eqnarray*}
+\end{block}
+Считаем, что заявки поступают достаточно редко и 
+обрабатываются достаточно быстро: 
+для каждой заявки предыдущие заявки практически не влияют на уровень
+загруженности
+\end{frame}
 
+
+\begin{frame}{Разностный аналог производной}
+\begin{block}{$\dif X(t)$ в момент времени поступления заявки $t_c$}
+  \begin{eqnarray*}
+  \dif X(t_c) 
+    & = & X(t_c) - X(t_c - \Delta t) = \\
+    & = & \mathcal{N}(m_c, \sigma^2 \Delta t + \sigma_c^2).
+  \end{eqnarray*}
+  (при условии, что в момент времени $(t_c - \Delta t)$ заявки не было)
+\end{block}
+\begin{block}{$\dif X(t)$ в момент времени отсутствия заявок $t$}
+  \begin{eqnarray*}
+  \dif X(t) 
+    & = & X(t) - X(t - \Delta t) = \\
+    & = & \mathcal{N}(0, \sigma^2 \Delta t) + 
+        \mathcal{N}(m_c, \sigma_c^2) \cdot 
+          \del{e^{-\lambda_c(t - t_c)} - e^{-\lambda_c(t - \Delta t - t_c)}}.
+  \end{eqnarray*}
+  (при условии, что в момент времени $(t - \Delta t)$ заявки не было)
 \end{block}
 \end{frame}
 
-\subsection[МНК]{Метод наименьших квадратов}
-\begin{frame}{Метод наименьших квадратов}
+
+\subsection{Идентификация моментов времени поступления заявок}
+\begin{frame}{Идентификация моментов времени поступления заявок}
+\begin{enumerate}
+\item Построим вариационный для $\dif x_i$:
+  $$\dif x_{(1)} \leqslant \dif x_{(2)} \leqslant \ldots 
+    \leqslant \dif x_{(N)}.$$
+  Приходящие заявки вносят существенно большее изменение уровня загруженности
+  ресурсов сервера, чем фоновая нагрузка
+
+  $\implies$ все наблюдения $\dif X(t_c)$ находятся в правой части ряда.
+
+\item Используя итеративный метод для идентификации заявок 
+$\proc{Find-Request-Index},$
+найдём границу $k$ наблюдений $\dif X(t_c)$ в вариационном ряде:
+$$
+  \dif x_{(i)} \sim \dif X(t_c), \quad i \geqslant k.
+$$
+
+\item По границе $k$ выделим наблюдения из $\widehat{T_c}$
+\end{enumerate}
 \end{frame}
 
+
+\subsection[МНК]{Метод наименьших квадратов}
+\begin{frame}{Метод наименьших квадратов (1)}
+\begin{block}{В моменты времени между поступлениями заявок $\sbr{t_k, t_{k+n}}$}
+\begin{eqnarray*}
+\dif X(t) 
+  & = & \mathcal{N}(0, \sigma^2 \Delta t) + 
+      \mathcal{N}(m_c, \sigma_c^2) \cdot 
+        \del{e^{-\lambda_c(t - t_c)} - e^{-\lambda_c(t - \Delta t - t_c)}} \\
+  & = & \del{
+      \mathcal{N}(0, \sigma^2 \Delta t) + 
+      \mathcal{N}(0, \sigma_c^2) \cdot 
+        \del{e^{-\lambda_c(t - t_c)} - e^{-\lambda_c(t - \Delta t - t_c)}}} +\\
+      && m_c \cdot 
+        \del{e^{-\lambda_c(t - t_c)} - e^{-\lambda_c(t - \Delta t - t_c)}}.
+\end{eqnarray*}
+\end{block}
+\end{frame}
+
+
+\subsection[МНК]{Метод наименьших квадратов}
+\begin{frame}{Метод наименьших квадратов (2)}
+\begin{block}{Метод наименьших квадратов}
+\begin{eqnarray*}
+\del{m_c, \lambda_c} 
+  & = & \argmin\limits_{m_c,\ \lambda_c} S(m_c, \lambda_c) = \\
+  & = & \argmin\limits_{m_c,\ \lambda_c} \sum\limits_{i=1}^{n} 
+    \del{\dif x_i - m_c \cdot 
+      \del{e^{-\lambda_c(t_i - t_k)} - 
+           e^{-\lambda_c(t_i - \Delta t - t_k)}}}^2
+\end{eqnarray*}
+\end{block}
+$S(m_c, \lambda_c)$ выпукла вниз на интересущей для анализа области~---
+используем численный метод минимизации (метод покоординатного спуска)
+\end{frame}
+
+
+\begin{frame}{Оценка параметров фоновой загрузки}
+$m$ и $\sigma$ оцениваются так же, как в итеративном методе
+\end{frame}
 
 
 \section{Результаты работы}

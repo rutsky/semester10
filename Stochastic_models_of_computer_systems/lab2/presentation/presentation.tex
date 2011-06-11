@@ -6,7 +6,7 @@
 % Unported License. See <http://creativecommons.org/licenses/by-sa/3.0/>
 % for details.
 
-\documentclass[utf8]{beamer}
+\documentclass[utf8,handout]{beamer}
 \usepackage[russian]{babel}
 
 % \dif, \del{}, \cbr{}, \sbr.
@@ -14,11 +14,6 @@
 
 % Pseudocode as in Cormen book.
 \usepackage{clrscode}
-
-%\usetheme{default}
-\usetheme{Madrid}
-%\usetheme{Warsaw}
-%\usetheme{Darmstadt}
 
 % Убирает меню навигации по слайдам.
 \setbeamertemplate{navigation symbols}{}
@@ -45,6 +40,20 @@
   \end{beamercolorbox}}%
   \vskip0pt%
 }
+
+\mode<presentation>
+{
+  \usetheme{Madrid}
+}
+
+\mode<handout>
+{
+  \usetheme{Madrid}
+
+  \usepackage{pgfpages}
+  \pgfpagesuselayout{2 on 1}
+}
+
 
 \DeclareMathOperator*{\argmax}{\arg\!\max}
 \DeclareMathOperator*{\argmin}{\arg\!\min}

@@ -10,6 +10,7 @@ DATABASES['native'] = DATABASES['default']
 DATABASES['default'] = {'ENGINE': 'dbindexer', 'TARGET': 'native'}
 AUTOLOAD_SITECONF = 'indexes'
 
+# TODO: Should be really secret!
 SECRET_KEY = r's_,1_h_CJIC,#b:{l-y"_HPYDw7e0Ouq*rL`m`}%iBdR=)I%S-tUyX;i/Rxtu}'
 
 INSTALLED_APPS = (

@@ -8,6 +8,7 @@ To setup local development environment:
       $ virtualenv -p python2.5 --no-site-packages python
       $ ./python/bin/pip install PIL
       $ ./python/bin/pip install ssl
+    Note that my installation of SSL wasn't successfully finished.
  2. Clone django-nonrel and setup links by running clone_django_nonrel.sh 
     script.
  3. Download latest Google App Engine Python SDK from 

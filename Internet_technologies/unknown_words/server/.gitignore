@@ -1,0 +1,8 @@
+/.google_appengine
+/autoload
+/dbindexer
+/django
+/djangoappengine
+/djangotoolbox
+/.gaedata
+*.pyc

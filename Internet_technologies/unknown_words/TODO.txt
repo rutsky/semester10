@@ -1,0 +1,3 @@
+ * /favicon.ico
+ * Add "Powered by GAE" icon from 
+ <http://code.google.com/appengine/downloads.html>

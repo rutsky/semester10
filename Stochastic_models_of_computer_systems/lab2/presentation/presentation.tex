@@ -6,7 +6,8 @@
 % Unported License. See <http://creativecommons.org/licenses/by-sa/3.0/>
 % for details.
 
-\documentclass[utf8,handout]{beamer}
+\documentclass[utf8]{beamer}
+%\documentclass[utf8,handout]{beamer}
 \usepackage[russian]{babel}
 
 % \dif, \del{}, \cbr{}, \sbr.
@@ -344,7 +345,6 @@ $\mathbf{z} = (z_1, \ldots, z_N)$
 \end{frame}
 
 
-\subsection[EM-алгоритм]{Оценивание EM-алгоритмом}
 \begin{frame}{EM-алгоритм. Построение функции правдоподобия}
 \begin{block}{Функция правдоподобия}
   $$
@@ -525,7 +525,7 @@ X(t)
 \end{frame}
 
 
-\subsection{Идентификация моментов времени поступления заявок}
+%\subsection{Идентификация моментов времени поступления заявок}
 \begin{frame}{Идентификация моментов времени поступления заявок}
 \begin{enumerate}
 \item Построим вариационный для $\dif x_i$:
@@ -561,13 +561,12 @@ $$
       \mathcal{N}(0, \sigma_c^2) \cdot 
         \del{e^{-\lambda_c(t - t_c)} - e^{-\lambda_c(t - \Delta t - t_c)}}} +\\
       && m_c \cdot 
-        \del{e^{-\lambda_c(t - t_c)} - e^{-\lambda_c(t - \Delta t - t_c)}}.
+        \del{e^{-\lambda_c(t - t_c)} - e^{-\lambda_c(t - \Delta t - t_c)}}
 \end{eqnarray*}
 \end{block}
 \end{frame}
 
 
-\subsection[МНК]{Метод наименьших квадратов}
 \begin{frame}{Метод наименьших квадратов (2)}
 \begin{block}{Метод наименьших квадратов}
 \begin{eqnarray*}

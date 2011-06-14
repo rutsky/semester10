@@ -1,3 +1,4 @@
  * Use GSL and http://o2scl.sourceforge.net/
  * Не совсем реалистично то, что наблюдения производятся с нулевого момента 
  времени работы сервера.
+ * Fix presentation footer.

@@ -1,0 +1,27 @@
+*** Iterative method ***
+Detected 183 requests.
+Poisson parameter lambda: 54.5879 (average time between requests)
+Noise average m: 1.79929 (by 40 measurements until first requests)
+Noise standard deviation sigma: 1.48647 (derivative average: 0.041421)
+Requests average m_c: 9.10925
+Requests standard deviation sigma_c: 2.62672
+
+*** EM-algorithm ***
+Start estimation: 
+  mu_1 = 13.032, mu_2 = -0.0896899
+  sigma_1 = 4.3739, sigma_2 = 4.3739
+  tau_1 = 0.5, tau_2 = 0.5
+0) nextTau = (0.0351795,0.96482), nextMu = (5.96381,-0.0025307), nextSigma = (23.8736,1.99922)
+1) nextTau = (0.0232747,0.976725), nextMu = (8.68658,0.00530817), nextSigma = (18.0055,1.88861)
+2) nextTau = (0.0227019,0.977298), nextMu = (8.99394,0.00325669), nextSigma = (15.4864,1.87458)
+3) nextTau = (0.0230043,0.976996), nextMu = (8.90543,0.00255842), nextSigma = (16.0142,1.87022)
+4) nextTau = (0.0229896,0.97701), nextMu = (8.91123,0.00255538), nextSigma = (15.9815,1.86996)
+5) nextTau = (0.0229924,0.977008), nextMu = (8.91056,0.00254591), nextSigma = (15.9846,1.8699)
+6) nextTau = (0.0229925,0.977007), nextMu = (8.91053,0.0025452), nextSigma = (15.9848,1.86989)
+7) nextTau = (0.0229925,0.977007), nextMu = (8.91053,0.00254511), nextSigma = (15.9848,1.86989)
+Detected 200 requests.
+Poisson parameter lambda: 49.9246 (average time between requests)
+Noise average m: 1.79929 (by 40 measurements until first requests)
+Noise standard deviation sigma: 1.86989 (derivative average: 0.00254511)
+Requests average m_c: 8.91053
+Requests standard deviation sigma_c: 15.8751

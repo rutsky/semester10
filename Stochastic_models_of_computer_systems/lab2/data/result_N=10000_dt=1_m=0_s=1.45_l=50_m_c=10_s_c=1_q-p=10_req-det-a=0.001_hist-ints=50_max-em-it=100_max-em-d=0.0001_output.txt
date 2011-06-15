@@ -1,0 +1,31 @@
+*** Iterative method ***
+Detected 180 requests.
+Poisson parameter lambda: 55.5028 (average time between requests)
+Noise average m: 1.90436 (by 40 measurements until first requests)
+Noise standard deviation sigma: 1.56583 (derivative average: 0.0442696)
+Requests average m_c: 9.11846
+Requests standard deviation sigma_c: 2.58198
+
+*** EM-algorithm ***
+Start estimation: 
+  mu_1 = 13.9014, mu_2 = 0.159869
+  sigma_1 = 4.58052, sigma_2 = 4.58052
+  tau_1 = 0.5, tau_2 = 0.5
+0) nextTau = (0.0318546,0.968145), nextMu = (6.28823,0.00753625), nextSigma = (23.982,2.29743)
+1) nextTau = (0.0215563,0.978444), nextMu = (8.78737,0.0185821), nextSigma = (19.1794,2.21731)
+2) nextTau = (0.0209718,0.979028), nextMu = (9.15413,0.0159615), nextSigma = (16.2047,2.1964)
+3) nextTau = (0.0214836,0.978516), nextMu = (9.04385,0.0136025), nextSigma = (16.7205,2.17804)
+4) nextTau = (0.0215944,0.978406), nextMu = (9.03392,0.0127992), nextSigma = (16.7152,2.17124)
+5) nextTau = (0.0216522,0.978348), nextMu = (9.02597,0.0124424), nextSigma = (16.7337,2.16833)
+6) nextTau = (0.0216752,0.978325), nextMu = (9.02291,0.0122984), nextSigma = (16.7405,2.16716)
+7) nextTau = (0.0216845,0.978315), nextMu = (9.02166,0.0122402), nextSigma = (16.7432,2.16668)
+8) nextTau = (0.0216883,0.978312), nextMu = (9.02116,0.0122167), nextSigma = (16.7444,2.16649)
+9) nextTau = (0.0216898,0.97831), nextMu = (9.02096,0.0122072), nextSigma = (16.7448,2.16641)
+10) nextTau = (0.0216904,0.97831), nextMu = (9.02087,0.0122034), nextSigma = (16.745,2.16638)
+11) nextTau = (0.0216906,0.978309), nextMu = (9.02084,0.0122019), nextSigma = (16.7451,2.16637)
+Detected 191 requests.
+Poisson parameter lambda: 52.2895 (average time between requests)
+Noise average m: 1.90436 (by 40 measurements until first requests)
+Noise standard deviation sigma: 2.16637 (derivative average: 0.0122019)
+Requests average m_c: 9.02084
+Requests standard deviation sigma_c: 16.6043

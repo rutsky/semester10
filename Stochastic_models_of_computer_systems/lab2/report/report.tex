@@ -522,17 +522,37 @@ $S(m_c, \lambda_c)$ выпукла вниз на интересущей для �
 Графики зависимости относительной погрешности полученных оценок числа 
 заявок $|T_c|$ в пунктах~\ref{iterative} и~\ref{EM} 
 от среднеквадратичных отклонений данных $\sigma$ и $\sigma_c$
-приведёны на рис.~\ref{fig:graph:lc0-Tc-errors}.
+приведены на рис.~\ref{fig:graph:lc0-Tc-errors}.
+На рис.~\ref{fig:graph:lcbig-errors} приведены графики зависимости относительной 
+погрешности полученных оценок методом наименьших квадратов для случая $\lambda_c \gg 0.$
 
 \begin{figure}
   \centering
   \subfloat[Зависимость относительной погрешности оценивания $|T_c|$ от $\sigma$.]%
-{\label{fig:graph:lc0-Tc-sigma}\includegraphics[height=7cm]{../../data/K_of_sigma.pdf}}
+{\label{fig:graph:lc0-Tc-sigma}\includegraphics[height=6.5cm]{../../data/K_of_sigma.pdf}}
   \quad
   \subfloat[Зависимость относительной погрешности оценивания $|T_c|$ от $\sigma_c$.]%
-{\label{fig:graph:lc0-Tc-sigma-c}\includegraphics[height=7cm]{../../data/K_of_sigma_c.pdf}}
+{\label{fig:graph:lc0-Tc-sigma-c}\includegraphics[height=6.5cm]{../../data/K_of_sigma_c.pdf}}
   \caption{Погрешности оценивания итеративным методом и EM-алгоритмом.}
   \label{fig:graph:lc0-Tc-errors}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \subfloat[Зависимость относительной погрешности оценивания $m_c$ и $\lambda_c$ от $\lambda$.]%
+{\label{fig:graph:lcbig-error-lambda}\includegraphics[height=6.5cm]{../../data2/gen_params_stats_lambda.pdf}}
+  \quad
+  \subfloat[Зависимость относительной погрешности оценивания $m_c$ и $\lambda_c$ от $\lambda_c$.]%
+{\label{fig:graph:lcbig-error-lambda-c}\includegraphics[height=6.5cm]{../../data2/gen_params_stats_lambda_signal.pdf}} \\
+  \subfloat[Зависимость относительной погрешности оценивания $m_c$ и $\lambda_c$ от $m_c$.]%
+{\label{fig:graph:lcbig-error-m-c}\includegraphics[height=6.5cm]{../../data2/gen_params_stats_m_signal.pdf}}
+  \quad
+  \subfloat[Зависимость относительной погрешности оценивания $m_c$ и $\lambda_c$ от $\sigma$.]%
+{\label{fig:graph:lcbig-error-sigma}\includegraphics[height=6.5cm]{../../data2/gen_params_stats_sigma.pdf}} \\
+  \subfloat[Зависимость относительной погрешности оценивания $m_c$ и $\lambda_c$ от $\sigma_c$.]%
+{\label{fig:graph:lcbig-error-sigma-c}\includegraphics[height=6.5cm]{../../data2/gen_params_stats_sigma_signal.pdf}}
+  \caption{Погрешности оценивания в случае $\lambda_c \gg 0$.}
+  \label{fig:graph:lcbig-errors}
 \end{figure}
 
 % TODO

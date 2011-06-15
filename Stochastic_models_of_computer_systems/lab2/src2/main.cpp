@@ -127,11 +127,13 @@ void calcRequestsArrival( variational_series_t const &varseries,
             requestsDetectionAlpha / 2.0));
 
     // DEBUG
+    /*
     std::cout << n << " ";
     std::cout << "  sigma2: " << sigma2 << 
       ", loQuantile: " << loQuantile <<
       ", hiQuantile: " << hiQuantile << 
       ", det: " << it->first << "\n";
+    */
     // END OF DEBUG
     
     // Check if next observing value lies in rare quantiles.
@@ -199,8 +201,10 @@ double dlc( DerFwdIt first, DerFwdIt beyond, double dt, double N, double lc )
   return dsum_dlc;
 }
 
+// Returns (m_c, lambda_c).
 template< class DerFwdIt >
-void calcExpParameters( DerFwdIt first, DerFwdIt beyond, double dt, 
+std::pair<double, double> 
+    calcExpParameters( DerFwdIt first, DerFwdIt beyond, double dt, 
                         double startN, double startLc,
                         double startStepN, double startStepLc )
 {
@@ -330,7 +334,35 @@ void calcExpParameters( DerFwdIt first, DerFwdIt beyond, double dt,
       break;
   }
 
-  std::cout << "lambda_c=" << lc << ", N=" << N << "\n";
+  //std::cout << "lambda_c=" << lc << ", N=" << N << "\n";
+  
+  return std::make_pair(N, lc);
+}
+
+// Returns (m_signal, lambda_signal).
+std::pair<double, double> estimateRequestsParams( 
+    request_indexes_t const &requests, derivatives_t const &derivatives,
+    double dt, 
+    double startN, double startLc, 
+    double startStepN, double startStepLc )
+{
+  BOOST_ASSERT(requests.size() > 0);
+
+  double m_c_sum(0), l_c_sum(0);
+  for (size_t i = 1; i < requests.size(); ++i)
+  {
+    double m_c_i, l_c_i;
+    boost::tie(m_c_i, l_c_i) = calcExpParameters(
+        derivatives.begin() + requests[i - 1] + 1, 
+        derivatives.begin() + requests[i], dt, 
+        startN, startLc, startStepN, startStepLc);
+    
+    m_c_sum += m_c_i;
+    l_c_sum += l_c_i;
+  }
+
+  double const R = static_cast<double>(requests.size());
+  return std::make_pair(m_c_sum / R, l_c_sum / R);
 }
 
 void writeRequests( char const *fileName, request_indexes_t const &requests )
@@ -348,8 +380,31 @@ void writeRequests( char const *fileName, request_indexes_t const &requests )
   }
 }
 
-double calcNoiseAverage( measurements_t const &measurements,
-                         request_indexes_t const &requests )
+void writeEstimatedParams( char const *fileName, 
+    size_t numberOfRequests, double m, double sigma, double lambda,
+    double m_signal, double lambda_signal )
+{
+  std::ofstream ofs(fileName);
+
+  if (ofs)
+  {
+    ofs << numberOfRequests << "," << 
+      m << "," << 
+      sigma << "," << 
+      lambda << "," << 
+      m_signal << "," << 
+      lambda_signal << "\n";
+  }
+  else
+  {
+    perror(fileName);
+  }
+}
+
+// Returns (m, sigma).
+std::pair<double, double> calcNoiseParams( 
+    measurements_t const &measurements,
+    request_indexes_t const &requests )
 {
   BOOST_ASSERT(requests.size() < measurements.size());
   
@@ -365,15 +420,26 @@ double calcNoiseAverage( measurements_t const &measurements,
 
     sum += measurements[i];
   }
-  if (i > 0)
+
+  double const m = i > 0 ? sum / static_cast<double>(i) : 0; // TODO
+  
+  double errorsSum(0);
+  for (i = 0; i < measurements.size(); ++i)
   {
-    return sum / static_cast<double>(i);
+    if (!requests.empty() && requests.front() == i)
+    {
+      // Stop at request.
+      break;
+    }
+
+    errorsSum += sqr(measurements[i] - m);
   }
-  else
-  {
-    // TODO
-    return 0;
-  }
+
+  double const sigma = i > 1 ? 
+      sqrt(errorsSum / static_cast<double>(i - 1)) : 
+      0;
+
+  return std::make_pair(m, sigma);
 }
 
 double calcPoissonParameter( request_indexes_t const &requests, double dt )
@@ -477,7 +543,8 @@ void estimate( measurements_t const &measurements, double const dt,
     double const startStepN, double const startStepLc )
 {
   char const 
-      *detectedRequestsFile = "detected_requests.txt";
+      *detectedRequestsFile = "detected_requests.txt",
+      *estimatedParamsFile = "estimated_params.txt";
 
   //size_t const N = measurements.size();
 
@@ -498,16 +565,29 @@ void estimate( measurements_t const &measurements, double const dt,
 
   std::cout << "Detected " << T_c.size() << " requests.\n";
 
+  // Estimate Poisson parameter.
+  double const lambda = calcPoissonParameter(T_c, dt);
+  std::cout << "Poisson parameter 1/lambda: " << lambda << 
+      " (average time between requests)\n";
+
+  double m, sigma;
+  boost::tie(m, sigma) = calcNoiseParams(measurements, T_c);
+  std::cout << "Estimated noise average m=" << m << 
+    " and its st. deviation sigma=" << sigma << "\n";
+
   // Estimate parameters for each period between requests.
   std::cout << "Estimate exponential lowering parameters for intervals "
-    "between each detected requests.";
-  for (size_t i = 1; i < T_c.size(); ++i)
-  {
-    calcExpParameters(
-        derivatives.begin() + T_c[i - 1] + 1, 
-        derivatives.begin() + T_c[i], dt, 
-        startN, startLc, startStepN, startStepLc);
-  }
+    "between each detected requests:\n";
+  double m_signal, lambda_signal;
+  boost::tie(m_signal, lambda_signal) = estimateRequestsParams(
+    T_c, derivatives, dt, startN, startLc, startStepN, startStepLc);
+  std::cout << "  m_signal=" << m_signal << 
+      ", lambda_signal=" << lambda_signal << ".\n";
+
+  // Write estimated parameters.
+  writeEstimatedParams(estimatedParamsFile,
+    T_c.size(), m, sigma, lambda,
+    m_signal, lambda_signal);
 }
 
 int main( int argc, char *argv[] )

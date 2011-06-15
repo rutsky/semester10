@@ -6,6 +6,11 @@
 % Unported License. See <http://creativecommons.org/licenses/by-sa/3.0/>
 % for details.
 
+% TODO:
+%  * Пронумеровать формулы.
+%  * Сейчас записаны некорректные формулы: в формулах смешиваются случайные
+%    процессы и распределения случайных величин.
+
 \documentclass[utf8]{beamer}
 %\documentclass[utf8,handout]{beamer}
 \usepackage[russian]{babel}
@@ -155,6 +160,7 @@ $T_c = \cbr{ t_{c_1}, \ldots, t_{c_R} }$~---
 \begin{block}{Лог загрузки сервера}
   Траектория $X(t_i)\colon \cbr{ x_i \ \vert\ i = 1, \ldots, N }$
 \end{block}
+% TODO: Написать к чему относятся переменные i и j.
 Считаем, что $\Delta t$ достаточно мало и $t_{c_j} = t_0 + i \cdot \Delta t$~---
 заявки поступили в некоторые наблюдаемые моменты времени $t_i.$
 
@@ -211,6 +217,7 @@ $T_c = \cbr{ t_{c_1}, \ldots, t_{c_R} }$~---
 не поступило ни одной заявки.
 
 Тогда $\dif x_k, \dots, \dif x_{k+n}$~--- наблюдения 
+% TODO: Написать что-то вроде L(X(t) = N(...)
 $\mathcal{N}(0, \sigma^2 \Delta t) = \dif X(t).$
 
 Оценим $\sigma^2$ по $\sbr{x_k, x_{k+n}}$:
@@ -289,6 +296,8 @@ $$\widehat{\lambda} =
         \sum\limits_{i=1}^{|\widehat{T_c}|} (t_{c_{i+1}} - t_{c_i})$$
 \end{block}
 \begin{block}{Параметры фоновой загрузки}
+% TODO: Использовать другое имя переменной для индекса наблюдения первой 
+% заявки, не K, т.к. K уже как-то используется ранее.
 $$
   \widehat{m} = \frac{1}{K-1} \sum\limits_{i=1}^{K-1} x_i, \quad
   \widehat{\sigma}^2 = 
@@ -528,7 +537,7 @@ X(t)
 %\subsection{Идентификация моментов времени поступления заявок}
 \begin{frame}{Идентификация моментов времени поступления заявок}
 \begin{enumerate}
-\item Построим вариационный для $\dif x_i$:
+\item Построим вариационный ряд для $\dif x_i$:
   $$\dif x_{(1)} \leqslant \dif x_{(2)} \leqslant \ldots 
     \leqslant \dif x_{(N)}.$$
   Приходящие заявки вносят существенно большее изменение уровня загруженности

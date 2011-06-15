@@ -3,3 +3,4 @@
  времени работы сервера.
  * Fix presentation footer.
  * Fix x/dx in EM in report!
+ * Rename "calc" with "estimate".

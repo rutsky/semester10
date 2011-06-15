@@ -147,6 +147,7 @@ void calcRequestsArrival( variational_series_t const &varseries,
   std::sort(requests.begin(), requests.end());
 }
 
+// Sum of squares of errors for least squares method.
 template< class DerFwdIt >
 double sum( DerFwdIt first, DerFwdIt beyond, double dt, double N, double lc )
 {
@@ -162,6 +163,7 @@ double sum( DerFwdIt first, DerFwdIt beyond, double dt, double N, double lc )
   return sum;
 }
 
+// Partial derivative  d sum / d N  (N is m_c observation).
 template< class DerFwdIt >
 double dN( DerFwdIt first, DerFwdIt beyond, double dt, double N, double lc )
 {
@@ -179,6 +181,7 @@ double dN( DerFwdIt first, DerFwdIt beyond, double dt, double N, double lc )
   return dsum_dN;
 }
 
+// Partial derivative  d sum / d l_c.
 template< class DerFwdIt >
 double dlc( DerFwdIt first, DerFwdIt beyond, double dt, double N, double lc )
 {
@@ -198,15 +201,16 @@ double dlc( DerFwdIt first, DerFwdIt beyond, double dt, double N, double lc )
 
 template< class DerFwdIt >
 void calcExpParameters( DerFwdIt first, DerFwdIt beyond, double dt, 
+                        double startN, double startLc,
                         double startStepN, double startStepLc )
 {
   // TODO: Start values should be estimater somehow.
-  double N = 60;
-  double lc = 0.2;
+  double N = startN;
+  double lc = startLc;
 
   size_t const binSearchSteps = 12;
-  double const NApproxDist = 1e-3;
-  double const lcApproxDist = 1e-3;
+  double const NApproxDist = 1e-3;  // precision epsilon
+  double const lcApproxDist = 1e-3; // precision epsilon
 
   /*
   {
@@ -467,16 +471,13 @@ std::pair<double, double>
   return std::make_pair(average, stDeviation);
 }
 
-void estimate( measurements_t const &measurements, double dt )
+void estimate( measurements_t const &measurements, double const dt,
+    size_t const quietPeriod, double const requestsDetectionAlpha,
+    double const startN, double const startLc,
+    double const startStepN, double const startStepLc )
 {
   char const 
       *detectedRequestsFile = "detected_requests.txt";
-
-  // TODO:
-  size_t const quietPeriod = 5;
-  double const requestsDetectionAlpha = 0.8;
-  double const startStepN = 10;
-  double const startStepLc = 0.05;
 
   //size_t const N = measurements.size();
 
@@ -504,15 +505,17 @@ void estimate( measurements_t const &measurements, double dt )
   {
     calcExpParameters(
         derivatives.begin() + T_c[i - 1] + 1, 
-        derivatives.begin() + T_c[i], dt, startStepN, startStepLc);
+        derivatives.begin() + T_c[i], dt, 
+        startN, startLc, startStepN, startStepLc);
   }
 }
 
 int main( int argc, char *argv[] )
 {
   std::string fileName;
-  double dt, varSeriesPickPart;
-  size_t joinDist;
+  size_t quietPeriod;
+  double dt, requestsDetectionAlpha, 
+      startN, startLc, startStepN, startStepLc;
 
   // Parse command line.
   try
@@ -522,21 +525,25 @@ int main( int argc, char *argv[] )
         ("help", "display help message.")
         ("load-file-name", po::value<std::string>(&fileName), 
             "resources load statistics.")
-        ("dt", po::value<double>(&dt),
-            "time interval between adjacent measurements.")
-        ("var-series-pick-part", po::value<double>(&varSeriesPickPart),
-            "right end normalized size of variational series which will be"
-            "analyzed for requests (from 0 to 1).")
-        ("join-dist", 
-            po::value<size_t>(&joinDist),
-            "requests detection join distance.")
+        ("dt", po::value<double>(&dt)->default_value(1),
+            "time interval between adjacent measurements (in seconds).")
+        ("quiet-period", po::value<size_t>(&quietPeriod)->default_value(5),
+            "estimation of minimal number of requests.")
+        ("requests-detection-alpha", 
+            po::value<double>(&requestsDetectionAlpha)->default_value(0.8),
+            "request detection hypothesis confident level.")
+        ("start-N", po::value<double>(&startN)->default_value(60),
+            "initial estimation of m_c in per-coordinate descend.")
+        ("start-Lc", po::value<double>(&startLc)->default_value(0.2),
+            "initial estimation of l_c in per-coordinate descend.")
+        ("start-step-N", po::value<double>(&startStepN)->default_value(10),
+            "initial descend step for m_c in per-coordinate descend.")
+        ("start-step-Lc", po::value<double>(&startStepLc)->default_value(0.05),
+            "initial descend step for l_c in per-coordinate descend.")
         ;
     po::positional_options_description posOptDesc;
     posOptDesc
         .add("load-file-name", 1)
-        .add("dt", 1)
-        .add("var-series-pick-part", 1)
-        .add("join-dist", 1)
         ;
 
     po::variables_map vm;
@@ -546,9 +553,6 @@ int main( int argc, char *argv[] )
 
     bool const haveRequiredOptions = 
         vm.count("load-file-name") && 
-        vm.count("dt") &&
-        vm.count("var-series-pick-part") &&
-        vm.count("join-dist") &&
         true;
 
     if (vm.count("help") || !haveRequiredOptions)
@@ -590,7 +594,8 @@ int main( int argc, char *argv[] )
   }
 
   // Run estimation.
-  estimate(measurements, dt);
+  estimate(measurements, dt, quietPeriod, requestsDetectionAlpha, 
+      startN, startLc, startStepN, startStepLc);
 
   return 0;
 }

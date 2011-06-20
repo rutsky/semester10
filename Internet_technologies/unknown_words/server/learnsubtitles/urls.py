@@ -17,9 +17,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django.conf.urls.defaults import *
-from django.shortcuts import render_to_response
 
-def home(request):
-    return render_to_response('home.html', {})
+from . import views
+
+urlpatterns = patterns('',
+    (r'^$', views.home),
+)
 
 # vim: ts=4 sw=4 et:

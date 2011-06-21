@@ -53,6 +53,10 @@ TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'templates'),)
 
 ROOT_URLCONF = 'urls'
 
+GAE_SETTINGS_MODULES = (
+    'gae_admin_settings',
+)
+
 if on_production_server:
     DEBUG = False
 else:

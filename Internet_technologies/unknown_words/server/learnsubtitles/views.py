@@ -20,6 +20,6 @@ from django.conf.urls.defaults import *
 from django.shortcuts import render_to_response
 
 def home(request):
-    return render_to_response('home.html', {})
+    return render_to_response('learnsubtitles/home.html', {})
 
 # vim: ts=4 sw=4 et:

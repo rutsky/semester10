@@ -1,1 +1,2 @@
  * /favicon.ico
+ * Make my name email-clickable.

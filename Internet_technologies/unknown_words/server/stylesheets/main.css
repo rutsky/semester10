@@ -32,7 +32,7 @@ html, body {
 }
 
 #header {
-  background: #929292;
+  background: #ddd;
   height: 80px;
   width: 100%;
   display: table;
@@ -54,7 +54,7 @@ html, body {
   bottom: 0;
   height: 55px; /* height of the footer */
   width: 100%;
-  background: #929292;
+  background: #ddd;
 }
 
 #footer-wrapper {

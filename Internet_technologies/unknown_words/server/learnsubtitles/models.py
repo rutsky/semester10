@@ -19,7 +19,8 @@
 from django.db import models
 
 class CategoryNode(models.Model):
-    parent = models.ForeignKey('self', related_name='children')
+    parent = models.ForeignKey('self', related_name='children', blank=True, 
+            null=True)
     name = models.CharField(max_length=300)
 
 class Episode(models.Model):

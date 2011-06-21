@@ -20,9 +20,15 @@ from django.db import models
 
 class CategoryNode(models.Model):
     parent = models.ForeignKey('self', related_name='children')
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=300)
 
 class Episode(models.Model):
     category = models.ForeignKey(CategoryName, related_name='episodes')
+    
+    name = models.CharField(max_length=300)
+    description = models.TextField()
+    
+    subtitles = model.TextField()
+    # TODO: Dictionaty etc.
 
 # vim: ts=4 sw=4 et:

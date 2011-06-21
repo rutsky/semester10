@@ -1,5 +1,5 @@
 #  This file is part of simple web site for learning unknown words from 
-#  movie's subtitles.
+#  serials subtitles.
 #
 #  Copyright (C) 2011  Vladimir Rutsky <altsysrq@gmail.com>
 #

@@ -1,4 +1,4 @@
-Simple web site for learning unknown words from movies subtitles.
+Simple web site for learning unknown words from serials subtitles.
 This is the course project for Internet technologies lessons in university.
 
 Copyright (C) 2011  Vladimir Rutsky <altsysrq@gmail.com>

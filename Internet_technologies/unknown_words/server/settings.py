@@ -5,6 +5,8 @@ from djangoappengine.settings_base import *
 
 import os
 
+from djangoappengine.utils import on_production_server, have_appserver
+
 # Activate django-dbindexer for the default database
 DATABASES['native'] = DATABASES['default']
 DATABASES['default'] = {'ENGINE': 'dbindexer', 'TARGET': 'native'}
@@ -51,5 +53,9 @@ TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'templates'),)
 
 ROOT_URLCONF = 'urls'
 
-# TODO: disable in production
-DEBUG = True
+if on_production_server:
+    DEBUG = False
+else:
+    DEBUG = True
+
+# vim: ts=4 sw=4 et:

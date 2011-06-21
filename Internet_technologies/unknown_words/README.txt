@@ -16,5 +16,6 @@ To setup local development environment:
     APP_ENGINE_SDK environment variable to unzip destination directory.
 
 To deploy:
- 1. Change in app.yaml application name (`application: ...').
+ 1. Change in app.yaml application name (`application: ...') to you 
+    application name registered at <https://appengine.google.com/start>.
  2. $ ./manage.py deploy

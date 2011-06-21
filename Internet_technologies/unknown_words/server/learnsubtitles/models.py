@@ -23,6 +23,9 @@ class CategoryNode(models.Model):
             null=True)
     name = models.CharField(max_length=300)
 
+    def __unicode__(self):
+        return self.name
+
 class Episode(models.Model):
     category = models.ForeignKey(CategoryNode, related_name='episodes')
     
@@ -31,5 +34,8 @@ class Episode(models.Model):
     
     subtitles = models.TextField()
     # TODO: Dictionaty etc.
+
+    def __unicode__(self):
+        return self.name
 
 # vim: ts=4 sw=4 et:

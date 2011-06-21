@@ -23,12 +23,12 @@ class CategoryNode(models.Model):
     name = models.CharField(max_length=300)
 
 class Episode(models.Model):
-    category = models.ForeignKey(CategoryName, related_name='episodes')
+    category = models.ForeignKey(CategoryNode, related_name='episodes')
     
     name = models.CharField(max_length=300)
     description = models.TextField()
     
-    subtitles = model.TextField()
+    subtitles = models.TextField()
     # TODO: Dictionaty etc.
 
 # vim: ts=4 sw=4 et:

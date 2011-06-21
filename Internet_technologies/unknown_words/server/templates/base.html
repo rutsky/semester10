@@ -3,6 +3,8 @@
   <head>
     <title>{% block title %}{% endblock %} - Learn Subtitles</title>
 
+    <link rel="stylesheet" type="text/css" href="/stylesheets/main.css">
+
     {% block css %}
     {% endblock %}
 
@@ -13,41 +15,44 @@
   </head>
 
   <body>
-    <div id="header">
-      {% block header %}
-      {% endblock %}
-    </div>
+    <div id="page-container">
+      <div id="header">
+        {% block header %}
+        {% endblock %}
+      </div>
 
-    <div id="content">
-      {% block content %}
-      {% endblock %}
-    </div>
+      <div id="content">
+        {% block content %}
+        {% endblock %}
+      </div>
 
-    <div id="footer">
-      <div id="footer-wrapper">
-        <div id="icons">
-          <div><a href="http://www.allbuttonspressed.com/projects/django-nonrel"><img 
-              src="/images/django-nonrel.png" 
-              border="0" 
-              alt="Made with Django-nonrel." 
-              title="Made with Django-nonrel."></a></div><!--
+      <div id="footer">
+        <div id="footer-wrapper">
+          <div id="copyright"><p>Copyright&nbsp;&copy;&nbsp;Vladimir&nbsp;Rutsky,&nbsp;2011<p></div>
+          <div id="width100p"></div>
+          <div id="icons">
+            <div><a href="http://www.allbuttonspressed.com/projects/django-nonrel"><img 
+                src="/images/django-nonrel.png" 
+                border="0" 
+                alt="Made with Django-nonrel." 
+                title="Made with Django-nonrel."></a></div><!--
 
-       --><div><a href="http://code.google.com/appengine/"><img 
-              style="border:0;width:120px;height:30px"
-              src="http://code.google.com/appengine/images/appengine-noborder-120x30.gif"
-              alt="Powered by Google App Engine"></a></div><!--
+         --><div><a href="http://code.google.com/appengine/"><img 
+                style="border:0;width:120px;height:30px"
+                src="http://code.google.com/appengine/images/appengine-noborder-120x30.gif"
+                alt="Powered by Google App Engine"></a></div><!--
 
-       --><div><a href="http://jigsaw.w3.org/css-validator/check/referer"><img
-              style="border:0;width:88px;height:31px"
-              src="http://jigsaw.w3.org/css-validator/images/vcss-blue"
-              alt="Valid CSS!"></a></div><!--
+         --><div><a href="http://jigsaw.w3.org/css-validator/check/referer"><img
+                style="border:0;width:88px;height:31px"
+                src="http://jigsaw.w3.org/css-validator/images/vcss-blue"
+                alt="Valid CSS!"></a></div><!--
 
-       --><div><a href="http://validator.w3.org/check?uri=referer"><img 
-              style="border:0;width:88px;height:31px"
-              src="/images/valid_html5.png"></a></div>
+         --><div><a href="http://validator.w3.org/check?uri=referer"><img 
+                style="border:0;width:88px;height:31px"
+                src="/images/valid_html5.png"></a></div>
+          </div>
         </div>
       </div>
-      <div id="copyright"><p>Copyright&nbsp;&copy;&nbsp;Vladimir&nbsp;Rutsky,&nbsp;2011<p></div>
     </div>
   </body>
 </html>

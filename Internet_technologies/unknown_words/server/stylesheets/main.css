@@ -1,0 +1,94 @@
+/*
+ *  This file is part of simple web site for learning unknown words from
+ *  movie's subtitles.
+ *
+ *  Copyright (C) 2011  Vladimir Rutsky <altsysrq@gmail.com>
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: arial, sans-serif;
+}
+
+#page-container {
+  min-height: 100%;
+  position: relative;
+  /*overflow: hidden;*/
+}
+
+#header {
+  background: #929292;
+  height: 80px;
+  width: 100%;
+  display: table;
+}
+
+#header > div {
+  display: table-cell;
+  padding: 15px;
+  vertical-align: middle;
+}
+
+#content {
+  padding: 10px;
+  padding-bottom: 65px; /* height of the footer + container padding */
+}
+
+#footer {
+  position: absolute;
+  bottom: 0;
+  height: 55px; /* height of the footer */
+  width: 100%;
+  background: #929292;
+}
+
+#footer-wrapper {
+  width: 100%;
+  height: 55px; /* height of the footer */
+  display: table;
+}
+
+#footer-wrapper > div,
+#footer-wrapper > div > div {
+  display: table-cell;
+  vertical-align: middle;
+  padding-left: 10px;
+  padding-right: 10px;
+  text-align: right;  
+}
+
+#width100p {
+  width: 100%;
+}
+
+#icons {
+  /*float: left;*/
+}
+
+#icons > div {
+}
+
+#copyright {
+  float: left;
+}
+
+img {
+  border: 0;
+}
+
+/* vim: set ts=2 sw=2 et: */

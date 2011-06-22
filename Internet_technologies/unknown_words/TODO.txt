@@ -1,3 +1,4 @@
  * /favicon.ico
  * Make my name email-clickable.
  * Fill initial database data (like root serial category) on reinstall.
+ * Add robots.txt.

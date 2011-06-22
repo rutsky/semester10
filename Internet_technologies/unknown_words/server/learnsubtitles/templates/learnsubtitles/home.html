@@ -1,8 +1,11 @@
 {% extends 'base.html' %}
+
+{% load learnsubtitles %}
+
 {% block title %}It works!{% endblock %}
 
 {% block content %}
-{% include 'learnsubtitles/tree.html' %}
+{% category_tree root_category %}
 
 <h1>It works!</h1>
 <p>

@@ -1,0 +1,9 @@
+{% load learnsubtitles %}
+<ul>
+{% for child in children %}
+  <li>{{ child }}</li>
+  {% if child.children.count > 0 %}
+  {% category_tree child %}
+  {% endif %}
+{% endfor %}
+</ul>

@@ -16,14 +16,13 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from django.conf.urls.defaults import *
-from django.shortcuts import render_to_response
+from django import template
 
-from .models import CategoryNode
+register = template.Library()
 
-def home(request):
-    root_category = CategoryNode.objects.get(name="root")
-    return render_to_response('learnsubtitles/home.html', 
-        { 'root_category' : root_category })
+@register.inclusion_tag('learnsubtitles/category_item.html')
+def category_tree(category):
+    children = category.children.all()
+    return {'children': children}
 
 # vim: ts=4 sw=4 et:

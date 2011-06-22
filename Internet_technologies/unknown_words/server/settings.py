@@ -58,7 +58,9 @@ GAE_SETTINGS_MODULES = (
 )
 
 if on_production_server:
-    DEBUG = False
+    #DEBUG = False
+    # TODO:
+    DEBUG = True
 else:
     DEBUG = True
 

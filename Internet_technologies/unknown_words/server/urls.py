@@ -7,7 +7,7 @@ urlpatterns = patterns('',
     (r'^admin/', include('urlsadmin')),
 #    ('^$', 'django.views.generic.simple.direct_to_template',
 #     {'template': 'home.html'}),
-    (r'^$', include('learnsubtitles.urls'))
+    (r'^', include('learnsubtitles.urls'))
 )
 
 # vim: ts=4 sw=4 et:

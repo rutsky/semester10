@@ -4,8 +4,25 @@
 
 {% block title %}It works!{% endblock %}
 
+{% block preload_js %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    // Setup tree.
+    $("#categories_tree")
+      .jstree({
+        core: {},
+        plugins: ["themes", "html_data"],
+      });
+  });
+</script>
+{% endblock %}
+
 {% block content %}
+<div id="categories_tree">
+<ul>
 {% category_tree root_category %}
+</ul>
+</div>
 
 <h1>It works!</h1>
 <p>
@@ -45,3 +62,6 @@ If you search for reusable apps that work with Django-nonrel here's a list to ge
 Finally, take a look at the apps listed on <a href="http://djangopackages.com/">Django Packages</a>. Many simple Django apps (e.g., <a href="https://bitbucket.org/ubernostrum/django-registration">django-registration</a>) should work unmodified. If you want to use <a href="http://robhudson.github.com/django-debug-toolbar/">django-debug-toolbar</a> you need to disable the SQLDebugPanel in your settings.
 </p>
 {% endblock %}
+{% comment %}
+vim: ts=2 sw=2 et:
+{% endcomment %}

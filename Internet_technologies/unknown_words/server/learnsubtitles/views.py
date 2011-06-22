@@ -18,6 +18,8 @@
 
 from django.conf.urls.defaults import *
 from django.shortcuts import render_to_response
+from django.http import HttpResponse
+from django.utils import simplejson
 
 from .models import CategoryNode
 
@@ -25,5 +27,23 @@ def home(request):
     root_category = CategoryNode.objects.get(name="root")
     return render_to_response('learnsubtitles/home.html', 
         { 'root_category' : root_category })
+
+def _process_XMLHTTPRequest(request, data):
+    print data
+    return data
+
+def XMLHTTPRequest_handler(request):
+    if request.is_ajax() and request.method == 'POST' and \
+            'data' in request.POST:
+        try:
+            input_data = simplejson.loads(request.POST['data'])
+        except ValueError:
+            return HttpResponse(status=400)
+        
+        data = _process_XMLHTTPRequest(request, input_data)
+        serialized_data = simplejson.dumps(data)
+        return HttpResponse(serialized_data, 'application/javascript')
+    else:
+        return HttpResponse(status=400)
 
 # vim: ts=4 sw=4 et:

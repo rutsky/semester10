@@ -22,6 +22,7 @@ from . import views
 
 urlpatterns = patterns('',
     (r'^$', views.home),
+    (r'^xhr$', views.XMLHTTPRequest_handler)
 )
 
 # vim: ts=4 sw=4 et:

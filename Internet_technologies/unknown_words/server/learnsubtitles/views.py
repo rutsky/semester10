@@ -19,7 +19,11 @@
 from django.conf.urls.defaults import *
 from django.shortcuts import render_to_response
 
+from .models import CategoryNode
+
 def home(request):
-    return render_to_response('learnsubtitles/home.html', {})
+    root_categories = CategoryNode.objects.filter(parent=None)
+    return render_to_response('learnsubtitles/home.html', 
+        { 'root_categories' : root_categories })
 
 # vim: ts=4 sw=4 et:

@@ -4,7 +4,8 @@
 
 {% block description %}
 
-{{ category }}
+<h1>{{ category }}</h1>
+<p>{{ category.description|default_if_none:"No description available." }}</p>
 
 {% endblock %}
 {% comment %}

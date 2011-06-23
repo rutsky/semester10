@@ -26,6 +26,20 @@ class CategoryNode(models.Model):
     def __unicode__(self):
         return self.name
 
+    def path(self):
+        """Returns path to current category: list of categories from root to
+        current category, starting with first non-root parent and ending with 
+        category himself (for root category it is empty list).
+        """
+        path = []
+        p = self
+        while p.name != "root":
+            path.append(p)
+            p = p.parent
+        path.reverse()
+
+        return path
+
 class Episode(models.Model):
     category = models.ForeignKey(CategoryNode, related_name='episodes')
     
@@ -37,5 +51,36 @@ class Episode(models.Model):
 
     def __unicode__(self):
         return self.name
+
+def root_category():
+    return CategoryNode.objects.get(name="root")
+
+def category_by_path(path):
+    """Find category by path to it.
+    If category with provided path doesn't exists returns None.
+    """
+    category = root_category()
+    for item in path:
+        try:
+            child = category.children.get(name=item)
+        except CategoryNode.DoesNotExist:
+            return None
+        category = child
+    return category
+
+def episode_by_path(path):
+    """Find episode by path to it.
+    If episode with provided path doesn't exists returns None.
+    """
+    assert len(path) >= 1
+
+    category = category_by_path(path[:-1])
+    if category is None:
+        return None
+
+    try:
+        return category.episodes.get(name=path[-1])
+    except Episode.DoesNotExist:
+        return None
 
 # vim: ts=4 sw=4 et:

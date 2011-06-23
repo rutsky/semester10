@@ -29,6 +29,7 @@ def category_tree(category):
     """Prepares context for displaying single category children nodes 
     template."""
 
+    # TODO: May be sort them?
     children = category.children.all()
     category_path = [_quote_name(cat.name) for cat in category.path()]
     children_data = [
@@ -43,6 +44,7 @@ def episodes_list(category):
     """Prepares context for displaying single category episodes list
     template."""
 
+    # TODO: May be sort them?
     episodes = category.episodes.all()
     category_path = [_quote_name(cat.name) for cat in category.path()]
     episodes_data = [

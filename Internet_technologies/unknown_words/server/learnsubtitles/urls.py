@@ -18,12 +18,15 @@
 
 
 from django.conf.urls.defaults import *
+from django.contrib.auth.views import login, logout
 
 urlpatterns = patterns('learnsubtitles.views',
-    (r'^$',             'home'),
-    (r'^cat/$',         'category_tree_node'),
-    (r'^cat/(.*)/$',    'category_tree_node'),
-    (r'^xhr$',          'XMLHTTPRequest_handler'),
+    (r'^$',                 'home'),
+    (r'^cat/$',             'category_tree_node'),
+    (r'^cat/(.*)/$',        'category_tree_node'),
+    (r'^accounts/login/$',  login),
+    (r'^accounts/logout/$', logout),
+    (r'^xhr$',              'XMLHTTPRequest_handler'),
 )
 
 # vim: ts=4 sw=4 et:

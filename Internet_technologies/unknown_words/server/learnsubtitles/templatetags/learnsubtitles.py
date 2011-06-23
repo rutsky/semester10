@@ -23,7 +23,8 @@ register = template.Library()
 
 @register.inclusion_tag('learnsubtitles/category_item.html')
 def category_tree(category):
-    children = category.children.all()
+    children = list(category.children.all())
+    children.extend(list(category.episodes.all()))
 
     path = []
     p = category
@@ -36,6 +37,7 @@ def category_tree(category):
     if path_str:
         path_str = path_str + '/'
 
+    # Returns context for `category_item.html' template.
     return { 'children': children, 'path_url': path_str }
 
 # vim: ts=4 sw=4 et:

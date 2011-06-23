@@ -21,23 +21,34 @@ from django.utils.http import urlquote
 
 register = template.Library()
 
+def _quote_name(name):
+    return urlquote(name, safe="")
+
 @register.inclusion_tag('learnsubtitles/category_item.html')
 def category_tree(category):
-    children = list(category.children.all())
-    children.extend(list(category.episodes.all()))
+    """Prepares context for displaying single category children nodes 
+    template."""
 
-    path = []
-    p = category
-    while p.name != "root":
-        path.append(p.name)
-        p = p.parent
-    path.reverse()
-
-    path_str = '/'.join(map(lambda x: urlquote(x, safe=""), path))
-    if path_str:
-        path_str = path_str + '/'
+    children = category.children.all()
+    category_path = [_quote_name(cat.name) for cat in category.path()]
+    children_data = [
+        (child, '/'.join(category_path + [_quote_name(child.name)]))
+            for child in children]
 
     # Returns context for `category_item.html' template.
-    return { 'children': children, 'path_url': path_str }
+    return { 'children': children_data }
+
+@register.inclusion_tag('learnsubtitles/episodes_list.html')
+def episodes_list(category):
+    """Prepares context for displaying single category episodes list
+    template."""
+
+    episodes = category.episodes.all()
+    category_path = [_quote_name(cat.name) for cat in category.path()]
+    episodes_data = [
+        (episode, '/'.join(category_path + [_quote_name(episode.name)]))
+            for episode in episodes]
+
+    return { 'episodes': episodes_data }
 
 # vim: ts=4 sw=4 et:

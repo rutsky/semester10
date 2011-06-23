@@ -1,0 +1,4 @@
+{% load learnsubtitles %}
+{% for episode, path in episodes %}
+  <li id="{{ episode.id }}"><a id="{{ episode.id }}_link" href="{% url learnsubtitles.views.category_tree_node path %}">{{ episode.name }}</a></li>
+{% endfor %}

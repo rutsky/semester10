@@ -1,9 +1,14 @@
 {% load learnsubtitles %}
-{% for child in children %}
-  <li id="{{ child.id }}"><a id="{{ child.id }}_link" href="{% url learnsubtitles.views.category %}{{ path_url|safe }}{{ child|urlencode }}/">{{ child }}</a>
-  {% if child.children.count > 0 or child.episodes.count > 0 %}
+{% for child, path in children %}
+  <li id="{{ child.id }}"><a id="{{ child.id }}_link" href="{% url learnsubtitles.views.category_tree_node path %}">{{ child.name }}</a>
+  {% if child.children.count > 0 %}
     <ul>
     {% category_tree child %}
+    </ul>
+  {% endif %}
+  {% if child.episodes.count > 0 %}
+    <ul>
+    {% episodes_list child %}
     </ul>
   {% endif %}
   </li>

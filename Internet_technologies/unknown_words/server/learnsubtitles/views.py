@@ -21,7 +21,8 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponse, Http404
 from django.utils import simplejson
 
-from .models import CategoryNode
+from .models import CategoryNode, category_by_path, episode_by_path, \
+    root_category
 
 def home(request):
     root_category = CategoryNode.objects.get(name="root")
@@ -46,22 +47,24 @@ def XMLHTTPRequest_handler(request):
     else:
         return HttpResponse(status=400)
 
-def category(request, cat=None):
-    root_category = CategoryNode.objects.get(name="root")
-    category = root_category
+def category_tree_node(request, path_str=None):
+    context = {'root_category': root_category()}
 
-    if cat is not None:
-        path = filter(None, cat.split('/'))
+    if path_str is not None:
+        path = filter(None, path_str.split('/'))
 
-        for cat_name in path:
-            try:
-                ch = category.children.get(name=cat_name)
-            except CategoryNode.DoesNotExist:
-                raise Http404
-            category = ch
+        episode = episode_by_path(path)
+        if episode is not None:
+            context.update({'episode': episode})
+            return render_to_response('learnsubtitles/episode.html', context)
+        
+        category = category_by_path(path)
+        if path is not None:
+            context.update({'category': category})
+            return render_to_response('learnsubtitles/category.html', context)
 
-    return render_to_response('learnsubtitles/category.html', 
-        { 'root_category': root_category, 
-          'category': category })
+        raise Http404
+    else:
+        return render_to_response('learnsubtitles/home.html', context)
 
 # vim: ts=4 sw=4 et:

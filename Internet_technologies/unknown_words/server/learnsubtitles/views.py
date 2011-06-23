@@ -53,12 +53,7 @@ def category(request, cat=None):
     if cat is not None:
         path = filter(None, cat.split('/'))
 
-        # DEBUG
-        import sys
-        print >>sys.stderr, path
-
         for cat_name in path:
-            print >>sys.stderr, category.children.all() # DEBUG
             try:
                 ch = category.children.get(name=cat_name)
             except CategoryNode.DoesNotExist:

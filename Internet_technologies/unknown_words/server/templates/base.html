@@ -19,14 +19,14 @@
   <body>
     <div id="page-container">
       <div id="header">
-        <span>{% block header %}{% endblock %}</span>
-        <span>
+        <div>{% block header %}{% endblock %}</div>
+        <div id="auth">
         {% if user.is_authenticated %}
           Welcome, {{ user.username }}! <a href="{% url django.contrib.auth.views.logout %}">logout</a>
         {% else %}
           <a href="{% url django.contrib.auth.views.login %}">login</a>
         {% endif %}
-        </span>
+        </div>
       </div>
 
       <div id="content">

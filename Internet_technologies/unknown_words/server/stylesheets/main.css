@@ -44,6 +44,11 @@ html, body {
   vertical-align: middle;
 }
 
+#auth {
+  width: 200px;
+  text-align: right;
+}
+
 #content {
   padding: 10px;
   padding-bottom: 65px; /* height of the footer + container padding */

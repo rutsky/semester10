@@ -17,12 +17,24 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from django import template
+from django.utils.http import urlquote
 
 register = template.Library()
 
 @register.inclusion_tag('learnsubtitles/category_item.html')
 def category_tree(category):
     children = category.children.all()
-    return {'children': children}
+
+    path = []
+    p = category
+    while p.name != "root":
+        path.append(p.name)
+        p = p.parent
+
+    path_str = '/' + '/'.join(map(lambda x: urlquote(x, safe=""), path))
+    if path_str != '/':
+        path_str = path_str + '/'
+
+    return { 'children': children, 'path_url': path_str }
 
 # vim: ts=4 sw=4 et:

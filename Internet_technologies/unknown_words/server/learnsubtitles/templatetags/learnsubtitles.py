@@ -30,6 +30,7 @@ def category_tree(category):
     while p.name != "root":
         path.append(p.name)
         p = p.parent
+    path.reverse()
 
     path_str = '/'.join(map(lambda x: urlquote(x, safe=""), path))
     if path_str:

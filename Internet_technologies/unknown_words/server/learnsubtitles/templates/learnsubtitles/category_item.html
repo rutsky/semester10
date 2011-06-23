@@ -1,6 +1,6 @@
 {% load learnsubtitles %}
 {% for child in children %}
-  <li id="{{ child.id }}"><a href="{% url learnsubtitles.views.category %}{{ path_url|safe }}{{ child|urlencode }}/" onclick="return false;">{{ child }}</a>
+  <li id="{{ child.id }}"><a id="{{ child.id }}_link" href="{% url learnsubtitles.views.category %}{{ path_url|safe }}{{ child|urlencode }}/">{{ child }}</a>
   {% if child.children.count > 0 %}
     <ul>
     {% category_tree child %}

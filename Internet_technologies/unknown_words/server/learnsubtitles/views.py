@@ -18,7 +18,7 @@
 
 from django.conf.urls.defaults import *
 from django.shortcuts import render_to_response
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.utils import simplejson
 
 from .models import CategoryNode
@@ -46,16 +46,27 @@ def XMLHTTPRequest_handler(request):
     else:
         return HttpResponse(status=400)
 
-def category(request, cat):
-    path = filter(None, cat.split('/'))
-
+def category(request, cat=None):
     root_category = CategoryNode.objects.get(name="root")
-    
-    #category = root_category
-    #for cat_name in path:
-    #    if category.children
+    category = root_category
+
+    if cat is not None:
+        path = filter(None, cat.split('/'))
+
+        # DEBUG
+        import sys
+        print >>sys.stderr, path
+
+        for cat_name in path:
+            print >>sys.stderr, category.children.all() # DEBUG
+            try:
+                ch = category.children.get(name=cat_name)
+            except CategoryNode.DoesNotExist:
+                raise Http404
+            category = ch
 
     return render_to_response('learnsubtitles/category.html', 
-        { 'root_category' : root_category })
+        { 'root_category': root_category, 
+          'category': category })
 
 # vim: ts=4 sw=4 et:

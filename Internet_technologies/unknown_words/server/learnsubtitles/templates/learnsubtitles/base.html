@@ -12,12 +12,19 @@
       .jstree({
         "plugins": ["themes", "html_data", "ui", "cookies"],
         "core": {},
+        "cookies": {
+            "save_selected": false,
+          },
         "themes": {
             "icons": false,
           },
         "ui": {
             "select_limit": 1,
           },
+      })
+      .bind("select_node.jstree", function( event, data ) {
+        var id = data.rslt.obj.attr("id");
+        window.location = $("#" + id + "_link").attr("href");
       });
 
     // Disable tree links (since JavaScript works).

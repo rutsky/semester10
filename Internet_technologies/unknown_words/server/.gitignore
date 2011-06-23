@@ -5,3 +5,4 @@
 /djangotoolbox
 /.gaedata
 *.pyc
+secret.py

@@ -1,35 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'learnsubtitles/base.html' %}
 
-{% load learnsubtitles %}
+{% block title %}Main{% endblock %}
 
-{% block title %}It works!{% endblock %}
 
-{% block preload_js %}
-<script type="text/javascript">
-  $(document).ready(function() {
-    // Setup tree.
-    $("#categories_tree")
-      .jstree({
-        "plugins": ["themes", "html_data", "ui", "cookies"],
-        "core": {},
-        "themes": {
-            "icons": false,
-          },
-        "ui": {
-            "select_limit": 1,
-          },
-      });
-  });
-</script>
-{% endblock %}
-
-{% block content %}
-<div id="categories_tree">
-<ul>
-{% category_tree root_category %}
-</ul>
-</div>
-
+{% block description %}
 <h1>It works!</h1>
 <p>
 Your Django-nonrel installation is working fine.

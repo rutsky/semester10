@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% load learnsubtitles %}
+
+{% block title %}It works!{% endblock %}
+
+{% block preload_js %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    // Setup tree.
+    $("#categories_tree")
+      .jstree({
+        "plugins": ["themes", "html_data", "ui", "cookies"],
+        "core": {},
+        "themes": {
+            "icons": false,
+          },
+        "ui": {
+            "select_limit": 1,
+          },
+      });
+
+    // Disable tree links (since JavaScript works).
+    $("#category_tree a").each(function( elem ) {
+      
+    })
+  });
+</script>
+{% endblock %}
+
+{% block content %}
+<div id="categories_tree">
+<ul>
+{% category_tree root_category %}
+</ul>
+</div>
+
+{% block description %}
+{% endblock %}
+
+{% endblock %}
+{% comment %}
+vim: ts=2 sw=2 et:
+{% endcomment %}

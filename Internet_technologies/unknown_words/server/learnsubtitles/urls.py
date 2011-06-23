@@ -16,13 +16,16 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 from django.conf.urls.defaults import *
 
 from . import views
 
 urlpatterns = patterns('',
     (r'^$', views.home),
-    (r'^xhr$', views.XMLHTTPRequest_handler)
+    (r'^xhr$', views.XMLHTTPRequest_handler),
+    (r'^cat/$', views.category),
+    (r'^cat/(.*)/$', views.category),
 )
 
 # vim: ts=4 sw=4 et:

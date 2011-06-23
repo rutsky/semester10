@@ -46,4 +46,16 @@ def XMLHTTPRequest_handler(request):
     else:
         return HttpResponse(status=400)
 
+def category(request, cat):
+    path = filter(None, cat.split('/'))
+
+    root_category = CategoryNode.objects.get(name="root")
+    
+    #category = root_category
+    #for cat_name in path:
+    #    if category.children
+
+    return render_to_response('learnsubtitles/category.html', 
+        { 'root_category' : root_category })
+
 # vim: ts=4 sw=4 et:

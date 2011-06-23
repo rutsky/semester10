@@ -31,8 +31,8 @@ def category_tree(category):
         path.append(p.name)
         p = p.parent
 
-    path_str = '/' + '/'.join(map(lambda x: urlquote(x, safe=""), path))
-    if path_str != '/':
+    path_str = '/'.join(map(lambda x: urlquote(x, safe=""), path))
+    if path_str:
         path_str = path_str + '/'
 
     return { 'children': children, 'path_url': path_str }

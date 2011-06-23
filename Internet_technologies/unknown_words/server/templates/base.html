@@ -5,16 +5,13 @@
     <title>{% block title %}{% endblock %} - Learn Subtitles</title>
 
     <link rel="stylesheet" type="text/css" href="/stylesheets/main.css">
+    {% block css %}{% endblock %}
+
     <script type="text/javascript" src="/javascript/jquery-1.6.1.min.js"></script>
     <script type="text/javascript" src="/javascript/jquery.cookie.js"></script>
     <!-- TODO: Move to learnsubtitles application? -->
     <script type="text/javascript" src="/javascript/jstree/jquery.jstree.js"></script>
-
-    {% block css %}
-    {% endblock %}
-
-    {% block preload_js %}
-    {% endblock %}
+    {% block preload_js %}{% endblock %}
 
     {% block extra-head %}{% endblock %}
   </head>

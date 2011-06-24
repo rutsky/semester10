@@ -2,17 +2,50 @@
 
 {% block title %}Episode{% endblock %}
 
+{% block extra-head %}
+<script type="text/javascript">
+  $(function() {
+    $("#words").change(function() {
+      $('option', this).each(function() {
+        var opt = $(this), val = opt.val();            
+        if (opt.is(":selected"))
+        {
+          $("#translation_" + val).show()
+        }
+        else 
+        {
+          $("#translation_" + val).hide();
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}
+
 {% block description %}
 
 <h1>{{ episode.name }}</h1>
 <p>{{ episode.description|default_if_none:"No description available." }}</p>
 
-{% if episode.dictionary %}
-  <select size="10">
-  {% for word in episode.dictionary.words.all %}
-    <option>{{ word.name }}</option>
+{% if words %}
+<table border="0">
+<tr>
+  <td valign="top">
+  <select id="words" size="10">
+  {% for word, transl in words %}
+    <option value="{{ forloop.counter }}">{{ word }}</option>
   {% endfor %}
   </select>
+  </td>
+  <td valign="top">
+  <div id="translation">
+  {% for word, transl in words %}
+    <div id="translation_{{ forloop.counter }}" style="display:none"><pre>{{ transl }}</pre></div>
+  {% endfor %}
+  </div>
+  </td>
+</tr>
+</table>
 {% endif %}
 
 {% endblock %}

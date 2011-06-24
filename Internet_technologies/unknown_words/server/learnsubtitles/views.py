@@ -25,6 +25,8 @@ from django.template import RequestContext
 from .models import CategoryNode, category_by_path, episode_by_path, \
     root_category
 
+import dictionary
+
 def home(request):
     root_category = CategoryNode.objects.get(name="root")
     return render_to_response('learnsubtitles/home.html', 
@@ -60,7 +62,16 @@ def category_tree_node(request, path_str=None):
             # DEBUG
             #episode.rebuild_dictionary()
 
+            words = None
+            if episode.dictionary is not None:
+                words = []
+                for word in list(episode.dictionary.words.all()):
+                    transl = dictionary.en2ru.get(word.name,
+                        'No translation. Sorry.')
+                    words.append((word.name, transl))
+
             context.update({'episode': episode})
+            context.update({'words': words})
             return render_to_response('learnsubtitles/episode.html', context,
                 context_instance=RequestContext(request))
         

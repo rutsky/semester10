@@ -18,9 +18,11 @@
 
 from django.contrib import admin
 
-from .models import CategoryNode, Episode
+from .models import CategoryNode, Dictionary, Word, Episode
 
 admin.site.register(CategoryNode)
+admin.site.register(Dictionary)
+admin.site.register(Word)
 admin.site.register(Episode)
 
 # vim: ts=4 sw=4 et:

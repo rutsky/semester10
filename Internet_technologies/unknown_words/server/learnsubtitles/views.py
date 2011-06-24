@@ -57,6 +57,9 @@ def category_tree_node(request, path_str=None):
 
         episode = episode_by_path(path)
         if episode is not None:
+            # DEBUG
+            #episode.rebuild_dictionary()
+
             context.update({'episode': episode})
             return render_to_response('learnsubtitles/episode.html', context,
                 context_instance=RequestContext(request))

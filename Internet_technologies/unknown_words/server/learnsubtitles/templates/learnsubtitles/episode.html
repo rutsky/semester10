@@ -7,6 +7,14 @@
 <h1>{{ episode.name }}</h1>
 <p>{{ episode.description|default_if_none:"No description available." }}</p>
 
+{% if episode.dictionary %}
+  <select size="10">
+  {% for word in episode.dictionary.words.all %}
+    <option>{{ word.name }}</option>
+  {% endfor %}
+  </select>
+{% endif %}
+
 {% endblock %}
 {% comment %}
 vim: ts=2 sw=2 et:

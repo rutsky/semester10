@@ -32,7 +32,17 @@ indexes:
   - name: __key__
     direction: desc
 
+- kind: learnsubtitles_dictionary
+  properties:
+  - name: __key__
+    direction: desc
+
 - kind: learnsubtitles_episode
+  properties:
+  - name: __key__
+    direction: desc
+
+- kind: learnsubtitles_word
   properties:
   - name: __key__
     direction: desc

@@ -44,7 +44,11 @@ class CategoryNode(models.Model):
         return "/" + "/".join(map(lambda x: x.name, self.path()))
 
 class Dictionary(models.Model):
-    pass
+    # DEBUG
+    test = models.CharField()
+
+    def __unicode__(self):
+        return "Dictionary #" + str(self.id)
 
 class Word(models.Model):
     dictionary = models.ForeignKey(Dictionary, related_name='words')
@@ -60,6 +64,7 @@ def _extract_dictionary(subtitles):
     s = re.sub(r"[^A-Za-z-]", " ", s)
     l = s.split(" ")
     l = filter(None, l)
+    l = filter(lambda x: len(x) >= 3, l)
     return set(l)
 
 class Episode(models.Model):
@@ -82,7 +87,7 @@ class Episode(models.Model):
             self.dictionary.delete()
 
             self.dictionary = None
-            self.dictionary.save()
+            self.save()
 
         # Fill dictionary if have subtitles.
         if self.subtitles is not None:
@@ -91,6 +96,7 @@ class Episode(models.Model):
             # Create new dictionary.
             self.dictionary = Dictionary()
             self.dictionary.save()
+            self.save()
 
             for word in words:
                 w = Word(name=word, dictionary=self.dictionary)

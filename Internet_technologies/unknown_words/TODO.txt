@@ -3,3 +3,4 @@
  * Fill initial database data (like root serial category) on reinstall.
  * Add robots.txt.
  * Security: GET logout!
+ * Make requests to dictionary throught AJAX and database!

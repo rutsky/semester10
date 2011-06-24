@@ -45,7 +45,7 @@ class CategoryNode(models.Model):
 
 class Dictionary(models.Model):
     # DEBUG
-    test = models.CharField()
+    test = models.CharField(max_length=200)
 
     def __unicode__(self):
         return "Dictionary #" + str(self.id)

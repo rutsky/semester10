@@ -4,7 +4,8 @@
 
 {% block description %}
 
-<h1>{{ episode }}</h1>
+<h1>{{ episode.name }}</h1>
+<p>{{ episode.description|default_if_none:"No description available." }}</p>
 
 {% endblock %}
 {% comment %}

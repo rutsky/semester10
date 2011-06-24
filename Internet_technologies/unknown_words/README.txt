@@ -18,4 +18,5 @@ To setup local development environment:
 To deploy:
  1. Change in app.yaml application name (`application: ...') to you 
     application name registered at <https://appengine.google.com/start>.
- 2. $ ./manage.py deploy
+ 2. Create custom server/secret.py (see server/secret.py.example for example).
+ 3. $ ./manage.py deploy

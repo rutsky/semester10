@@ -16,6 +16,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import re
+
 from django.db import models
 
 class CategoryNode(models.Model):
@@ -41,17 +43,58 @@ class CategoryNode(models.Model):
     def __unicode__(self):
         return "/" + "/".join(map(lambda x: x.name, self.path()))
 
+class Dictionary(models.Model):
+    pass
+
+class Word(models.Model):
+    dictionary = models.ForeignKey(Dictionary, related_name='words')
+
+    name = models.CharField(max_length=300)
+
+    def __unicode__(self):
+        return self.name
+
+def _extract_dictionary(subtitles):
+    """Split subtitles into list of words."""
+    s = subtitles.lower()
+    s = re.sub(r"[^A-Za-z-]", " ", s)
+    l = s.split(" ")
+    l = filter(None, l)
+    return set(l)
+
 class Episode(models.Model):
     category = models.ForeignKey(CategoryNode, related_name='episodes')
     
     name = models.CharField(max_length=300)
     description = models.TextField()
     
-    subtitles = models.TextField()
-    # TODO: Dictionaty etc.
+    subtitles = models.TextField(blank=True, null=True)
+
+    dictionary = models.ForeignKey(Dictionary, related_name='episodes',
+        on_delete=models.SET_NULL, blank=True, null=True)
 
     def __unicode__(self):
         return unicode(self.category) + "/" + self.name
+
+    def rebuild_dictionary(self):
+        # Remove old dictionary if exists.
+        if self.dictionary is not None:
+            self.dictionary.delete()
+
+            self.dictionary = None
+            self.dictionary.save()
+
+        # Fill dictionary if have subtitles.
+        if self.subtitles is not None:
+            words = _extract_dictionary(self.subtitles)
+
+            # Create new dictionary.
+            self.dictionary = Dictionary()
+            self.dictionary.save()
+
+            for word in words:
+                w = Word(name=word, dictionary=self.dictionary)
+                w.save()
 
 def root_category():
     return CategoryNode.objects.get(name="root")

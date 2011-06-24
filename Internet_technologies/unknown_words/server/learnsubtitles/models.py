@@ -24,9 +24,6 @@ class CategoryNode(models.Model):
     name = models.CharField(max_length=300)
     description = models.TextField(blank=True, null=True)
 
-    def __unicode__(self):
-        return self.name
-
     def path(self):
         """Returns path to current category: list of categories from root to
         current category, starting with first non-root parent and ending with 
@@ -41,6 +38,9 @@ class CategoryNode(models.Model):
 
         return path
 
+    def __unicode__(self):
+        return "/" + "/".join(map(lambda x: x.name, self.path()))
+
 class Episode(models.Model):
     category = models.ForeignKey(CategoryNode, related_name='episodes')
     
@@ -53,6 +53,8 @@ class Episode(models.Model):
     def __unicode__(self):
         return self.name
 
+    def __unicode__(self):
+        return unicode(self.category) + "/" + self.name
 def root_category():
     return CategoryNode.objects.get(name="root")
 

@@ -51,10 +51,8 @@ class Episode(models.Model):
     # TODO: Dictionaty etc.
 
     def __unicode__(self):
-        return self.name
-
-    def __unicode__(self):
         return unicode(self.category) + "/" + self.name
+
 def root_category():
     return CategoryNode.objects.get(name="root")
 
